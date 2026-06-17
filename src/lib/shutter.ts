@@ -21,10 +21,49 @@ export type LandingMemory = {
   body: string;
 };
 
+export type LandingSectionKey =
+  | "hero"
+  | "tenuta"
+  | "corallo"
+  | "archive"
+  | "vigna"
+  | "cantina"
+  | "memoria"
+  | "contatti";
+
+export type LandingSectionMarker = {
+  referenceId: string;
+  menuLabel: string;
+};
+
 export type LandingContent = {
+  brand: {
+    name: string;
+    mark: string;
+    homeAriaLabel: string;
+    crestAriaLabel: string;
+    wordmark: {
+      light: LandingImage;
+      dark: LandingImage;
+    };
+    crest: {
+      light: LandingImage;
+      dark: LandingImage;
+    };
+    diamond: {
+      light: LandingImage;
+      dark: LandingImage;
+    };
+  };
+  menu: {
+    sections: Record<LandingSectionKey, LandingSectionMarker>;
+    darkSections: LandingSectionKey[];
+  };
   navigation: LandingNavItem[];
   hero: {
     eyebrow: string;
+    secondaryEyebrow: string;
+    scrollLabel: string;
     title: string;
     subtitle: string;
     body: string;
@@ -50,6 +89,7 @@ export type LandingContent = {
     items: LandingMemory[];
   };
   contact: {
+    eyebrow: string;
     title: string;
     email: string;
     location: string;
@@ -58,6 +98,79 @@ export type LandingContent = {
 };
 
 export const fallbackLandingContent: LandingContent = {
+  brand: {
+    name: "Tenuta Montenisa",
+    mark: "M77",
+    homeAriaLabel: "Marchese Antinori Tenuta Montenisa home",
+    crestAriaLabel: "Tenuta Montenisa home",
+    wordmark: {
+      light: {
+        src: "/brand/marchese-antinori-wordmark-light.svg",
+        alt: "Marchese Antinori",
+      },
+      dark: {
+        src: "/brand/marchese-antinori-wordmark-dark.svg",
+        alt: "Marchese Antinori",
+      },
+    },
+    crest: {
+      light: {
+        src: "/brand/marchese-antinori-logo-light.svg",
+        alt: "Tenuta Montenisa crest",
+      },
+      dark: {
+        src: "/brand/marchese-antinori-logo-dark.svg",
+        alt: "Tenuta Montenisa crest",
+      },
+    },
+    diamond: {
+      light: {
+        src: "/brand/menu-diamond-light.svg",
+        alt: "",
+      },
+      dark: {
+        src: "/brand/menu-diamond-dark.svg",
+        alt: "",
+      },
+    },
+  },
+  menu: {
+    sections: {
+      hero: {
+        referenceId: "la-franciacorta",
+        menuLabel: "La Franciacorta",
+      },
+      tenuta: {
+        referenceId: "la-tenuta",
+        menuLabel: "La Tenuta",
+      },
+      corallo: {
+        referenceId: "gli-spumanti",
+        menuLabel: "Gli Spumanti",
+      },
+      archive: {
+        referenceId: "curtes-francae",
+        menuLabel: "Curtes Francae",
+      },
+      vigna: {
+        referenceId: "la-vigna",
+        menuLabel: "I Vigneti",
+      },
+      cantina: {
+        referenceId: "visita-la-cantina",
+        menuLabel: "Visita la Cantina",
+      },
+      memoria: {
+        referenceId: "la-storia",
+        menuLabel: "La Storia",
+      },
+      contatti: {
+        referenceId: "contatti",
+        menuLabel: "Contatti",
+      },
+    },
+    darkSections: ["hero", "corallo", "vigna", "memoria"],
+  },
   navigation: [
     { label: "La Tenuta", href: "#tenuta" },
     { label: "Gli Spumanti", href: "#spumanti" },
@@ -66,6 +179,8 @@ export const fallbackLandingContent: LandingContent = {
   ],
   hero: {
     eyebrow: "Tenuta Montenisa",
+    secondaryEyebrow: "Franciacorta",
+    scrollLabel: "Scroll",
     title: "Nel cuore della Franciacorta",
     subtitle: "Una storia che custodisce meraviglia.",
     body:
@@ -167,6 +282,7 @@ export const fallbackLandingContent: LandingContent = {
     ],
   },
   contact: {
+    eyebrow: "Dove siamo",
     title: "Tenuta Montenisa",
     email: "studio@montenisa.it",
     location: "Calino, Franciacorta",
@@ -185,6 +301,14 @@ type DeepPartial<T> = {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
+const mergeImage = (
+  fallback: LandingImage,
+  content: DeepPartial<LandingImage> | undefined,
+): LandingImage => ({
+  ...fallback,
+  ...(isRecord(content) ? content : {}),
+});
+
 const mergeChapter = <T extends LandingChapter>(
   fallback: T,
   content: DeepPartial<T> | undefined,
@@ -197,11 +321,69 @@ const mergeChapter = <T extends LandingChapter>(
       : (content?.image as T["image"]) ?? fallback.image,
 });
 
+const mergeSectionMarkers = (
+  content: DeepPartial<LandingContent["menu"]["sections"]> | undefined,
+): LandingContent["menu"]["sections"] => {
+  const fallbackSections = fallbackLandingContent.menu.sections;
+  const nextSections = { ...fallbackSections };
+
+  (Object.keys(fallbackSections) as LandingSectionKey[]).forEach((section) => {
+    nextSections[section] = {
+      ...fallbackSections[section],
+      ...(isRecord(content?.[section]) ? content[section] : {}),
+    };
+  });
+
+  return nextSections;
+};
+
 const mergeContent = (
   content: DeepPartial<LandingContent>,
 ): LandingContent => ({
   ...fallbackLandingContent,
   ...content,
+  brand: {
+    ...fallbackLandingContent.brand,
+    ...(isRecord(content.brand) ? content.brand : {}),
+    wordmark: {
+      light: mergeImage(
+        fallbackLandingContent.brand.wordmark.light,
+        content.brand?.wordmark?.light,
+      ),
+      dark: mergeImage(
+        fallbackLandingContent.brand.wordmark.dark,
+        content.brand?.wordmark?.dark,
+      ),
+    },
+    crest: {
+      light: mergeImage(
+        fallbackLandingContent.brand.crest.light,
+        content.brand?.crest?.light,
+      ),
+      dark: mergeImage(
+        fallbackLandingContent.brand.crest.dark,
+        content.brand?.crest?.dark,
+      ),
+    },
+    diamond: {
+      light: mergeImage(
+        fallbackLandingContent.brand.diamond.light,
+        content.brand?.diamond?.light,
+      ),
+      dark: mergeImage(
+        fallbackLandingContent.brand.diamond.dark,
+        content.brand?.diamond?.dark,
+      ),
+    },
+  },
+  menu: {
+    ...fallbackLandingContent.menu,
+    ...(isRecord(content.menu) ? content.menu : {}),
+    sections: mergeSectionMarkers(content.menu?.sections),
+    darkSections: Array.isArray(content.menu?.darkSections)
+      ? content.menu.darkSections
+      : fallbackLandingContent.menu.darkSections,
+  },
   navigation: Array.isArray(content.navigation)
     ? content.navigation
     : fallbackLandingContent.navigation,
