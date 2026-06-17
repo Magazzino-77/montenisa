@@ -1,0 +1,20 @@
+{
+  "site": "montenisa",
+  "schemaKey": "m77.home",
+  "schemaVersion": "1.0.0",
+  "updatedAt": "2026-06-17T12:42:09.217Z",
+  "content": {
+    "hero": {
+      "eyebrow": "montenisa",
+      "title": "asdasdas",
+      "subtitle": "Designed, developed, and animated by humans."
+    },
+    "seo": {
+      "title": "montenisa — Custom Website",
+      "description": "montenisa: a bespoke, animation-rich website managed through Shutter."
+    },
+    "footer": {
+      "phone": "+39 02 0000 0000"
+    }
+  }
+}
