@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ede9e3;
+  --foreground: #101011;
+  --paper: #f7f4ef;
+  --ink: #101011;
+  --wine: #691c22;
+  --gold: #b29567;
+  --mist: #cfc7bb;
+  --graphite: #1a1a1a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-wine: var(--wine);
+  --color-gold: var(--gold);
+  --color-mist: var(--mist);
+  --color-graphite: var(--graphite);
+  --font-display: var(--font-display);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-menu: var(--font-menu);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: auto;
+  background: var(--background);
+}
+
+body {
+  min-width: 320px;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), sans-serif;
+}
+
+a {
+  text-underline-offset: 0.22em;
+}
+
+::selection {
+  background: var(--wine);
+  color: var(--paper);
+}
+
+.grain::before {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  content: "";
+  opacity: 0.085;
+  mix-blend-mode: multiply;
+  background-image:
+    linear-gradient(110deg, rgba(255, 255, 255, 0.18), transparent 45%),
+    repeating-radial-gradient(circle at 17% 23%, rgba(16, 16, 17, 0.18) 0 0.7px, transparent 0.8px 3px);
+}
+
+.text-pretty {
+  text-wrap: pretty;
+}
+
+.arch {
+  border-radius: 999px 999px 0 0;
+}
+
+.chapter-rule::before,
+.chapter-rule::after {
+  display: inline-block;
+  width: min(32vw, 260px);
+  height: 1px;
+  margin: 0 18px 0.35rem;
+  content: "";
+  background: currentColor;
+  opacity: 0.28;
+}
+
+.chapter-rule-dark::before,
+.chapter-rule-dark::after {
+  opacity: 0.22;
+}
+
+.archive-grid {
+  background-image:
+    linear-gradient(45deg, rgba(16, 16, 17, 0.055) 1px, transparent 1px),
+    linear-gradient(-45deg, rgba(16, 16, 17, 0.045) 1px, transparent 1px);
+  background-size: 116px 116px;
+}
+
+.menu-row-scroll {
+  scrollbar-width: none;
+}
+
+.menu-row-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .chapter-rule::before,
+  .chapter-rule::after {
+    width: 19vw;
+    margin-inline: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+}
