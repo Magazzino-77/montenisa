@@ -5,7 +5,12 @@ import { type MouseEvent, useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
-import type { LandingContent, LandingImage } from "@/lib/shutter";
+import type {
+  LandingContent,
+  LandingImage,
+  LandingSectionKey,
+  LandingSectionMarker,
+} from "@/lib/shutter";
 
 type LandingPageProps = {
   content: LandingContent;
@@ -40,24 +45,25 @@ function Figure({
   );
 }
 
-function Crest({ className = "" }: { className?: string }) {
+function Crest({ className = "", label }: { className?: string; label: string }) {
   return (
     <div
       className={`font-display text-[1.35rem] font-semibold leading-none ${className}`}
       aria-hidden="true"
     >
-      M77
+      {label}
     </div>
   );
 }
 
 function SectionReference({
-  id,
+  marker,
   tone = "light",
 }: {
-  id: string;
+  marker: LandingSectionMarker;
   tone?: "light" | "dark";
 }) {
+  const id = marker.referenceId;
   const toneClass =
     tone === "dark"
       ? "border-paper/12 bg-paper/[0.035] text-paper/36 hover:text-paper/70"
@@ -76,24 +82,11 @@ function SectionReference({
 }
 
 type MenuState = {
-  activeSection: string;
+  activeSection: LandingSectionKey;
   isDark: boolean;
   sectionLabel: string;
   showSectionLabel: boolean;
 };
-
-const menuLabels: Record<string, string> = {
-  hero: "La Franciacorta",
-  tenuta: "La Tenuta",
-  corallo: "Gli Spumanti",
-  archive: "Curtes Francae",
-  vigna: "I Vigneti",
-  cantina: "Visita la Cantina",
-  memoria: "La Storia",
-  contatti: "Contatti",
-};
-
-const darkMenuSections = new Set(["hero", "corallo", "vigna", "memoria"]);
 
 function SiteMenu({
   content,
@@ -107,24 +100,34 @@ function SiteMenu({
         background: "bg-[#1d1d1b]",
         text: "text-[#f1efee]",
         rule: "bg-[#f1efee]/36",
-        logo: "/brand/marchese-antinori-wordmark-light.svg",
-        crest: "/brand/marchese-antinori-logo-light.svg",
-        diamond: "/brand/menu-diamond-light.svg",
+        logo: content.brand.wordmark.light,
+        crest: content.brand.crest.light,
+        diamond: content.brand.diamond.light,
       }
     : {
         background: "bg-[#f7f4ef]",
         text: "text-ink",
         rule: "bg-ink/32",
-        logo: "/brand/marchese-antinori-wordmark-dark.svg",
-        crest: "/brand/marchese-antinori-logo-dark.svg",
-        diamond: "/brand/menu-diamond-dark.svg",
+        logo: content.brand.wordmark.dark,
+        crest: content.brand.crest.dark,
+        diamond: content.brand.diamond.dark,
       };
 
-  const hrefToSection: Record<string, string> = {
+  const hrefToSection: Record<string, LandingSectionKey> = {
+    "#top": "hero",
+    [`#${content.menu.sections.hero.referenceId}`]: "hero",
     "#tenuta": "tenuta",
+    [`#${content.menu.sections.tenuta.referenceId}`]: "tenuta",
     "#spumanti": "corallo",
+    [`#${content.menu.sections.corallo.referenceId}`]: "corallo",
+    [`#${content.menu.sections.archive.referenceId}`]: "archive",
+    "#vigna": "vigna",
+    [`#${content.menu.sections.vigna.referenceId}`]: "vigna",
     "#cantina": "cantina",
+    [`#${content.menu.sections.cantina.referenceId}`]: "cantina",
+    [`#${content.menu.sections.memoria.referenceId}`]: "memoria",
     "#contatti": "contatti",
+    [`#${content.menu.sections.contatti.referenceId}`]: "contatti",
   };
 
   return (
@@ -137,11 +140,11 @@ function SiteMenu({
           <a
             href="#top"
             className="relative block h-[36px] w-[178px] shrink-0 md:h-[61px] md:w-[300px]"
-            aria-label="Marchese Antinori Tenuta Montenisa home"
+            aria-label={content.brand.homeAriaLabel}
           >
             <Image
-              src={tone.logo}
-              alt=""
+              src={tone.logo.src}
+              alt={tone.logo.alt}
               fill
               priority
               sizes="(min-width: 768px) 300px, 178px"
@@ -152,11 +155,11 @@ function SiteMenu({
           <a
             href="#top"
             className="absolute left-1/2 top-1/2 block h-[62px] w-[82px] -translate-x-1/2 -translate-y-1/2 md:h-[98px] md:w-[128px]"
-            aria-label="Tenuta Montenisa home"
+            aria-label={content.brand.crestAriaLabel}
           >
             <Image
-              src={tone.crest}
-              alt=""
+              src={tone.crest.src}
+              alt={tone.crest.alt}
               fill
               priority
               sizes="(min-width: 768px) 128px, 82px"
@@ -207,8 +210,8 @@ function SiteMenu({
           <div className="overflow-hidden">
             <div className="flex items-center justify-center gap-4 py-3 md:py-4">
               <Image
-                src={tone.diamond}
-                alt=""
+                src={tone.diamond.src}
+                alt={tone.diamond.alt}
                 width={15}
                 height={15}
                 className="h-[11px] w-[11px] md:h-[15px] md:w-[15px]"
@@ -217,8 +220,8 @@ function SiteMenu({
                 {menuState.sectionLabel}
               </p>
               <Image
-                src={tone.diamond}
-                alt=""
+                src={tone.diamond.src}
+                alt={tone.diamond.alt}
                 width={15}
                 height={15}
                 className="h-[11px] w-[11px] md:h-[15px] md:w-[15px]"
@@ -236,8 +239,8 @@ export default function LandingPage({ content }: LandingPageProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const [menuState, setMenuState] = useState<MenuState>({
     activeSection: "hero",
-    isDark: true,
-    sectionLabel: menuLabels.hero,
+    isDark: content.menu.darkSections.includes("hero"),
+    sectionLabel: content.menu.sections.hero.menuLabel,
     showSectionLabel: false,
   });
 
@@ -312,17 +315,20 @@ export default function LandingPage({ content }: LandingPageProps) {
     }
 
     const context = gsap.context(() => {
-      const updateMenu = (section: string) => {
+      const darkMenuSections = new Set(content.menu.darkSections);
+      const updateMenu = (section: LandingSectionKey) => {
         setMenuState({
           activeSection: section,
           isDark: darkMenuSections.has(section),
-          sectionLabel: menuLabels[section] ?? "La Franciacorta",
+          sectionLabel:
+            content.menu.sections[section]?.menuLabel ??
+            content.menu.sections.hero.menuLabel,
           showSectionLabel: section !== "hero",
         });
       };
 
       gsap.utils.toArray<HTMLElement>("[data-section]").forEach((element) => {
-        const section = element.dataset.section ?? "hero";
+        const section = (element.dataset.section ?? "hero") as LandingSectionKey;
 
         ScrollTrigger.create({
           trigger: element,
@@ -375,7 +381,7 @@ export default function LandingPage({ content }: LandingPageProps) {
     }, rootRef);
 
     return () => context.revert();
-  }, []);
+  }, [content.menu.darkSections, content.menu.sections]);
 
   return (
     <div
@@ -390,7 +396,7 @@ export default function LandingPage({ content }: LandingPageProps) {
           data-section="hero"
           className="relative flex min-h-[100svh] items-center justify-center bg-ink px-5 pb-16 pt-36 text-paper md:px-8 md:pt-48"
         >
-          <SectionReference id="la-franciacorta" tone="dark" />
+          <SectionReference marker={content.menu.sections.hero} tone="dark" />
           <div className="absolute inset-0 opacity-[0.48]">
             <Image
               src={content.hero.image.src}
@@ -408,8 +414,8 @@ export default function LandingPage({ content }: LandingPageProps) {
               data-hero-reveal
               className="flex items-center justify-between border-y border-paper/26 py-2 font-mono text-[0.62rem] uppercase tracking-[0.2em] text-paper/70"
             >
-              <span>Tenuta Montenisa</span>
-              <span>Franciacorta</span>
+              <span>{content.hero.eyebrow}</span>
+              <span>{content.hero.secondaryEyebrow}</span>
             </div>
 
             <div className="mx-auto max-w-[920px] text-center">
@@ -438,7 +444,7 @@ export default function LandingPage({ content }: LandingPageProps) {
               className="mx-auto flex items-center gap-4 font-mono text-[0.64rem] uppercase tracking-[0.18em] text-paper/72"
             >
               <span className="h-px w-14 bg-paper/34" />
-              <span>Scroll</span>
+              <span>{content.hero.scrollLabel}</span>
               <span className="h-px w-14 bg-paper/34" />
             </div>
           </div>
@@ -449,10 +455,10 @@ export default function LandingPage({ content }: LandingPageProps) {
           data-section="tenuta"
           className="relative bg-paper px-5 py-[4.5rem] md:px-8 md:py-28"
         >
-          <SectionReference id="la-tenuta" />
+          <SectionReference marker={content.menu.sections.tenuta} />
           <div className="mx-auto max-w-[1560px]">
             <div className="chapter-rule text-center text-ink/72">
-              <Crest className="mx-auto text-ink" />
+              <Crest label={content.brand.mark} className="mx-auto text-ink" />
               <p className="mt-4 font-mono text-[0.62rem] uppercase tracking-[0.22em]">
                 {content.introduction.eyebrow}
               </p>
@@ -505,10 +511,10 @@ export default function LandingPage({ content }: LandingPageProps) {
           data-section="corallo"
           className="relative bg-ink px-5 py-[4.5rem] text-paper md:px-8 md:py-28"
         >
-          <SectionReference id="gli-spumanti" tone="dark" />
+          <SectionReference marker={content.menu.sections.corallo} tone="dark" />
           <div className="mx-auto max-w-[1560px]">
             <div className="chapter-rule chapter-rule-dark text-center text-paper/72">
-              <Crest className="mx-auto text-paper" />
+              <Crest label={content.brand.mark} className="mx-auto text-paper" />
               <p className="mt-4 font-mono text-[0.62rem] uppercase tracking-[0.22em]">
                 {content.product.eyebrow}
               </p>
@@ -553,7 +559,7 @@ export default function LandingPage({ content }: LandingPageProps) {
           data-section="archive"
           className="archive-grid relative bg-paper px-5 py-[4.5rem] md:px-8 md:py-32"
         >
-          <SectionReference id="curtes-francae" />
+          <SectionReference marker={content.menu.sections.archive} />
           <div className="mx-auto grid max-w-[1180px] gap-10 text-center">
             <div
               data-drift
@@ -591,7 +597,7 @@ export default function LandingPage({ content }: LandingPageProps) {
           data-section="vigna"
           className="relative bg-ink px-5 py-[4.5rem] text-paper md:px-8 md:py-28"
         >
-          <SectionReference id="la-vigna" tone="dark" />
+          <SectionReference marker={content.menu.sections.vigna} tone="dark" />
           <div className="mx-auto grid max-w-[1380px] gap-12 lg:grid-cols-[0.58fr_0.42fr] lg:items-center">
             <Figure
               image={content.vineyard.image!}
@@ -617,7 +623,7 @@ export default function LandingPage({ content }: LandingPageProps) {
           data-section="cantina"
           className="relative bg-paper px-5 py-[4.5rem] md:px-8 md:py-28"
         >
-          <SectionReference id="visita-la-cantina" />
+          <SectionReference marker={content.menu.sections.cantina} />
           <div className="mx-auto max-w-[1320px]">
             <div className="relative min-h-[780px] md:min-h-[900px]">
               <Figure
@@ -661,10 +667,10 @@ export default function LandingPage({ content }: LandingPageProps) {
           data-section="memoria"
           className="relative bg-ink px-5 py-20 text-paper md:px-8 md:py-32"
         >
-          <SectionReference id="la-storia" tone="dark" />
+          <SectionReference marker={content.menu.sections.memoria} tone="dark" />
           <div className="mx-auto max-w-[1560px]">
             <div className="chapter-rule chapter-rule-dark text-center text-paper/72">
-              <Crest className="mx-auto text-paper" />
+              <Crest label={content.brand.mark} className="mx-auto text-paper" />
               <p className="mt-4 font-mono text-[0.62rem] uppercase tracking-[0.22em]">
                 {content.memory.eyebrow}
               </p>
@@ -707,17 +713,22 @@ export default function LandingPage({ content }: LandingPageProps) {
         data-section="contatti"
         className="relative bg-paper px-5 py-12 text-ink md:px-8 md:py-16"
       >
-        <SectionReference id="contatti" />
+        <SectionReference marker={content.menu.sections.contatti} />
         <div className="mx-auto grid max-w-[1560px] gap-8 border-y border-ink/18 py-8 md:grid-cols-[1fr_auto_1fr] md:items-center">
           <div>
             <p className="font-mono text-[0.62rem] uppercase tracking-[0.18em] text-ink/60">
-              Dove siamo
+              {content.contact.eyebrow}
             </p>
             <p className="mt-2 font-display text-2xl">
               {content.contact.location}
             </p>
           </div>
-          <Crest className="text-center" />
+          <div className="text-center">
+            <Crest label={content.brand.mark} className="text-center" />
+            <p className="mt-3 font-display text-xl leading-none">
+              {content.contact.title}
+            </p>
+          </div>
           <div className="md:text-right">
             <a
               className="font-display text-2xl transition hover:text-wine"
