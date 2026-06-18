@@ -20,6 +20,7 @@ type FigureProps = {
   image: LandingImage;
   className?: string;
   imageClassName?: string;
+  shutterKey?: string;
   priority?: boolean;
   sizes?: string;
 };
@@ -28,11 +29,15 @@ function Figure({
   image,
   className = "",
   imageClassName = "",
+  shutterKey,
   priority = false,
   sizes = "(min-width: 1024px) 40vw, 100vw",
 }: FigureProps) {
   return (
-    <figure className={`relative overflow-hidden ${className}`}>
+    <figure
+      className={`relative overflow-hidden ${className}`}
+      data-shutter-key={shutterKey}
+    >
       <Image
         src={image.src}
         alt={image.alt}
@@ -45,10 +50,19 @@ function Figure({
   );
 }
 
-function Crest({ className = "", label }: { className?: string; label: string }) {
+function Crest({
+  className = "",
+  label,
+  shutterKey,
+}: {
+  className?: string;
+  label: string;
+  shutterKey?: string;
+}) {
   return (
     <div
       className={`font-display text-[1.35rem] font-semibold leading-none ${className}`}
+      data-shutter-key={shutterKey}
       aria-hidden="true"
     >
       {label}
@@ -58,9 +72,11 @@ function Crest({ className = "", label }: { className?: string; label: string })
 
 function SectionReference({
   marker,
+  shutterKey,
   tone = "light",
 }: {
   marker: LandingSectionMarker;
+  shutterKey?: string;
   tone?: "light" | "dark";
 }) {
   const id = marker.referenceId;
@@ -74,6 +90,7 @@ function SectionReference({
       id={id}
       href={`#${id}`}
       className={`absolute left-5 top-36 z-20 scroll-mt-36 border px-2 py-1 font-mono text-[0.58rem] uppercase tracking-[0.16em] transition md:left-8 md:top-44 ${toneClass}`}
+      data-shutter-key={shutterKey}
       aria-label={`Section reference ${id}`}
     >
       #{id}
@@ -171,17 +188,18 @@ function SiteMenu({
             aria-label="Primary navigation"
             className="hidden items-center gap-[2.15rem] font-menu text-[0.78rem] font-semibold uppercase leading-none tracking-[0.08em] md:flex"
           >
-            {content.navigation.map((item) => {
+            {content.navigation.map((item, index) => {
               const isActive = hrefToSection[item.href] === menuState.activeSection;
 
               return (
                 <a
                   key={item.href}
-                  className={`whitespace-nowrap transition-opacity hover:opacity-65 ${
-                    isActive ? "font-black" : ""
-                  }`}
-                  href={item.href}
-                >
+                    className={`whitespace-nowrap transition-opacity hover:opacity-65 ${
+                      isActive ? "font-black" : ""
+                    }`}
+                    data-shutter-key={`navigation.${index}.label`}
+                    href={item.href}
+                  >
                   {item.label}
                 </a>
               );
@@ -192,8 +210,13 @@ function SiteMenu({
         <div className={`h-px w-full ${tone.rule}`} />
 
         <div className="menu-row-scroll flex gap-6 overflow-x-auto py-3 font-menu text-[0.7rem] font-semibold uppercase tracking-[0.08em] md:hidden">
-          {content.navigation.map((item) => (
-            <a key={item.href} className="shrink-0" href={item.href}>
+            {content.navigation.map((item, index) => (
+              <a
+                key={item.href}
+                className="shrink-0"
+                data-shutter-key={`navigation.${index}.label`}
+                href={item.href}
+              >
               {item.label}
             </a>
           ))}
@@ -216,7 +239,10 @@ function SiteMenu({
                 height={15}
                 className="h-[11px] w-[11px] md:h-[15px] md:w-[15px]"
               />
-              <p className="font-menu text-[0.78rem] font-bold uppercase leading-none tracking-[0.16em] md:text-base">
+              <p
+                className="font-menu text-[0.78rem] font-bold uppercase leading-none tracking-[0.16em] md:text-base"
+                data-shutter-key={`menu.sections.${menuState.activeSection}.menuLabel`}
+              >
                 {menuState.sectionLabel}
               </p>
               <Image
@@ -396,11 +422,15 @@ export default function LandingPage({ content }: LandingPageProps) {
           data-section="hero"
           className="relative flex min-h-[100svh] items-center justify-center bg-ink px-5 pb-16 pt-36 text-paper md:px-8 md:pt-48"
         >
-          <SectionReference marker={content.menu.sections.hero} tone="dark" />
+          <SectionReference
+            marker={content.menu.sections.hero}
+            shutterKey="menu.sections.hero.referenceId"
+            tone="dark"
+          />
           <div className="absolute inset-0 opacity-[0.48]">
-            <Image
-              src={content.hero.image.src}
-              alt={content.hero.image.alt}
+              <Image
+                src={content.hero.image.src}
+                alt={content.hero.image.alt}
               fill
               priority
               sizes="100vw"
@@ -414,27 +444,34 @@ export default function LandingPage({ content }: LandingPageProps) {
               data-hero-reveal
               className="flex items-center justify-between border-y border-paper/26 py-2 font-mono text-[0.62rem] uppercase tracking-[0.2em] text-paper/70"
             >
-              <span>{content.hero.eyebrow}</span>
-              <span>{content.hero.secondaryEyebrow}</span>
+                <span data-shutter-key="hero.eyebrow">
+                  {content.hero.eyebrow}
+                </span>
+                <span data-shutter-key="hero.secondaryEyebrow">
+                  {content.hero.secondaryEyebrow}
+                </span>
             </div>
 
             <div className="mx-auto max-w-[920px] text-center">
-              <p
-                data-hero-reveal
-                className="font-display text-[clamp(1.55rem,3vw,3.7rem)] italic leading-tight text-paper/88"
-              >
+                <p
+                  data-hero-reveal
+                  className="font-display text-[clamp(1.55rem,3vw,3.7rem)] italic leading-tight text-paper/88"
+                  data-shutter-key="hero.subtitle"
+                >
                 {content.hero.subtitle}
               </p>
-              <h1
-                data-hero-reveal
-                className="mx-auto mt-5 max-w-[12ch] font-display text-[clamp(3rem,12vw,3.45rem)] font-semibold leading-[0.86] text-paper md:text-[clamp(3.8rem,9vw,10.5rem)] md:leading-[0.84]"
-              >
-                {content.hero.title}
+                <h1
+                  data-hero-reveal
+                  className="mx-auto mt-5 max-w-[12ch] font-display text-[clamp(3rem,12vw,3.45rem)] font-semibold leading-[0.86] text-paper md:text-[clamp(3.8rem,9vw,10.5rem)] md:leading-[0.84]"
+                  data-shutter-key="hero.headline"
+                >
+                {content.hero.headline}
               </h1>
-              <p
-                data-hero-reveal
-                className="mx-auto mt-7 max-w-[620px] text-pretty text-sm leading-7 text-paper/76 md:text-base"
-              >
+                <p
+                  data-hero-reveal
+                  className="mx-auto mt-7 max-w-[620px] text-pretty text-sm leading-7 text-paper/76 md:text-base"
+                  data-shutter-key="hero.body"
+                >
                 {content.hero.body}
               </p>
             </div>
@@ -444,7 +481,9 @@ export default function LandingPage({ content }: LandingPageProps) {
               className="mx-auto flex items-center gap-4 font-mono text-[0.64rem] uppercase tracking-[0.18em] text-paper/72"
             >
               <span className="h-px w-14 bg-paper/34" />
-              <span>{content.hero.scrollLabel}</span>
+                <span data-shutter-key="hero.scrollLabel">
+                  {content.hero.scrollLabel}
+                </span>
               <span className="h-px w-14 bg-paper/34" />
             </div>
           </div>
@@ -455,27 +494,39 @@ export default function LandingPage({ content }: LandingPageProps) {
           data-section="tenuta"
           className="relative bg-paper px-5 py-[4.5rem] md:px-8 md:py-28"
         >
-          <SectionReference marker={content.menu.sections.tenuta} />
+            <SectionReference
+              marker={content.menu.sections.tenuta}
+              shutterKey="menu.sections.tenuta.referenceId"
+            />
           <div className="mx-auto max-w-[1560px]">
             <div className="chapter-rule text-center text-ink/72">
-              <Crest label={content.brand.mark} className="mx-auto text-ink" />
-              <p className="mt-4 font-mono text-[0.62rem] uppercase tracking-[0.22em]">
+                <Crest
+                  label={content.brand.mark}
+                  shutterKey="brand.mark"
+                  className="mx-auto text-ink"
+                />
+                <p
+                  className="mt-4 font-mono text-[0.62rem] uppercase tracking-[0.22em]"
+                  data-shutter-key="introduction.eyebrow"
+                >
                 {content.introduction.eyebrow}
               </p>
             </div>
 
             <h2
-              data-reveal
-              className="mx-auto mt-12 max-w-[18ch] text-center font-display text-[clamp(2.25rem,5vw,5.8rem)] font-medium leading-[0.95] text-ink"
-            >
-              {content.introduction.title}
+                data-reveal
+                className="mx-auto mt-12 max-w-[18ch] text-center font-display text-[clamp(2.25rem,5vw,5.8rem)] font-medium leading-[0.95] text-ink"
+                data-shutter-key="introduction.headline"
+              >
+              {content.introduction.headline}
             </h2>
 
             <div className="mx-auto mt-14 grid max-w-[1080px] grid-cols-3 gap-3 md:gap-8">
               {[0, 1, 2].map((index) => (
                 <Figure
-                  key={index}
-                  image={content.introduction.image!}
+                    key={index}
+                    image={content.introduction.image!}
+                    shutterKey="introduction.image"
                   className="arch aspect-[0.62] border border-ink/12"
                   imageClassName={`scale-125 ${
                     index === 0
@@ -493,11 +544,14 @@ export default function LandingPage({ content }: LandingPageProps) {
               data-reveal
               className="mx-auto mt-14 max-w-[720px] text-center text-sm leading-7 text-ink/68 md:text-base"
             >
-              <p>{content.introduction.body}</p>
-              <a
-                href="#spumanti"
-                className="mt-8 inline-flex items-center gap-4 font-mono text-[0.64rem] uppercase tracking-[0.18em] text-ink transition hover:text-wine"
-              >
+                <p data-shutter-key="introduction.body">
+                  {content.introduction.body}
+                </p>
+                <a
+                  href="#spumanti"
+                  className="mt-8 inline-flex items-center gap-4 font-mono text-[0.64rem] uppercase tracking-[0.18em] text-ink transition hover:text-wine"
+                  data-shutter-key="introduction.cta"
+                >
                 <span className="h-px w-12 bg-current" />
                 {content.introduction.cta}
                 <span className="h-px w-12 bg-current" />
@@ -511,32 +565,46 @@ export default function LandingPage({ content }: LandingPageProps) {
           data-section="corallo"
           className="relative bg-ink px-5 py-[4.5rem] text-paper md:px-8 md:py-28"
         >
-          <SectionReference marker={content.menu.sections.corallo} tone="dark" />
+            <SectionReference
+              marker={content.menu.sections.corallo}
+              shutterKey="menu.sections.corallo.referenceId"
+              tone="dark"
+            />
           <div className="mx-auto max-w-[1560px]">
             <div className="chapter-rule chapter-rule-dark text-center text-paper/72">
-              <Crest label={content.brand.mark} className="mx-auto text-paper" />
-              <p className="mt-4 font-mono text-[0.62rem] uppercase tracking-[0.22em]">
+                <Crest
+                  label={content.brand.mark}
+                  shutterKey="brand.mark"
+                  className="mx-auto text-paper"
+                />
+                <p
+                  className="mt-4 font-mono text-[0.62rem] uppercase tracking-[0.22em]"
+                  data-shutter-key="product.eyebrow"
+                >
                 {content.product.eyebrow}
               </p>
             </div>
 
             <div className="mx-auto mt-12 grid max-w-[1180px] gap-10 text-center">
               <h2
-                data-reveal
-                className="font-display text-[clamp(2.7rem,7vw,7.4rem)] font-medium italic leading-none"
-              >
-                {content.product.title}
+                  data-reveal
+                  className="font-display text-[clamp(2.7rem,7vw,7.4rem)] font-medium italic leading-none"
+                  data-shutter-key="product.headline"
+                >
+                {content.product.headline}
               </h2>
               <Figure
-                image={content.product.image!}
+                  image={content.product.image!}
+                  shutterKey="product.image"
                 className="mx-auto aspect-[0.75] w-full max-w-[420px] border border-paper/14"
                 imageClassName="object-[50%_50%]"
                 sizes="(min-width: 768px) 420px, 86vw"
               />
               <p
-                data-reveal
-                className="mx-auto max-w-[620px] text-sm leading-7 text-paper/70 md:text-base"
-              >
+                  data-reveal
+                  className="mx-auto max-w-[620px] text-sm leading-7 text-paper/70 md:text-base"
+                  data-shutter-key="product.body"
+                >
                 {content.product.body}
               </p>
             </div>
@@ -544,8 +612,9 @@ export default function LandingPage({ content }: LandingPageProps) {
             <div className="mt-16 grid gap-5 md:grid-cols-3">
               {content.product.gallery.map((image, index) => (
                 <Figure
-                  key={`${image.src}-${index}`}
-                  image={image}
+                    key={`${image.src}-${index}`}
+                    image={image}
+                    shutterKey={`product.gallery.${index}`}
                   className="aspect-[0.84] border border-paper/12"
                   imageClassName="transition duration-700 hover:scale-105"
                   sizes="(min-width: 768px) 31vw, 100vw"
@@ -559,32 +628,41 @@ export default function LandingPage({ content }: LandingPageProps) {
           data-section="archive"
           className="archive-grid relative bg-paper px-5 py-[4.5rem] md:px-8 md:py-32"
         >
-          <SectionReference marker={content.menu.sections.archive} />
+            <SectionReference
+              marker={content.menu.sections.archive}
+              shutterKey="menu.sections.archive.referenceId"
+            />
           <div className="mx-auto grid max-w-[1180px] gap-10 text-center">
             <div
               data-drift
               className="mx-auto h-48 w-48 rounded-full border border-wine/40 bg-wine shadow-[inset_0_18px_28px_rgba(255,255,255,0.16),0_24px_50px_rgba(74,16,20,0.24)] md:h-64 md:w-64"
               aria-hidden="true"
             />
-            <p className="font-mono text-[0.62rem] uppercase tracking-[0.22em] text-wine">
+              <p
+                className="font-mono text-[0.62rem] uppercase tracking-[0.22em] text-wine"
+                data-shutter-key="archive.eyebrow"
+              >
               {content.archive.eyebrow}
             </p>
             <h2
-              data-reveal
-              className="mx-auto max-w-[11ch] font-display text-[clamp(3rem,8vw,8rem)] font-medium uppercase leading-[0.9] text-ink"
-            >
-              {content.archive.title}
+                data-reveal
+                className="mx-auto max-w-[11ch] font-display text-[clamp(3rem,8vw,8rem)] font-medium uppercase leading-[0.9] text-ink"
+                data-shutter-key="archive.headline"
+              >
+              {content.archive.headline}
             </h2>
             <p
-              data-reveal
-              className="mx-auto max-w-[680px] text-sm uppercase leading-7 tracking-[0.06em] text-ink/72"
-            >
+                data-reveal
+                className="mx-auto max-w-[680px] text-sm uppercase leading-7 tracking-[0.06em] text-ink/72"
+                data-shutter-key="archive.body"
+              >
               {content.archive.body}
             </p>
             <div
-              data-reveal
-              className="mx-auto flex items-center gap-4 font-mono text-[0.62rem] uppercase tracking-[0.18em] text-ink/58"
-            >
+                data-reveal
+                className="mx-auto flex items-center gap-4 font-mono text-[0.62rem] uppercase tracking-[0.18em] text-ink/58"
+                data-shutter-key="archive.sealLabel"
+              >
               <span className="h-px w-12 bg-current" />
               {content.archive.sealLabel}
               <span className="h-px w-12 bg-current" />
@@ -597,21 +675,35 @@ export default function LandingPage({ content }: LandingPageProps) {
           data-section="vigna"
           className="relative bg-ink px-5 py-[4.5rem] text-paper md:px-8 md:py-28"
         >
-          <SectionReference marker={content.menu.sections.vigna} tone="dark" />
+            <SectionReference
+              marker={content.menu.sections.vigna}
+              shutterKey="menu.sections.vigna.referenceId"
+              tone="dark"
+            />
           <div className="mx-auto grid max-w-[1380px] gap-12 lg:grid-cols-[0.58fr_0.42fr] lg:items-center">
             <Figure
-              image={content.vineyard.image!}
+                image={content.vineyard.image!}
+                shutterKey="vineyard.image"
               className="aspect-[0.9] border border-paper/12 lg:aspect-[0.82]"
               sizes="(min-width: 1024px) 50vw, 100vw"
             />
             <div data-reveal className="lg:pl-8">
-              <p className="font-mono text-[0.62rem] uppercase tracking-[0.22em] text-gold">
+                <p
+                  className="font-mono text-[0.62rem] uppercase tracking-[0.22em] text-gold"
+                  data-shutter-key="vineyard.eyebrow"
+                >
                 {content.vineyard.eyebrow}
               </p>
-              <h2 className="mt-6 max-w-[9ch] font-display text-[clamp(3.3rem,7vw,7.4rem)] font-medium uppercase leading-[0.9]">
-                {content.vineyard.title}
+                <h2
+                  className="mt-6 max-w-[9ch] font-display text-[clamp(3.3rem,7vw,7.4rem)] font-medium uppercase leading-[0.9]"
+                  data-shutter-key="vineyard.headline"
+                >
+                {content.vineyard.headline}
               </h2>
-              <p className="mt-8 max-w-[560px] text-sm leading-7 text-paper/70 md:text-base">
+                <p
+                  className="mt-8 max-w-[560px] text-sm leading-7 text-paper/70 md:text-base"
+                  data-shutter-key="vineyard.body"
+                >
                 {content.vineyard.body}
               </p>
             </div>
@@ -623,16 +715,21 @@ export default function LandingPage({ content }: LandingPageProps) {
           data-section="cantina"
           className="relative bg-paper px-5 py-[4.5rem] md:px-8 md:py-28"
         >
-          <SectionReference marker={content.menu.sections.cantina} />
+            <SectionReference
+              marker={content.menu.sections.cantina}
+              shutterKey="menu.sections.cantina.referenceId"
+            />
           <div className="mx-auto max-w-[1320px]">
             <div className="relative min-h-[780px] md:min-h-[900px]">
               <Figure
-                image={content.cellar.image!}
+                  image={content.cellar.image!}
+                  shutterKey="cellar.image"
                 className="arch absolute left-0 top-0 aspect-[0.58] w-[54%] max-w-[470px] border border-ink/12 md:w-[34%]"
                 sizes="(min-width: 768px) 34vw, 54vw"
               />
               <Figure
-                image={content.cellar.secondaryImage}
+                  image={content.cellar.secondaryImage}
+                  shutterKey="cellar.secondaryImage"
                 className="arch absolute right-0 top-[230px] aspect-[0.72] w-[48%] max-w-[390px] border border-ink/12 md:right-[8%] md:w-[28%]"
                 imageClassName="object-[48%_50%]"
                 sizes="(min-width: 768px) 28vw, 48vw"
@@ -641,19 +738,29 @@ export default function LandingPage({ content }: LandingPageProps) {
                 data-reveal
                 className="absolute left-1/2 top-[250px] w-[min(92vw,720px)] -translate-x-1/2 text-center md:top-[300px]"
               >
-                <p className="font-mono text-[0.62rem] uppercase tracking-[0.22em] text-wine">
+                  <p
+                    className="font-mono text-[0.62rem] uppercase tracking-[0.22em] text-wine"
+                    data-shutter-key="cellar.eyebrow"
+                  >
                   {content.cellar.eyebrow}
                 </p>
-                <h2 className="mt-5 font-display text-[clamp(3rem,7vw,7.6rem)] font-medium uppercase leading-[0.9] text-ink">
-                  {content.cellar.title}
+                  <h2
+                    className="mt-5 font-display text-[clamp(3rem,7vw,7.6rem)] font-medium uppercase leading-[0.9] text-ink"
+                    data-shutter-key="cellar.headline"
+                  >
+                  {content.cellar.headline}
                 </h2>
-                <p className="mx-auto mt-7 max-w-[560px] text-sm uppercase leading-7 tracking-[0.04em] text-ink/74">
+                  <p
+                    className="mx-auto mt-7 max-w-[560px] text-sm uppercase leading-7 tracking-[0.04em] text-ink/74"
+                    data-shutter-key="cellar.body"
+                  >
                   {content.cellar.body}
                 </p>
                 <a
-                  href="#contatti"
-                  className="mt-8 inline-flex items-center gap-4 font-mono text-[0.62rem] uppercase tracking-[0.18em] text-ink transition hover:text-wine"
-                >
+                    href="#contatti"
+                    className="mt-8 inline-flex items-center gap-4 font-mono text-[0.62rem] uppercase tracking-[0.18em] text-ink transition hover:text-wine"
+                    data-shutter-key="cellar.cta"
+                  >
                   <span className="h-px w-10 bg-current" />
                   {content.cellar.cta}
                   <span className="h-px w-10 bg-current" />
@@ -667,21 +774,33 @@ export default function LandingPage({ content }: LandingPageProps) {
           data-section="memoria"
           className="relative bg-ink px-5 py-20 text-paper md:px-8 md:py-32"
         >
-          <SectionReference marker={content.menu.sections.memoria} tone="dark" />
+            <SectionReference
+              marker={content.menu.sections.memoria}
+              shutterKey="menu.sections.memoria.referenceId"
+              tone="dark"
+            />
           <div className="mx-auto max-w-[1560px]">
             <div className="chapter-rule chapter-rule-dark text-center text-paper/72">
-              <Crest label={content.brand.mark} className="mx-auto text-paper" />
-              <p className="mt-4 font-mono text-[0.62rem] uppercase tracking-[0.22em]">
+                <Crest
+                  label={content.brand.mark}
+                  shutterKey="brand.mark"
+                  className="mx-auto text-paper"
+                />
+                <p
+                  className="mt-4 font-mono text-[0.62rem] uppercase tracking-[0.22em]"
+                  data-shutter-key="memory.eyebrow"
+                >
                 {content.memory.eyebrow}
               </p>
             </div>
 
             <div className="relative mt-[4.5rem] min-h-[640px] md:mt-24">
               <h2
-                aria-hidden="true"
-                className="pointer-events-none absolute left-1/2 top-1/2 w-max -translate-x-1/2 -translate-y-1/2 font-display text-[clamp(8rem,27vw,27rem)] font-medium uppercase leading-none text-paper/95"
-              >
-                {content.memory.title}
+                  aria-hidden="true"
+                  className="pointer-events-none absolute left-1/2 top-1/2 w-max -translate-x-1/2 -translate-y-1/2 font-display text-[clamp(8rem,27vw,27rem)] font-medium uppercase leading-none text-paper/95"
+                  data-shutter-key="memory.headline"
+                >
+                {content.memory.headline}
               </h2>
               <div className="relative z-10 grid gap-8 md:grid-cols-3 md:items-start">
                 {content.memory.items.map((item, index) => (
@@ -692,13 +811,22 @@ export default function LandingPage({ content }: LandingPageProps) {
                       index === 1 ? "md:mt-48" : index === 2 ? "md:mt-20" : ""
                     }`}
                   >
-                    <p className="font-mono text-[0.62rem] uppercase tracking-[0.22em] text-gold">
+                      <p
+                        className="font-mono text-[0.62rem] uppercase tracking-[0.22em] text-gold"
+                        data-shutter-key={`memory.items.${index}.number`}
+                      >
                       ({item.number})
                     </p>
-                    <h3 className="mt-4 font-display text-3xl font-medium leading-none">
-                      {item.title}
+                      <h3
+                        className="mt-4 font-display text-3xl font-medium leading-none"
+                        data-shutter-key={`memory.items.${index}.headline`}
+                      >
+                      {item.headline}
                     </h3>
-                    <p className="mt-5 text-sm leading-6 text-paper/70">
+                      <p
+                        className="mt-5 text-sm leading-6 text-paper/70"
+                        data-shutter-key={`memory.items.${index}.body`}
+                      >
                       {item.body}
                     </p>
                   </article>
@@ -713,30 +841,50 @@ export default function LandingPage({ content }: LandingPageProps) {
         data-section="contatti"
         className="relative bg-paper px-5 py-12 text-ink md:px-8 md:py-16"
       >
-        <SectionReference marker={content.menu.sections.contatti} />
+          <SectionReference
+            marker={content.menu.sections.contatti}
+            shutterKey="menu.sections.contatti.referenceId"
+          />
         <div className="mx-auto grid max-w-[1560px] gap-8 border-y border-ink/18 py-8 md:grid-cols-[1fr_auto_1fr] md:items-center">
           <div>
-            <p className="font-mono text-[0.62rem] uppercase tracking-[0.18em] text-ink/60">
+              <p
+                className="font-mono text-[0.62rem] uppercase tracking-[0.18em] text-ink/60"
+                data-shutter-key="contact.eyebrow"
+              >
               {content.contact.eyebrow}
             </p>
-            <p className="mt-2 font-display text-2xl">
+              <p
+                className="mt-2 font-display text-2xl"
+                data-shutter-key="contact.location"
+              >
               {content.contact.location}
             </p>
           </div>
           <div className="text-center">
-            <Crest label={content.brand.mark} className="text-center" />
-            <p className="mt-3 font-display text-xl leading-none">
+              <Crest
+                label={content.brand.mark}
+                shutterKey="brand.mark"
+                className="text-center"
+              />
+              <p
+                className="mt-3 font-display text-xl leading-none"
+                data-shutter-key="contact.title"
+              >
               {content.contact.title}
             </p>
           </div>
           <div className="md:text-right">
             <a
-              className="font-display text-2xl transition hover:text-wine"
-              href={`mailto:${content.contact.email}`}
-            >
+                className="font-display text-2xl transition hover:text-wine"
+                data-shutter-key="contact.email"
+                href={`mailto:${content.contact.email}`}
+              >
               {content.contact.email}
             </a>
-            <p className="mt-3 font-mono text-[0.58rem] uppercase tracking-[0.16em] text-ink/54">
+              <p
+                className="mt-3 font-mono text-[0.58rem] uppercase tracking-[0.16em] text-ink/54"
+                data-shutter-key="contact.legal"
+              >
               {content.contact.legal}
             </p>
           </div>
