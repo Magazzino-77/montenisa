@@ -10,14 +10,14 @@ export type LandingImage = {
 
 export type LandingChapter = {
   eyebrow: string;
-  title: string;
+  headline: string;
   body: string;
   image?: LandingImage;
 };
 
 export type LandingMemory = {
   number: string;
-  title: string;
+  headline: string;
   body: string;
 };
 
@@ -64,7 +64,7 @@ export type LandingContent = {
     eyebrow: string;
     secondaryEyebrow: string;
     scrollLabel: string;
-    title: string;
+    headline: string;
     subtitle: string;
     body: string;
     image: LandingImage;
@@ -75,7 +75,7 @@ export type LandingContent = {
   product: LandingChapter & {
     gallery: LandingImage[];
   };
-  archive: LandingChapter & {
+  archive: Omit<LandingChapter, "image"> & {
     sealLabel: string;
   };
   vineyard: LandingChapter;
@@ -85,7 +85,7 @@ export type LandingContent = {
   };
   memory: {
     eyebrow: string;
-    title: string;
+    headline: string;
     items: LandingMemory[];
   };
   contact: {
@@ -96,6 +96,16 @@ export type LandingContent = {
     legal: string;
   };
 };
+
+type DeepPartial<T> = {
+  [K in keyof T]?: T[K] extends Array<infer U>
+    ? U[]
+    : T[K] extends object
+      ? DeepPartial<T[K]>
+      : T[K];
+};
+
+type ContentPayload = DeepPartial<LandingContent> & Record<string, unknown>;
 
 export const fallbackLandingContent: LandingContent = {
   brand: {
@@ -181,7 +191,7 @@ export const fallbackLandingContent: LandingContent = {
     eyebrow: "Tenuta Montenisa",
     secondaryEyebrow: "Franciacorta",
     scrollLabel: "Scroll",
-    title: "Nel cuore della Franciacorta",
+    headline: "Nel cuore della Franciacorta",
     subtitle: "Una storia che custodisce meraviglia.",
     body:
       "Tra stanze di pietra, vigne ordinate e archivi di famiglia, Montenisa diventa una dimora narrativa: ogni sezione della homepage apre un capitolo, pronto per essere animato in dettaglio.",
@@ -192,7 +202,7 @@ export const fallbackLandingContent: LandingContent = {
   },
   introduction: {
     eyebrow: "La tenuta",
-    title: "Dove ogni meraviglia ha inizio",
+    headline: "Dove ogni meraviglia ha inizio",
     body:
       "La storica Tenuta Montenisa accoglie attraverso un luogo che custodisce vini, gesti e memoria. Questa pagina imposta il ritmo generale del prototipo: ingresso, scoperta, prodotto, archivio, vigna, cantina e memoria.",
     cta: "Scopri le meraviglie della tenuta",
@@ -203,7 +213,7 @@ export const fallbackLandingContent: LandingContent = {
   },
   product: {
     eyebrow: "Le meraviglie della tenuta",
-    title: "Il Corallo Rosa",
+    headline: "Il Corallo Rosa",
     body:
       "Una sezione scura e scenografica per il racconto dello spumante: un oggetto centrale, dettagli laterali e un ritmo più contemplativo, pronto per slider, parallax e micro-interazioni.",
     image: {
@@ -227,14 +237,14 @@ export const fallbackLandingContent: LandingContent = {
   },
   archive: {
     eyebrow: "Le promesse di origine",
-    title: "Curtes Francae",
+    headline: "Curtes Francae",
     body:
       "Il capitolo d'archivio lavora su pergamene, sigilli e tracce storiche. Per ora resta una sezione statica con elementi decorativi, pronta per una futura scena in cui le carte entrano e si sovrappongono allo scroll.",
     sealLabel: "Archivio Montenisa",
   },
   vineyard: {
     eyebrow: "I vigneti",
-    title: "La vigna custodisce",
+    headline: "La vigna custodisce",
     body:
       "Dove la natura lascia il tempo al metodo. Una sezione orizzontale, più silenziosa, che alterna fotografia e testo per preparare movimenti di camera, dissolvenze e progressioni lente.",
     image: {
@@ -244,7 +254,7 @@ export const fallbackLandingContent: LandingContent = {
   },
   cellar: {
     eyebrow: "Le cantine",
-    title: "La stanza nascosta",
+    headline: "La stanza nascosta",
     body:
       "Sotto i portici della Tenuta Montenisa si apre la stanza più segreta: la cantina. Qui il racconto cambia luce e scala, con forme ad arco e immagini sospese.",
     cta: "Le cantine e i segreti",
@@ -259,23 +269,23 @@ export const fallbackLandingContent: LandingContent = {
   },
   memory: {
     eyebrow: "La storia",
-    title: "Memoria viva",
+    headline: "Memoria viva",
     items: [
       {
         number: "01",
-        title: "La dimora",
+        headline: "La dimora",
         body:
           "Una casa agricola e nobile, fatta di soglie, portici e corti interne.",
       },
       {
         number: "02",
-        title: "Il paesaggio",
+        headline: "Il paesaggio",
         body:
           "La Franciacorta come territorio di precisione, attesa e trasformazione.",
       },
       {
         number: "03",
-        title: "Il sogno delle bollicine",
+        headline: "Il sogno delle bollicine",
         body:
           "La materia del vino incontra una forma più luminosa e contemporanea.",
       },
@@ -290,16 +300,323 @@ export const fallbackLandingContent: LandingContent = {
   },
 };
 
-type DeepPartial<T> = {
-  [K in keyof T]?: T[K] extends Array<infer U>
-    ? U[]
-    : T[K] extends object
-      ? DeepPartial<T[K]>
-      : T[K];
-};
+export const landingContentAudit = [
+  "brand.name",
+  "brand.mark",
+  "brand.homeAriaLabel",
+  "brand.crestAriaLabel",
+  "brand.wordmark.light.src",
+  "brand.wordmark.light.alt",
+  "brand.wordmark.dark.src",
+  "brand.wordmark.dark.alt",
+  "brand.crest.light.src",
+  "brand.crest.light.alt",
+  "brand.crest.dark.src",
+  "brand.crest.dark.alt",
+  "brand.diamond.light.src",
+  "brand.diamond.light.alt",
+  "brand.diamond.dark.src",
+  "brand.diamond.dark.alt",
+  "menu.sections.hero.referenceId",
+  "menu.sections.hero.menuLabel",
+  "menu.sections.tenuta.referenceId",
+  "menu.sections.tenuta.menuLabel",
+  "menu.sections.corallo.referenceId",
+  "menu.sections.corallo.menuLabel",
+  "menu.sections.archive.referenceId",
+  "menu.sections.archive.menuLabel",
+  "menu.sections.vigna.referenceId",
+  "menu.sections.vigna.menuLabel",
+  "menu.sections.cantina.referenceId",
+  "menu.sections.cantina.menuLabel",
+  "menu.sections.memoria.referenceId",
+  "menu.sections.memoria.menuLabel",
+  "menu.sections.contatti.referenceId",
+  "menu.sections.contatti.menuLabel",
+  "navigation[].label",
+  "navigation[].href",
+  "hero.eyebrow",
+  "hero.secondaryEyebrow",
+  "hero.scrollLabel",
+  "hero.headline",
+  "hero.subtitle",
+  "hero.body",
+  "hero.image.src",
+  "hero.image.alt",
+  "introduction.eyebrow",
+  "introduction.headline",
+  "introduction.body",
+  "introduction.cta",
+  "introduction.image.src",
+  "introduction.image.alt",
+  "product.eyebrow",
+  "product.headline",
+  "product.body",
+  "product.image.src",
+  "product.image.alt",
+  "product.gallery[].src",
+  "product.gallery[].alt",
+  "archive.eyebrow",
+  "archive.headline",
+  "archive.body",
+  "archive.sealLabel",
+  "vineyard.eyebrow",
+  "vineyard.headline",
+  "vineyard.body",
+  "vineyard.image.src",
+  "vineyard.image.alt",
+  "cellar.eyebrow",
+  "cellar.headline",
+  "cellar.body",
+  "cellar.cta",
+  "cellar.image.src",
+  "cellar.image.alt",
+  "cellar.secondaryImage.src",
+  "cellar.secondaryImage.alt",
+  "memory.eyebrow",
+  "memory.headline",
+  "memory.items[].number",
+  "memory.items[].headline",
+  "memory.items[].body",
+  "contact.eyebrow",
+  "contact.title",
+  "contact.email",
+  "contact.location",
+  "contact.legal",
+] as const;
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
+
+const withoutUndefined = <T extends Record<string, unknown>>(record: T) =>
+  Object.fromEntries(
+    Object.entries(record).filter(([, value]) => value !== undefined),
+  ) as Partial<T>;
+
+const pickString = (
+  record: Record<string, unknown> | undefined,
+  keys: string[],
+) => {
+  if (!record) {
+    return undefined;
+  }
+
+  for (const key of keys) {
+    const value = record[key];
+
+    if (typeof value === "string") {
+      return value;
+    }
+  }
+
+  return undefined;
+};
+
+const pickRecord = (
+  record: Record<string, unknown> | undefined,
+  keys: string[],
+) => {
+  if (!record) {
+    return undefined;
+  }
+
+  for (const key of keys) {
+    const value = record[key];
+
+    if (isRecord(value)) {
+      return value;
+    }
+  }
+
+  return undefined;
+};
+
+const pickArray = (
+  record: Record<string, unknown> | undefined,
+  keys: string[],
+) => {
+  if (!record) {
+    return undefined;
+  }
+
+  for (const key of keys) {
+    const value = record[key];
+
+    if (Array.isArray(value)) {
+      return value;
+    }
+  }
+
+  return undefined;
+};
+
+const normalizeImagePayload = (
+  value: unknown,
+): DeepPartial<LandingImage> | undefined => {
+  if (typeof value === "string") {
+    return { src: value };
+  }
+
+  if (!isRecord(value)) {
+    return undefined;
+  }
+
+  return withoutUndefined({
+    src: pickString(value, ["src", "url", "imageUrl", "assetUrl"]),
+    alt: pickString(value, ["alt", "altText", "description", "title"]),
+  }) as DeepPartial<LandingImage>;
+};
+
+const normalizeNavItem = (item: unknown): LandingNavItem | undefined => {
+  if (!isRecord(item)) {
+    return undefined;
+  }
+
+  const label = pickString(item, ["label", "title", "text", "name"]);
+  const href = pickString(item, ["href", "url", "anchor"]);
+
+  if (!label || !href) {
+    return undefined;
+  }
+
+  return { label, href };
+};
+
+const normalizeChapterPayload = (
+  value: unknown,
+): DeepPartial<LandingChapter> | undefined => {
+  if (!isRecord(value)) {
+    return undefined;
+  }
+
+  return withoutUndefined({
+    eyebrow: pickString(value, ["eyebrow", "kicker", "overline", "label"]),
+    headline: pickString(value, ["headline", "title", "heading"]),
+    body: pickString(value, ["body", "copy", "description", "text"]),
+    image: normalizeImagePayload(
+      value.image ?? value.media ?? value.photo ?? value.backgroundImage,
+    ),
+  }) as DeepPartial<LandingChapter>;
+};
+
+const normalizeMemoryItem = (item: unknown): LandingMemory | undefined => {
+  if (!isRecord(item)) {
+    return undefined;
+  }
+
+  const number = pickString(item, ["number", "index", "label"]);
+  const headline = pickString(item, ["headline", "title", "heading"]);
+  const body = pickString(item, ["body", "copy", "description", "text"]);
+
+  if (!number || !headline || !body) {
+    return undefined;
+  }
+
+  return { number, headline, body };
+};
+
+export const normalizeLandingContent = (
+  payload: ContentPayload,
+): DeepPartial<LandingContent> => {
+  const hero = pickRecord(payload, ["hero", "heroSection", "topBanner"]);
+  const introduction = pickRecord(payload, [
+    "introduction",
+    "tenuta",
+    "estate",
+    "laTenuta",
+  ]);
+  const product = pickRecord(payload, [
+    "product",
+    "spumanti",
+    "corallo",
+    "wine",
+  ]);
+  const archive = pickRecord(payload, ["archive", "curtesFrancae", "history"]);
+  const vineyard = pickRecord(payload, ["vineyard", "vigna", "vigneti"]);
+  const cellar = pickRecord(payload, ["cellar", "cantina"]);
+  const memory = pickRecord(payload, ["memory", "memoria", "story"]);
+  const contact = pickRecord(payload, ["contact", "contacts", "footer"]);
+  const brand = pickRecord(payload, ["brand"]);
+  const menu = pickRecord(payload, ["menu"]);
+  const navigation = pickArray(payload, ["navigation", "nav", "menuItems"]);
+  const productGallery = pickArray(product, ["gallery", "images", "media"]);
+  const memoryItems = pickArray(memory, ["items", "entries", "chapters"]);
+
+  return withoutUndefined({
+    brand: isRecord(brand)
+      ? {
+          name: pickString(brand, ["name", "title"]),
+          mark: pickString(brand, ["mark", "monogram", "logoText"]),
+          homeAriaLabel: pickString(brand, ["homeAriaLabel"]),
+          crestAriaLabel: pickString(brand, ["crestAriaLabel"]),
+          wordmark: isRecord(brand.wordmark) ? brand.wordmark : undefined,
+          crest: isRecord(brand.crest) ? brand.crest : undefined,
+          diamond: isRecord(brand.diamond) ? brand.diamond : undefined,
+        }
+      : undefined,
+    menu: isRecord(menu) ? menu : undefined,
+    navigation: navigation?.map(normalizeNavItem).filter(Boolean),
+    hero: withoutUndefined({
+      ...normalizeChapterPayload(hero),
+      eyebrow: pickString(hero, ["eyebrow", "kicker", "overline", "label"]),
+      secondaryEyebrow: pickString(hero, [
+        "secondaryEyebrow",
+        "secondaryLabel",
+        "location",
+      ]),
+      scrollLabel: pickString(hero, ["scrollLabel", "scroll", "scrollText"]),
+      headline: pickString(payload, ["heroHeadline", "headline"]) ??
+        pickString(hero, ["headline", "title", "heading"]),
+      subtitle:
+        pickString(payload, ["heroSubtitle", "subheadline"]) ??
+        pickString(hero, ["subtitle", "subheadline", "intro"]),
+      body:
+        pickString(payload, ["heroBody", "description"]) ??
+        pickString(hero, ["body", "copy", "description", "text"]),
+      image: normalizeImagePayload(
+        hero?.image ??
+          hero?.backgroundImage ??
+          hero?.media ??
+          payload.heroImage ??
+          payload.heroImageUrl,
+      ),
+    }) as DeepPartial<LandingContent["hero"]>,
+    introduction: withoutUndefined({
+      ...normalizeChapterPayload(introduction),
+      cta: pickString(introduction, ["cta", "ctaLabel", "ctaText"]),
+    }),
+    product: withoutUndefined({
+      ...normalizeChapterPayload(product),
+      gallery: productGallery?.map(normalizeImagePayload).filter(Boolean),
+    }),
+    archive: withoutUndefined({
+      ...normalizeChapterPayload(archive),
+      sealLabel: pickString(archive, ["sealLabel", "label", "cta", "ctaLabel"]),
+    }),
+    vineyard: normalizeChapterPayload(vineyard),
+    cellar: withoutUndefined({
+      ...normalizeChapterPayload(cellar),
+      cta: pickString(cellar, ["cta", "ctaLabel", "ctaText"]),
+      secondaryImage: normalizeImagePayload(
+        cellar?.secondaryImage ?? cellar?.secondaryMedia ?? cellar?.detailImage,
+      ),
+    }),
+    memory: withoutUndefined({
+      eyebrow: pickString(memory, ["eyebrow", "kicker", "overline", "label"]),
+      headline: pickString(memory, ["headline", "title", "heading"]),
+      items: memoryItems?.map(normalizeMemoryItem).filter(Boolean),
+    }),
+    contact: isRecord(contact)
+      ? withoutUndefined({
+          eyebrow: pickString(contact, ["eyebrow", "kicker", "overline", "label"]),
+          title: pickString(contact, ["title", "headline", "name"]),
+          email: pickString(contact, ["email", "mail"]),
+          location: pickString(contact, ["location", "address", "place"]),
+          legal: pickString(contact, ["legal", "legalText", "copyright"]),
+        })
+      : undefined,
+  }) as DeepPartial<LandingContent>;
+};
 
 const mergeImage = (
   fallback: LandingImage,
@@ -402,10 +719,13 @@ const mergeContent = (
   product: {
     ...mergeChapter(fallbackLandingContent.product, content.product),
     gallery: Array.isArray(content.product?.gallery)
-      ? content.product.gallery
+      ? (content.product.gallery as LandingImage[])
       : fallbackLandingContent.product.gallery,
   },
-  archive: mergeChapter(fallbackLandingContent.archive, content.archive),
+  archive: {
+    ...fallbackLandingContent.archive,
+    ...(isRecord(content.archive) ? content.archive : {}),
+  },
   vineyard: mergeChapter(fallbackLandingContent.vineyard, content.vineyard),
   cellar: {
     ...mergeChapter(fallbackLandingContent.cellar, content.cellar),
@@ -420,7 +740,7 @@ const mergeContent = (
     ...fallbackLandingContent.memory,
     ...(isRecord(content.memory) ? content.memory : {}),
     items: Array.isArray(content.memory?.items)
-      ? content.memory.items
+      ? (content.memory.items as LandingMemory[])
       : fallbackLandingContent.memory.items,
   },
   contact: {
@@ -428,6 +748,9 @@ const mergeContent = (
     ...(isRecord(content.contact) ? content.contact : {}),
   },
 });
+
+export const resolveLandingPageContent = (payload: ContentPayload) =>
+  mergeContent(normalizeLandingContent(payload));
 
 export async function getLandingPageContent(): Promise<LandingContent> {
   const endpoint =
@@ -451,9 +774,9 @@ export async function getLandingPageContent(): Promise<LandingContent> {
       return fallbackLandingContent;
     }
 
-    const content = (await response.json()) as DeepPartial<LandingContent>;
+    const payload = (await response.json()) as ContentPayload;
 
-    return mergeContent(content);
+    return resolveLandingPageContent(payload);
   } catch {
     return fallbackLandingContent;
   }
