@@ -8,6 +8,12 @@ export type LandingImage = {
   alt: string;
 };
 
+export type ProductSlide = {
+  headline: string;
+  image: LandingImage;
+  thumbnail: LandingImage;
+};
+
 export type LandingChapter = {
   eyebrow: string;
   headline: string;
@@ -19,6 +25,22 @@ export type LandingMemory = {
   number: string;
   headline: string;
   body: string;
+};
+
+export type ArchiveObject = {
+  image: LandingImage;
+  placement: string;
+};
+
+export type ArchiveState = {
+  headline: string;
+  body: string;
+  objects: ArchiveObject[];
+};
+
+export type ArchiveChapter = {
+  cta: string;
+  states: ArchiveState[];
 };
 
 export type LandingSectionKey =
@@ -73,11 +95,9 @@ export type LandingContent = {
     cta: string;
   };
   product: LandingChapter & {
-    gallery: LandingImage[];
+    slides: ProductSlide[];
   };
-  archive: Omit<LandingChapter, "image"> & {
-    sealLabel: string;
-  };
+  archive: ArchiveChapter;
   vineyard: LandingChapter;
   cellar: LandingChapter & {
     secondaryImage: LandingImage;
@@ -220,27 +240,123 @@ export const fallbackLandingContent: LandingContent = {
       src: "/images/montenisa-corallo-rosa.png",
       alt: "Rosé bottle still life with coral form",
     },
-    gallery: [
+    slides: [
       {
-        src: "/images/corallo-3d.png",
-        alt: "Pink coral sculpture",
+        headline: "Il Corallo Rosa",
+        image: {
+          src: "/images/corallo-3d.png",
+          alt: "Pink coral sculpture",
+        },
+        thumbnail: {
+          src: "/images/montenisa-corallo-rosa.png",
+          alt: "Rosé Franciacorta bottle thumbnail",
+        },
       },
       {
-        src: "/images/chiave-3d.png",
-        alt: "Ornate golden key sculpture",
+        headline: "La Conchiglia",
+        image: {
+          src: "/images/conchiglia-3d.png",
+          alt: "Ivory shell sculpture",
+        },
+        thumbnail: {
+          src: "/images/montenisa-conchiglia.png",
+          alt: "Blanc de Blancs bottle thumbnail",
+        },
       },
       {
-        src: "/images/conchiglia-3d.png",
-        alt: "Ivory shell sculpture",
+        headline: "La Chiave Antica",
+        image: {
+          src: "/images/chiave-3d.png",
+          alt: "Ornate golden key sculpture",
+        },
+        thumbnail: {
+          src: "/images/montenisa-chiave-antica.png",
+          alt: "Cuvée Royale bottle thumbnail",
+        },
       },
     ],
   },
   archive: {
-    eyebrow: "Le promesse di origine",
-    headline: "Curtes Francae",
-    body:
-      "Il capitolo d'archivio lavora su pergamene, sigilli e tracce storiche. Per ora resta una sezione statica con elementi decorativi, pronta per una futura scena in cui le carte entrano e si sovrappongono allo scroll.",
-    sealLabel: "Archivio Montenisa",
+    cta: "Scopri le meraviglie della tenuta",
+    states: [
+      {
+        headline: "Curtes Francae",
+        body:
+          "Ogni meraviglia comincia da un nome. E ogni nome custodisce una storia. C'è chi racconta che “Franciacorta” derivi da Petite France, il nome affettuoso che Carlo Magno avrebbe dato a questa terra. Ma la traccia più antica conduce altrove: alle Curtes Francae, corti monastiche medievali libere da alcuni tributi, luoghi di lavoro, sapere e custodia.",
+        objects: [
+          {
+            image: {
+              src: "/images/archive-sigillo.png",
+              alt: "Sigillo di cera con stemma",
+            },
+            placement:
+              "right-[-3%] top-[7%] h-[min(24vw,300px)] w-[min(24vw,300px)] rotate-[8deg]",
+          },
+          {
+            image: {
+              src: "/images/archive-piuma.png",
+              alt: "Piuma d'oca",
+            },
+            placement:
+              "bottom-[4%] left-[-6%] h-[min(42vw,520px)] w-[min(30vw,380px)] -rotate-[18deg]",
+          },
+          {
+            image: {
+              src: "/images/archive-moneta.png",
+              alt: "Moneta antica",
+            },
+            placement:
+              "right-[3%] bottom-[7%] h-[min(18vw,220px)] w-[min(18vw,220px)] rotate-[12deg]",
+          },
+        ],
+      },
+      {
+        headline: "Petite France",
+        body:
+          "Alcuni racconti preferiscono un'origine più intima: una “piccola Francia” affacciata sulle colline bresciane, dove il linguaggio, le abitudini e la cultura lasciavano tracce leggibili ancora oggi. È una leggenda affettuosa, nutrita di memoria orale e di sguardi che riconoscono in questo paesaggio un volto familiare.",
+        objects: [
+          {
+            image: {
+              src: "/images/archive-piuma.png",
+              alt: "Piuma d'oca",
+            },
+            placement:
+              "bottom-[8%] left-[4%] h-[min(36vw,460px)] w-[min(26vw,340px)] -rotate-[8deg]",
+          },
+          {
+            image: {
+              src: "/images/archive-sigillo.png",
+              alt: "Sigillo di cera con stemma",
+            },
+            placement:
+              "right-[8%] top-[18%] h-[min(20vw,250px)] w-[min(20vw,250px)] rotate-[-6deg]",
+          },
+        ],
+      },
+      {
+        headline: "La traccia più antica",
+        body:
+          "Più probabilmente il nome nasce dalle Curtes Francae: comunità monastiche che qui coltivavano la terra, conservavano saperi e difendevano un equilibrio tra lavoro e contemplazione. È da quelle corti franchigiate che la Franciacorta trae il proprio carattere: un territorio fatto di disciplina, paesaggio e attesa.",
+        objects: [
+          {
+            image: {
+              src: "/images/archive-moneta.png",
+              alt: "Moneta antica",
+            },
+            placement:
+              "right-[6%] bottom-[12%] h-[min(22vw,280px)] w-[min(22vw,280px)] rotate-[4deg]",
+          },
+          {
+            image: {
+              src: "/images/archive-sigillo.png",
+              alt: "Sigillo di cera con stemma",
+            },
+            placement:
+              "left-[6%] top-[14%] h-[min(18vw,230px)] w-[min(18vw,230px)] rotate-[-10deg]",
+          },
+        ],
+      },
+    ],
   },
   vineyard: {
     eyebrow: "I vigneti",
@@ -354,12 +470,16 @@ export const landingContentAudit = [
   "product.body",
   "product.image.src",
   "product.image.alt",
-  "product.gallery[].src",
-  "product.gallery[].alt",
-  "archive.eyebrow",
-  "archive.headline",
-  "archive.body",
-  "archive.sealLabel",
+  "product.slides[].headline",
+  "product.slides[].image.src",
+  "product.slides[].image.alt",
+  "product.slides[].thumbnail.src",
+  "product.slides[].thumbnail.alt",
+  "archive.cta",
+  "archive.states[].headline",
+  "archive.states[].body",
+  "archive.states[].objects[].image.src",
+  "archive.states[].objects[].image.alt",
   "vineyard.eyebrow",
   "vineyard.headline",
   "vineyard.body",
@@ -467,6 +587,27 @@ const normalizeImagePayload = (
   }) as DeepPartial<LandingImage>;
 };
 
+const normalizeProductSlide = (
+  value: unknown,
+): DeepPartial<ProductSlide> | undefined => {
+  if (!isRecord(value)) {
+    return undefined;
+  }
+
+  const image = normalizeImagePayload(
+    value.image ?? value.media ?? value.photo ?? value.mainImage,
+  );
+  const thumbnail = normalizeImagePayload(
+    value.thumbnail ?? value.thumb ?? value.preview ?? value.image,
+  );
+
+  return withoutUndefined({
+    headline: pickString(value, ["headline", "title", "heading", "label"]),
+    image,
+    thumbnail: thumbnail ?? image,
+  }) as DeepPartial<ProductSlide>;
+};
+
 const normalizeNavItem = (item: unknown): LandingNavItem | undefined => {
   if (!isRecord(item)) {
     return undefined;
@@ -539,7 +680,12 @@ export const normalizeLandingContent = (
   const brand = pickRecord(payload, ["brand"]);
   const menu = pickRecord(payload, ["menu"]);
   const navigation = pickArray(payload, ["navigation", "nav", "menuItems"]);
-  const productGallery = pickArray(product, ["gallery", "images", "media"]);
+  const productGallery = pickArray(product, [
+    "slides",
+    "gallery",
+    "images",
+    "media",
+  ]);
   const memoryItems = pickArray(memory, ["items", "entries", "chapters"]);
 
   return withoutUndefined({
@@ -587,11 +733,82 @@ export const normalizeLandingContent = (
     }),
     product: withoutUndefined({
       ...normalizeChapterPayload(product),
-      gallery: productGallery?.map(normalizeImagePayload).filter(Boolean),
+      slides: productGallery
+        ?.map((item) => {
+          const slide = normalizeProductSlide(item);
+
+          if (slide?.headline && slide.image?.src) {
+            return slide;
+          }
+
+          const image = normalizeImagePayload(item);
+
+          if (!image?.src) {
+            return undefined;
+          }
+
+          return {
+            headline: pickString(isRecord(item) ? item : undefined, [
+              "headline",
+              "title",
+              "heading",
+              "label",
+              "alt",
+            ]),
+            image,
+            thumbnail: image,
+          } satisfies DeepPartial<ProductSlide>;
+        })
+        .filter(Boolean),
     }),
     archive: withoutUndefined({
-      ...normalizeChapterPayload(archive),
-      sealLabel: pickString(archive, ["sealLabel", "label", "cta", "ctaLabel"]),
+      cta:
+        pickString(archive, ["cta", "ctaLabel", "sealLabel", "label"]) ??
+        pickString(archive, ["headline"]) ??
+        undefined,
+      states: pickArray(archive, ["states", "chapters", "steps"])?.map(
+        (state) => {
+          if (!isRecord(state)) {
+            return undefined;
+          }
+
+          const objects = pickArray(state, ["objects", "items", "assets"])
+            ?.map((object) => {
+              if (!isRecord(object)) {
+                return undefined;
+              }
+
+              const image = normalizeImagePayload(
+                object.image ?? object.media ?? object.asset,
+              );
+
+              if (!image?.src || !image.alt) {
+                return undefined;
+              }
+
+              return {
+                image: { src: image.src, alt: image.alt },
+                placement:
+                  pickString(object, ["placement", "className", "position"]) ??
+                  "",
+              } satisfies ArchiveObject;
+            })
+            .filter((object): object is ArchiveObject => Boolean(object));
+
+          const headline = pickString(state, ["headline", "title", "heading"]);
+          const body = pickString(state, ["body", "copy", "description", "text"]);
+
+          if (!headline || !body) {
+            return undefined;
+          }
+
+          return {
+            headline,
+            body,
+            objects,
+          } satisfies DeepPartial<ArchiveState>;
+        },
+      ),
     }),
     vineyard: normalizeChapterPayload(vineyard),
     cellar: withoutUndefined({
@@ -718,13 +935,16 @@ const mergeContent = (
   ),
   product: {
     ...mergeChapter(fallbackLandingContent.product, content.product),
-    gallery: Array.isArray(content.product?.gallery)
-      ? (content.product.gallery as LandingImage[])
-      : fallbackLandingContent.product.gallery,
+    slides: Array.isArray(content.product?.slides)
+      ? (content.product.slides as ProductSlide[])
+      : fallbackLandingContent.product.slides,
   },
   archive: {
     ...fallbackLandingContent.archive,
     ...(isRecord(content.archive) ? content.archive : {}),
+    states: Array.isArray(content.archive?.states)
+      ? (content.archive.states as ArchiveState[])
+      : fallbackLandingContent.archive.states,
   },
   vineyard: mergeChapter(fallbackLandingContent.vineyard, content.vineyard),
   cellar: {

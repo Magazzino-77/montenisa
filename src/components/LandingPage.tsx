@@ -6,11 +6,15 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import type {
+  ArchiveChapter,
   LandingContent,
   LandingImage,
   LandingSectionKey,
   LandingSectionMarker,
+  ProductSlide,
 } from "@/lib/shutter";
+
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
 type LandingPageProps = {
   content: LandingContent;
@@ -51,14 +55,16 @@ function Figure({
 }
 
 function ProductGallerySlider({
-  images,
+  slides,
 }: {
-  images: LandingImage[];
+  slides: ProductSlide[];
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const frameRefs = useRef<Array<HTMLElement | null>>([]);
   const thumbRefs = useRef<Array<HTMLButtonElement | null>>([]);
-  const safeImages = images.length > 0 ? images : [];
+  const headlineRef = useRef<HTMLHeadingElement | null>(null);
+  const safeSlides = slides.length > 0 ? slides : [];
+  const activeSlide = safeSlides[activeIndex];
 
   useEffect(() => {
     const activeFrame = frameRefs.current[activeIndex];
@@ -101,137 +107,155 @@ function ProductGallerySlider({
         stagger: 0.055,
       },
     );
+
+    if (headlineRef.current) {
+      gsap.fromTo(
+        headlineRef.current,
+        { autoAlpha: 0, y: 18 },
+        { autoAlpha: 1, y: 0, duration: 0.65, ease: "power2.out" },
+      );
+    }
   }, [activeIndex]);
 
-  if (safeImages.length === 0) {
+  if (safeSlides.length === 0 || !activeSlide) {
     return null;
   }
 
   const goToPrevious = () =>
     setActiveIndex((current) =>
-      current === 0 ? safeImages.length - 1 : current - 1,
+      current === 0 ? safeSlides.length - 1 : current - 1,
     );
   const goToNext = () =>
     setActiveIndex((current) =>
-      current === safeImages.length - 1 ? 0 : current + 1,
+      current === safeSlides.length - 1 ? 0 : current + 1,
     );
 
   return (
-    <div
-      className="mx-auto w-full max-w-[1180px]"
-      data-active-slide={activeIndex}
-      data-product-slider
-    >
-      <div className="relative mx-auto aspect-[0.75] w-full max-w-[420px] overflow-hidden">
-        {safeImages.map((image, index) => (
-          <figure
-            key={`${image.src}-${index}`}
-            ref={(element) => {
-              frameRefs.current[index] = element;
-            }}
-            className="pointer-events-none absolute inset-0"
-            data-shutter-key={`product.gallery.${index}`}
-            aria-hidden={activeIndex !== index}
-          >
-            <Image
-              src={image.src}
-              alt={image.alt}
-              fill
-              sizes="(min-width: 768px) 420px, 86vw"
-              className="object-contain object-[50%_50%]"
-            />
-          </figure>
-        ))}
+    <>
+      <h2
+        ref={headlineRef}
+        data-reveal
+        className="font-display text-[clamp(2.7rem,7vw,7.4rem)] font-medium italic leading-none"
+        data-shutter-key={`product.slides.${activeIndex}.headline`}
+      >
+        {activeSlide.headline}
+      </h2>
 
-        <button
-          type="button"
-          onPointerDown={(event) => {
-            event.preventDefault();
-            goToPrevious();
-          }}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" || event.key === " ") {
-              event.preventDefault();
-              goToPrevious();
-            }
-          }}
-          className="absolute left-3 top-1/2 z-30 grid h-11 w-11 -translate-y-1/2 place-items-center border border-paper/24 bg-ink/42 font-display text-2xl leading-none text-paper backdrop-blur-sm transition hover:bg-paper hover:text-ink"
-          aria-label="Previous image"
-        >
-          ‹
-        </button>
-        <button
-          type="button"
-          onPointerDown={(event) => {
-            event.preventDefault();
-            goToNext();
-          }}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" || event.key === " ") {
-              event.preventDefault();
-              goToNext();
-            }
-          }}
-          className="absolute right-3 top-1/2 z-30 grid h-11 w-11 -translate-y-1/2 place-items-center border border-paper/24 bg-ink/42 font-display text-2xl leading-none text-paper backdrop-blur-sm transition hover:bg-paper hover:text-ink"
-          aria-label="Next image"
-        >
-          ›
-        </button>
-      </div>
-
-      <div className="mx-auto mt-8 flex max-w-[760px] items-center justify-center gap-3 md:gap-6">
-        {safeImages.map((image, index) => {
-          const isActive = activeIndex === index;
-          const isCenter = index === 1;
-
-          return (
-            <button
-              key={`thumb-${image.src}-${index}`}
+      <div
+        className="mx-auto w-full max-w-[1180px]"
+        data-active-slide={activeIndex}
+        data-product-slider
+      >
+        <div className="relative mx-auto aspect-[0.75] w-full max-w-[420px] overflow-hidden">
+          {safeSlides.map((slide, index) => (
+            <figure
+              key={`${slide.image.src}-${index}`}
               ref={(element) => {
-                thumbRefs.current[index] = element;
+                frameRefs.current[index] = element;
               }}
-              type="button"
-              onPointerDown={(event) => {
-                event.preventDefault();
-                setActiveIndex(index);
-              }}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  setActiveIndex(index);
-                }
-              }}
-              className={`group relative shrink-0 overflow-hidden transition duration-500 ${
-                isCenter
-                  ? "h-[120px] w-[160px] md:h-[172px] md:w-[230px]"
-                  : "h-[94px] w-[126px] md:h-[136px] md:w-[182px]"
-              } ${
-                isActive
-                  ? "opacity-100"
-                  : "opacity-48 hover:opacity-90"
-              }`}
-              aria-label={`Show image ${index + 1}`}
-              aria-current={isActive ? "true" : undefined}
+              className="pointer-events-none absolute inset-0"
+              data-shutter-key={`product.slides.${index}.image`}
+              aria-hidden={activeIndex !== index}
             >
               <Image
-                src={image.src}
-                alt=""
+                src={slide.image.src}
+                alt={slide.image.alt}
                 fill
-                sizes="(min-width: 768px) 220px, 30vw"
-                className={`object-contain transition duration-700 ${
-                  isActive ? "scale-105" : "scale-100 group-hover:scale-105"
-                }`}
+                sizes="(min-width: 768px) 420px, 86vw"
+                className="object-contain object-[50%_50%] mix-blend-lighten"
               />
-              <span
-                className={`absolute inset-x-0 bottom-0 h-px origin-left bg-paper transition-transform duration-500 ${
-                  isActive ? "scale-x-100" : "scale-x-0"
+            </figure>
+          ))}
+
+          <button
+            type="button"
+            onPointerDown={(event) => {
+              event.preventDefault();
+              goToPrevious();
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                goToPrevious();
+              }
+            }}
+            className="absolute left-3 top-1/2 z-30 grid h-11 w-11 -translate-y-1/2 place-items-center border border-paper/24 bg-ink/42 font-display text-2xl leading-none text-paper backdrop-blur-sm transition hover:bg-paper hover:text-ink"
+            aria-label="Previous image"
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            onPointerDown={(event) => {
+              event.preventDefault();
+              goToNext();
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                goToNext();
+              }
+            }}
+            className="absolute right-3 top-1/2 z-30 grid h-11 w-11 -translate-y-1/2 place-items-center border border-paper/24 bg-ink/42 font-display text-2xl leading-none text-paper backdrop-blur-sm transition hover:bg-paper hover:text-ink"
+            aria-label="Next image"
+          >
+            ›
+          </button>
+        </div>
+
+        <div className="mx-auto mt-8 flex max-w-[760px] items-end justify-center gap-3 md:gap-6">
+          {safeSlides.map((slide, index) => {
+            const isActive = activeIndex === index;
+
+            return (
+              <button
+                key={`thumb-${slide.thumbnail.src}-${index}`}
+                ref={(element) => {
+                  thumbRefs.current[index] = element;
+                }}
+                type="button"
+                onPointerDown={(event) => {
+                  event.preventDefault();
+                  setActiveIndex(index);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    setActiveIndex(index);
+                  }
+                }}
+                className={`group relative shrink-0 overflow-hidden transition duration-500 ${
+                  isActive
+                    ? "h-[120px] w-[160px] md:h-[172px] md:w-[230px]"
+                    : "h-[94px] w-[126px] md:h-[136px] md:w-[182px]"
+                } ${
+                  isActive
+                    ? "opacity-100"
+                    : "opacity-48 hover:opacity-90"
                 }`}
-              />
-            </button>
-          );
-        })}
+                aria-label={`Show ${slide.headline}`}
+                aria-current={isActive ? "true" : undefined}
+              >
+                <Image
+                  src={slide.thumbnail.src}
+                  alt={slide.thumbnail.alt}
+                  fill
+                  sizes="(min-width: 768px) 220px, 30vw"
+                  className={`object-contain transition duration-700 ${
+                    isActive ? "scale-105" : "scale-100 group-hover:scale-105"
+                  }`}
+                />
+                <span
+                  className={`absolute inset-x-0 bottom-0 h-px origin-left bg-paper transition-transform duration-500 ${
+                    isActive ? "scale-x-100" : "scale-x-0"
+                  }`}
+                />
+              </button>
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -252,6 +276,238 @@ function Crest({
     >
       {label}
     </div>
+  );
+}
+
+function ArchiveChapterSection({
+  archive,
+  diamond,
+  marker,
+}: {
+  archive: ArchiveChapter;
+  diamond: LandingImage;
+  marker: LandingSectionMarker;
+}) {
+  const stageRef = useRef<HTMLElement>(null);
+  const states = archive.states.length > 0 ? archive.states : [];
+
+  useEffect(() => {
+    const stage = stageRef.current;
+
+    if (!stage || states.length === 0) {
+      return;
+    }
+
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    const stateLayers = gsap.utils.toArray<HTMLElement>(
+      "[data-archive-state]",
+      stage,
+    );
+    const copyLayers = gsap.utils.toArray<HTMLElement>(
+      "[data-archive-copy]",
+      stage,
+    );
+    const objects = gsap.utils.toArray<HTMLElement>(
+      "[data-archive-object]",
+      stage,
+    );
+
+    gsap.set(stateLayers, { autoAlpha: 0 });
+    gsap.set(copyLayers, { autoAlpha: 0, y: 28 });
+    gsap.set(stateLayers[0], { autoAlpha: 1 });
+    gsap.set(copyLayers[0], { autoAlpha: 1, y: 0 });
+
+    if (reduceMotion || states.length === 1) {
+      return;
+    }
+
+    const timeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: stage,
+        start: "top top",
+        end: `+=${states.length * 95}%`,
+        pin: true,
+        scrub: 0.85,
+        anticipatePin: 1,
+      },
+    });
+
+    states.forEach((_, index) => {
+      if (index === 0) {
+        return;
+      }
+
+      const previous = index - 1;
+      const transitionStart = previous;
+
+      timeline.to(
+        `[data-archive-copy="${previous}"]`,
+        {
+          autoAlpha: 0,
+          y: -24,
+          duration: 0.35,
+          ease: "power2.inOut",
+        },
+        transitionStart,
+      );
+      timeline.to(
+        `[data-archive-state="${previous}"]`,
+        {
+          autoAlpha: 0,
+          duration: 0.35,
+          ease: "power2.inOut",
+        },
+        transitionStart,
+      );
+      timeline.fromTo(
+        `[data-archive-copy="${index}"]`,
+        { autoAlpha: 0, y: 36 },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.45,
+          ease: "power2.out",
+        },
+        transitionStart + 0.08,
+      );
+      timeline.fromTo(
+        `[data-archive-state="${index}"] [data-archive-object]`,
+        { y: 120, autoAlpha: 0 },
+        {
+          y: 0,
+          autoAlpha: 1,
+          duration: 0.7,
+          ease: "power3.out",
+          stagger: 0.08,
+        },
+        transitionStart + 0.04,
+      );
+      timeline.to(
+        `[data-archive-state="${index}"]`,
+        {
+          autoAlpha: 1,
+          duration: 0.2,
+          ease: "none",
+        },
+        transitionStart + 0.04,
+      );
+    });
+
+    objects.forEach((object, index) => {
+      gsap.to(object, {
+        y: index % 2 === 0 ? -14 : 12,
+        rotation: index % 2 === 0 ? 2.5 : -2.5,
+        duration: 4.8 + index * 0.35,
+        ease: "sine.inOut",
+        repeat: -1,
+        yoyo: true,
+      });
+    });
+
+    return () => {
+      timeline.scrollTrigger?.kill();
+      timeline.kill();
+    };
+  }, [states]);
+
+  if (states.length === 0) {
+    return null;
+  }
+
+  return (
+    <section
+      ref={stageRef}
+      data-section="archive"
+      data-archive-stage
+      className="archive-grid relative bg-paper"
+    >
+      <SectionReference
+        marker={marker}
+        shutterKey="menu.sections.archive.referenceId"
+      />
+      <div className="relative mx-auto flex min-h-[100svh] max-w-[1560px] items-center px-5 py-[4.5rem] md:px-8 md:py-32">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          {states.map((state, stateIndex) => (
+            <div
+              key={`archive-state-${stateIndex}`}
+              data-archive-state={stateIndex}
+              className="absolute inset-0"
+              aria-hidden={stateIndex !== 0}
+            >
+              {state.objects.map((object, objectIndex) => (
+                <div
+                  key={`${object.image.src}-${objectIndex}`}
+                  data-archive-object
+                  className={`absolute ${object.placement ?? ""} relative`}
+                  data-shutter-key={`archive.states.${stateIndex}.objects.${objectIndex}.image`}
+                >
+                  <Image
+                    src={object.image.src}
+                    alt={object.image.alt}
+                    fill
+                    sizes="(min-width: 1024px) 320px, 42vw"
+                    className="object-contain mix-blend-lighten"
+                  />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+
+        <div className="relative z-10 mx-auto w-full max-w-[1180px] text-center">
+          <div className="relative min-h-[clamp(18rem,42vw,28rem)]">
+            {states.map((state, stateIndex) => (
+              <div
+                key={`archive-copy-${stateIndex}`}
+                data-archive-copy={stateIndex}
+                className={
+                  stateIndex === 0
+                    ? "relative"
+                    : "absolute inset-x-0 top-0"
+                }
+                aria-hidden={stateIndex !== 0}
+              >
+                <h2
+                  className="mx-auto max-w-[12ch] font-display text-[clamp(3rem,8vw,8rem)] font-medium uppercase leading-[0.9] text-ink"
+                  data-shutter-key={`archive.states.${stateIndex}.headline`}
+                >
+                  {state.headline}
+                </h2>
+                <p
+                  className="mx-auto mt-8 max-w-[680px] text-sm uppercase leading-7 tracking-[0.06em] text-ink/72 md:text-[0.95rem]"
+                  data-shutter-key={`archive.states.${stateIndex}.body`}
+                >
+                  {state.body}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <a
+            href="#tenuta"
+            className="relative z-10 mt-12 inline-flex flex-col items-center gap-4 font-mono text-[0.62rem] uppercase tracking-[0.18em] text-ink/58 transition hover:text-wine"
+            data-shutter-key="archive.cta"
+          >
+            <span className="flex items-center gap-4">
+              <span className="h-px w-12 bg-current" />
+              {archive.cta}
+              <span className="h-px w-12 bg-current" />
+            </span>
+            <Image
+              src={diamond.src}
+              alt=""
+              width={18}
+              height={18}
+              aria-hidden="true"
+              className="opacity-72"
+            />
+          </a>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -519,8 +775,6 @@ export default function LandingPage({ content }: LandingPageProps) {
   };
 
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-
     if (!rootRef.current) {
       return;
     }
@@ -739,18 +993,6 @@ export default function LandingPage({ content }: LandingPageProps) {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,16,17,0.28),rgba(16,16,17,0.84)_68%),linear-gradient(180deg,rgba(16,16,17,0.28),rgba(16,16,17,0.9))]" />
 
           <div className="relative mx-auto flex min-h-[78svh] w-full max-w-[1560px] flex-col justify-between">
-            <div
-              data-hero-reveal
-              className="flex items-center justify-between border-y border-paper/26 py-2 font-mono text-[0.62rem] uppercase tracking-[0.2em] text-paper/70"
-            >
-                <span data-shutter-key="hero.eyebrow">
-                  {content.hero.eyebrow}
-                </span>
-                <span data-shutter-key="hero.secondaryEyebrow">
-                  {content.hero.secondaryEyebrow}
-                </span>
-            </div>
-
             <div className="mx-auto max-w-[920px] text-center">
                 <p
                   data-hero-reveal
@@ -895,20 +1137,7 @@ export default function LandingPage({ content }: LandingPageProps) {
             />
           <div className="mx-auto max-w-[1560px]">
             <div className="mx-auto grid max-w-[1180px] gap-10 text-center">
-              <h2
-                  data-reveal
-                  className="font-display text-[clamp(2.7rem,7vw,7.4rem)] font-medium italic leading-none"
-                  data-shutter-key="product.headline"
-              >
-                {content.product.headline}
-              </h2>
-              <ProductGallerySlider
-                images={
-                  content.product.gallery.length > 0
-                    ? content.product.gallery.slice(0, 3)
-                    : [content.product.image!]
-                }
-              />
+              <ProductGallerySlider slides={content.product.slides} />
               <p
                   data-reveal
                   className="mx-auto max-w-[620px] text-sm leading-7 text-paper/70 md:text-base"
@@ -920,51 +1149,11 @@ export default function LandingPage({ content }: LandingPageProps) {
           </div>
         </section>
 
-        <section
-          data-section="archive"
-          className="archive-grid relative bg-paper px-5 py-[4.5rem] md:px-8 md:py-32"
-        >
-            <SectionReference
-              marker={content.menu.sections.archive}
-              shutterKey="menu.sections.archive.referenceId"
-            />
-          <div className="mx-auto grid max-w-[1180px] gap-10 text-center">
-            <div
-              data-drift
-              className="mx-auto h-48 w-48 rounded-full border border-wine/40 bg-wine shadow-[inset_0_18px_28px_rgba(255,255,255,0.16),0_24px_50px_rgba(74,16,20,0.24)] md:h-64 md:w-64"
-              aria-hidden="true"
-            />
-              <p
-                className="font-mono text-[0.62rem] uppercase tracking-[0.22em] text-wine"
-                data-shutter-key="archive.eyebrow"
-              >
-              {content.archive.eyebrow}
-            </p>
-            <h2
-                data-reveal
-                className="mx-auto max-w-[11ch] font-display text-[clamp(3rem,8vw,8rem)] font-medium uppercase leading-[0.9] text-ink"
-                data-shutter-key="archive.headline"
-              >
-              {content.archive.headline}
-            </h2>
-            <p
-                data-reveal
-                className="mx-auto max-w-[680px] text-sm uppercase leading-7 tracking-[0.06em] text-ink/72"
-                data-shutter-key="archive.body"
-              >
-              {content.archive.body}
-            </p>
-            <div
-                data-reveal
-                className="mx-auto flex items-center gap-4 font-mono text-[0.62rem] uppercase tracking-[0.18em] text-ink/58"
-                data-shutter-key="archive.sealLabel"
-              >
-              <span className="h-px w-12 bg-current" />
-              {content.archive.sealLabel}
-              <span className="h-px w-12 bg-current" />
-            </div>
-          </div>
-        </section>
+        <ArchiveChapterSection
+          archive={content.archive}
+          diamond={content.brand.diamond.light}
+          marker={content.menu.sections.archive}
+        />
 
         <section
           id="vigna"
