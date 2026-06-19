@@ -222,16 +222,16 @@ export const fallbackLandingContent: LandingContent = {
     },
     gallery: [
       {
-        src: "/images/montenisa-corallo-rosa.png",
-        alt: "Dark product still life",
+        src: "/images/corallo-3d.png",
+        alt: "Pink coral sculpture",
       },
       {
-        src: "/images/montenisa-cellar.png",
-        alt: "Cellar detail with barrels",
+        src: "/images/chiave-3d.png",
+        alt: "Ornate golden key sculpture",
       },
       {
-        src: "/images/montenisa-estate-hero.png",
-        alt: "Estate facade detail",
+        src: "/images/conchiglia-3d.png",
+        alt: "Ivory shell sculpture",
       },
     ],
   },

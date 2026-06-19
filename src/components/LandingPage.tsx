@@ -50,6 +50,191 @@ function Figure({
   );
 }
 
+function ProductGallerySlider({
+  images,
+}: {
+  images: LandingImage[];
+}) {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const frameRefs = useRef<Array<HTMLElement | null>>([]);
+  const thumbRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const safeImages = images.length > 0 ? images : [];
+
+  useEffect(() => {
+    const activeFrame = frameRefs.current[activeIndex];
+
+    if (!activeFrame) {
+      return;
+    }
+
+    gsap.set(frameRefs.current.filter(Boolean), {
+      autoAlpha: 0,
+      scale: 1.025,
+      clipPath: "inset(0% 0% 0% 100%)",
+    });
+    gsap.fromTo(
+      activeFrame,
+      {
+        autoAlpha: 0,
+        scale: 1.035,
+        clipPath: "inset(0% 0% 0% 100%)",
+      },
+      {
+        autoAlpha: 1,
+        scale: 1,
+        clipPath: "inset(0% 0% 0% 0%)",
+        duration: 0.95,
+        ease: "power3.out",
+      },
+    );
+    gsap.fromTo(
+      thumbRefs.current.filter(Boolean),
+      {
+        y: 12,
+        autoAlpha: 0.42,
+      },
+      {
+        y: 0,
+        autoAlpha: 1,
+        duration: 0.55,
+        ease: "power2.out",
+        stagger: 0.055,
+      },
+    );
+  }, [activeIndex]);
+
+  if (safeImages.length === 0) {
+    return null;
+  }
+
+  const goToPrevious = () =>
+    setActiveIndex((current) =>
+      current === 0 ? safeImages.length - 1 : current - 1,
+    );
+  const goToNext = () =>
+    setActiveIndex((current) =>
+      current === safeImages.length - 1 ? 0 : current + 1,
+    );
+
+  return (
+    <div
+      className="mx-auto w-full max-w-[1180px]"
+      data-active-slide={activeIndex}
+      data-product-slider
+    >
+      <div className="relative mx-auto aspect-[0.75] w-full max-w-[420px] overflow-hidden">
+        {safeImages.map((image, index) => (
+          <figure
+            key={`${image.src}-${index}`}
+            ref={(element) => {
+              frameRefs.current[index] = element;
+            }}
+            className="pointer-events-none absolute inset-0"
+            data-shutter-key={`product.gallery.${index}`}
+            aria-hidden={activeIndex !== index}
+          >
+            <Image
+              src={image.src}
+              alt={image.alt}
+              fill
+              sizes="(min-width: 768px) 420px, 86vw"
+              className="object-contain object-[50%_50%]"
+            />
+          </figure>
+        ))}
+
+        <button
+          type="button"
+          onPointerDown={(event) => {
+            event.preventDefault();
+            goToPrevious();
+          }}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              goToPrevious();
+            }
+          }}
+          className="absolute left-3 top-1/2 z-30 grid h-11 w-11 -translate-y-1/2 place-items-center border border-paper/24 bg-ink/42 font-display text-2xl leading-none text-paper backdrop-blur-sm transition hover:bg-paper hover:text-ink"
+          aria-label="Previous image"
+        >
+          ‹
+        </button>
+        <button
+          type="button"
+          onPointerDown={(event) => {
+            event.preventDefault();
+            goToNext();
+          }}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              goToNext();
+            }
+          }}
+          className="absolute right-3 top-1/2 z-30 grid h-11 w-11 -translate-y-1/2 place-items-center border border-paper/24 bg-ink/42 font-display text-2xl leading-none text-paper backdrop-blur-sm transition hover:bg-paper hover:text-ink"
+          aria-label="Next image"
+        >
+          ›
+        </button>
+      </div>
+
+      <div className="mx-auto mt-8 flex max-w-[760px] items-center justify-center gap-3 md:gap-6">
+        {safeImages.map((image, index) => {
+          const isActive = activeIndex === index;
+          const isCenter = index === 1;
+
+          return (
+            <button
+              key={`thumb-${image.src}-${index}`}
+              ref={(element) => {
+                thumbRefs.current[index] = element;
+              }}
+              type="button"
+              onPointerDown={(event) => {
+                event.preventDefault();
+                setActiveIndex(index);
+              }}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  setActiveIndex(index);
+                }
+              }}
+              className={`group relative shrink-0 overflow-hidden transition duration-500 ${
+                isCenter
+                  ? "h-[120px] w-[160px] md:h-[172px] md:w-[230px]"
+                  : "h-[94px] w-[126px] md:h-[136px] md:w-[182px]"
+              } ${
+                isActive
+                  ? "opacity-100"
+                  : "opacity-48 hover:opacity-90"
+              }`}
+              aria-label={`Show image ${index + 1}`}
+              aria-current={isActive ? "true" : undefined}
+            >
+              <Image
+                src={image.src}
+                alt=""
+                fill
+                sizes="(min-width: 768px) 220px, 30vw"
+                className={`object-contain transition duration-700 ${
+                  isActive ? "scale-105" : "scale-100 group-hover:scale-105"
+                }`}
+              />
+              <span
+                className={`absolute inset-x-0 bottom-0 h-px origin-left bg-paper transition-transform duration-500 ${
+                  isActive ? "scale-x-100" : "scale-x-0"
+                }`}
+              />
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function Crest({
   className = "",
   label,
@@ -403,6 +588,120 @@ export default function LandingPage({ content }: LandingPageProps) {
             },
           });
         });
+
+        const tenutaStage = document.querySelector<HTMLElement>(
+          "[data-tenuta-reveal]",
+        );
+
+        if (tenutaStage) {
+          const maskOpenings = {
+            left: tenutaStage.querySelector<SVGPathElement>(
+              '[data-tenuta-mask-opening="left"]',
+            ),
+            center: tenutaStage.querySelector<SVGPathElement>(
+              '[data-tenuta-mask-opening="center"]',
+            ),
+            right: tenutaStage.querySelector<SVGPathElement>(
+              '[data-tenuta-mask-opening="right"]',
+            ),
+          };
+          const archPath = ({
+            x,
+            y,
+            radius,
+            right,
+          }: {
+            x: number;
+            y: number;
+            radius: number;
+            right: number;
+          }) =>
+            `M${x} 650 L${x} ${y} A${radius} ${radius} 0 0 1 ${right} ${y} L${right} 650 Z`;
+          const interpolate = (from: number, to: number, progress: number) =>
+            from + (to - from) * progress;
+          const setTenutaMaskProgress = (progress: number) => {
+            const sideProgress = Math.min(progress * 1.35, 1);
+            maskOpenings.left?.setAttribute(
+              "d",
+              archPath({
+                x: interpolate(82, -620, sideProgress),
+                y: interpolate(320, 180, sideProgress),
+                radius: interpolate(150, 300, sideProgress),
+                right: interpolate(382, -110, sideProgress),
+              }),
+            );
+            maskOpenings.center?.setAttribute(
+              "d",
+              archPath({
+                x: interpolate(450, -260, progress),
+                y: interpolate(300, -620, progress),
+                radius: interpolate(150, 860, progress),
+                right: interpolate(750, 1460, progress),
+              }),
+            );
+            maskOpenings.right?.setAttribute(
+              "d",
+              archPath({
+                x: interpolate(818, 1310, sideProgress),
+                y: interpolate(320, 180, sideProgress),
+                radius: interpolate(150, 300, sideProgress),
+                right: interpolate(1118, 1820, sideProgress),
+              }),
+            );
+          };
+
+          setTenutaMaskProgress(0);
+
+          gsap
+            .timeline({
+              scrollTrigger: {
+                trigger: tenutaStage,
+                start: "center center",
+                end: "+=1800",
+                pin: true,
+                pinSpacing: true,
+                anticipatePin: 1,
+                invalidateOnRefresh: true,
+                scrub: true,
+                onUpdate: (self) => setTenutaMaskProgress(self.progress),
+              },
+            })
+            .to(
+              tenutaStage,
+              {
+                width: () => window.innerWidth,
+                minWidth: () => window.innerWidth,
+                maxWidth: "none",
+                height: () => window.innerHeight,
+                minHeight: () => window.innerHeight,
+                x: () => -(window.innerWidth - tenutaStage.offsetWidth) / 2,
+                y: () => -(window.innerHeight - tenutaStage.offsetHeight) / 2,
+                ease: "none",
+              },
+              0,
+            )
+            .fromTo(
+              "[data-tenuta-video]",
+              {
+                scale: 1.08,
+                filter: "brightness(0.78) saturate(0.82)",
+              },
+              {
+                scale: 1,
+                filter: "brightness(0.94) saturate(1.02)",
+                ease: "none",
+              },
+              0,
+            )
+            .to(
+              "[data-tenuta-mask-surface]",
+              {
+                opacity: 0.92,
+                ease: "none",
+              },
+              0,
+            );
+        }
       }
     }, rootRef);
 
@@ -465,15 +764,15 @@ export default function LandingPage({ content }: LandingPageProps) {
                   className="mx-auto mt-5 max-w-[12ch] font-display text-[clamp(3rem,12vw,3.45rem)] font-semibold leading-[0.86] text-paper md:text-[clamp(3.8rem,9vw,10.5rem)] md:leading-[0.84]"
                   data-shutter-key="hero.headline"
                 >
-                {content.hero.headline}
-              </h1>
+                  {content.hero.headline}
+                </h1>
                 <p
                   data-hero-reveal
                   className="mx-auto mt-7 max-w-[620px] text-pretty text-sm leading-7 text-paper/76 md:text-base"
                   data-shutter-key="hero.body"
                 >
-                {content.hero.body}
-              </p>
+                  {content.hero.body}
+                </p>
             </div>
 
             <div
@@ -481,9 +780,9 @@ export default function LandingPage({ content }: LandingPageProps) {
               className="mx-auto flex items-center gap-4 font-mono text-[0.64rem] uppercase tracking-[0.18em] text-paper/72"
             >
               <span className="h-px w-14 bg-paper/34" />
-                <span data-shutter-key="hero.scrollLabel">
-                  {content.hero.scrollLabel}
-                </span>
+              <span data-shutter-key="hero.scrollLabel">
+                {content.hero.scrollLabel}
+              </span>
               <span className="h-px w-14 bg-paper/34" />
             </div>
           </div>
@@ -494,50 +793,74 @@ export default function LandingPage({ content }: LandingPageProps) {
           data-section="tenuta"
           className="relative bg-paper px-5 py-[4.5rem] md:px-8 md:py-28"
         >
-            <SectionReference
-              marker={content.menu.sections.tenuta}
-              shutterKey="menu.sections.tenuta.referenceId"
-            />
+          <SectionReference
+            marker={content.menu.sections.tenuta}
+            shutterKey="menu.sections.tenuta.referenceId"
+          />
           <div className="mx-auto max-w-[1560px]">
-            <div className="chapter-rule text-center text-ink/72">
-                <Crest
-                  label={content.brand.mark}
-                  shutterKey="brand.mark"
-                  className="mx-auto text-ink"
-                />
-                <p
-                  className="mt-4 font-mono text-[0.62rem] uppercase tracking-[0.22em]"
-                  data-shutter-key="introduction.eyebrow"
-                >
-                {content.introduction.eyebrow}
-              </p>
-            </div>
-
             <h2
-                data-reveal
-                className="mx-auto mt-12 max-w-[18ch] text-center font-display text-[clamp(2.25rem,5vw,5.8rem)] font-medium leading-[0.95] text-ink"
-                data-shutter-key="introduction.headline"
-              >
+              data-reveal
+              className="mx-auto max-w-[18ch] text-center font-display text-[clamp(2.25rem,5vw,5.8rem)] font-medium leading-[0.95] text-ink"
+              data-shutter-key="introduction.headline"
+            >
               {content.introduction.headline}
             </h2>
 
-            <div className="mx-auto mt-14 grid max-w-[1080px] grid-cols-3 gap-3 md:gap-8">
-              {[0, 1, 2].map((index) => (
-                <Figure
-                    key={index}
-                    image={content.introduction.image!}
-                    shutterKey="introduction.image"
-                  className="arch aspect-[0.62] border border-ink/12"
-                  imageClassName={`scale-125 ${
-                    index === 0
-                      ? "object-[28%_50%]"
-                      : index === 1
-                        ? "object-[50%_50%]"
-                        : "object-[72%_50%]"
-                  }`}
-                  sizes="(min-width: 768px) 28vw, 31vw"
+            <div
+              className="relative mx-auto mt-14 h-[58vw] min-h-[320px] w-full overflow-hidden outline-none md:h-[590px] md:w-[1120px]"
+              data-tenuta-reveal
+              data-shutter-key="introduction.videoPlaceholder"
+            >
+              <div
+                className="absolute inset-0 z-0"
+                data-tenuta-video
+                aria-hidden="true"
+              >
+                <Image
+                  src={content.introduction.image!.src}
+                  alt=""
+                  fill
+                  sizes="(min-width: 768px) 1120px, 118vw"
+                  className="scale-105 object-cover object-[50%_52%]"
                 />
-              ))}
+                <div className="absolute inset-0 bg-ink/16" />
+              </div>
+              <svg
+                className="absolute -inset-[1px] z-10 h-[calc(100%+2px)] w-[calc(100%+2px)]"
+                viewBox="0 0 1200 700"
+                preserveAspectRatio="none"
+                aria-hidden="true"
+              >
+                <defs>
+                  <mask id="tenuta-arch-openings">
+                    <rect width="1200" height="700" fill="white" />
+                    <path
+                      data-tenuta-mask-opening="left"
+                      d="M82 650 L82 320 A150 150 0 0 1 382 320 L382 650 Z"
+                      fill="black"
+                    />
+                    <path
+                      data-tenuta-mask-opening="center"
+                      d="M450 650 L450 300 A150 150 0 0 1 750 300 L750 650 Z"
+                      fill="black"
+                    />
+                    <path
+                      data-tenuta-mask-opening="right"
+                      d="M818 650 L818 320 A150 150 0 0 1 1118 320 L1118 650 Z"
+                      fill="black"
+                    />
+                  </mask>
+                </defs>
+                <rect
+                  data-tenuta-mask-surface
+                  x="-8"
+                  y="-8"
+                  width="1216"
+                  height="716"
+                  fill="var(--paper)"
+                  mask="url(#tenuta-arch-openings)"
+                />
+              </svg>
             </div>
 
             <div
@@ -571,34 +894,20 @@ export default function LandingPage({ content }: LandingPageProps) {
               tone="dark"
             />
           <div className="mx-auto max-w-[1560px]">
-            <div className="chapter-rule chapter-rule-dark text-center text-paper/72">
-                <Crest
-                  label={content.brand.mark}
-                  shutterKey="brand.mark"
-                  className="mx-auto text-paper"
-                />
-                <p
-                  className="mt-4 font-mono text-[0.62rem] uppercase tracking-[0.22em]"
-                  data-shutter-key="product.eyebrow"
-                >
-                {content.product.eyebrow}
-              </p>
-            </div>
-
-            <div className="mx-auto mt-12 grid max-w-[1180px] gap-10 text-center">
+            <div className="mx-auto grid max-w-[1180px] gap-10 text-center">
               <h2
                   data-reveal
                   className="font-display text-[clamp(2.7rem,7vw,7.4rem)] font-medium italic leading-none"
                   data-shutter-key="product.headline"
-                >
+              >
                 {content.product.headline}
               </h2>
-              <Figure
-                  image={content.product.image!}
-                  shutterKey="product.image"
-                className="mx-auto aspect-[0.75] w-full max-w-[420px] border border-paper/14"
-                imageClassName="object-[50%_50%]"
-                sizes="(min-width: 768px) 420px, 86vw"
+              <ProductGallerySlider
+                images={
+                  content.product.gallery.length > 0
+                    ? content.product.gallery.slice(0, 3)
+                    : [content.product.image!]
+                }
               />
               <p
                   data-reveal
@@ -607,19 +916,6 @@ export default function LandingPage({ content }: LandingPageProps) {
                 >
                 {content.product.body}
               </p>
-            </div>
-
-            <div className="mt-16 grid gap-5 md:grid-cols-3">
-              {content.product.gallery.map((image, index) => (
-                <Figure
-                    key={`${image.src}-${index}`}
-                    image={image}
-                    shutterKey={`product.gallery.${index}`}
-                  className="aspect-[0.84] border border-paper/12"
-                  imageClassName="transition duration-700 hover:scale-105"
-                  sizes="(min-width: 768px) 31vw, 100vw"
-                />
-              ))}
             </div>
           </div>
         </section>
@@ -684,7 +980,7 @@ export default function LandingPage({ content }: LandingPageProps) {
             <Figure
                 image={content.vineyard.image!}
                 shutterKey="vineyard.image"
-              className="aspect-[0.9] border border-paper/12 lg:aspect-[0.82]"
+              className="aspect-[0.9] lg:aspect-[0.82]"
               sizes="(min-width: 1024px) 50vw, 100vw"
             />
             <div data-reveal className="lg:pl-8">
@@ -724,13 +1020,13 @@ export default function LandingPage({ content }: LandingPageProps) {
               <Figure
                   image={content.cellar.image!}
                   shutterKey="cellar.image"
-                className="arch absolute left-0 top-0 aspect-[0.58] w-[54%] max-w-[470px] border border-ink/12 md:w-[34%]"
+                className="arch absolute left-0 top-0 aspect-[0.58] w-[54%] max-w-[470px] md:w-[34%]"
                 sizes="(min-width: 768px) 34vw, 54vw"
               />
               <Figure
                   image={content.cellar.secondaryImage}
                   shutterKey="cellar.secondaryImage"
-                className="arch absolute right-0 top-[230px] aspect-[0.72] w-[48%] max-w-[390px] border border-ink/12 md:right-[8%] md:w-[28%]"
+                className="arch absolute right-0 top-[230px] aspect-[0.72] w-[48%] max-w-[390px] md:right-[8%] md:w-[28%]"
                 imageClassName="object-[48%_50%]"
                 sizes="(min-width: 768px) 28vw, 48vw"
               />
@@ -780,21 +1076,7 @@ export default function LandingPage({ content }: LandingPageProps) {
               tone="dark"
             />
           <div className="mx-auto max-w-[1560px]">
-            <div className="chapter-rule chapter-rule-dark text-center text-paper/72">
-                <Crest
-                  label={content.brand.mark}
-                  shutterKey="brand.mark"
-                  className="mx-auto text-paper"
-                />
-                <p
-                  className="mt-4 font-mono text-[0.62rem] uppercase tracking-[0.22em]"
-                  data-shutter-key="memory.eyebrow"
-                >
-                {content.memory.eyebrow}
-              </p>
-            </div>
-
-            <div className="relative mt-[4.5rem] min-h-[640px] md:mt-24">
+            <div className="relative min-h-[640px]">
               <h2
                   aria-hidden="true"
                   className="pointer-events-none absolute left-1/2 top-1/2 w-max -translate-x-1/2 -translate-y-1/2 font-display text-[clamp(8rem,27vw,27rem)] font-medium uppercase leading-none text-paper/95"
