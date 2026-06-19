@@ -20,40 +20,6 @@ type LandingPageProps = {
   content: LandingContent;
 };
 
-type FigureProps = {
-  image: LandingImage;
-  className?: string;
-  imageClassName?: string;
-  shutterKey?: string;
-  priority?: boolean;
-  sizes?: string;
-};
-
-function Figure({
-  image,
-  className = "",
-  imageClassName = "",
-  shutterKey,
-  priority = false,
-  sizes = "(min-width: 1024px) 40vw, 100vw",
-}: FigureProps) {
-  return (
-    <figure
-      className={`relative overflow-hidden ${className}`}
-      data-shutter-key={shutterKey}
-    >
-      <Image
-        src={image.src}
-        alt={image.alt}
-        fill
-        priority={priority}
-        sizes={sizes}
-        className={`object-cover ${imageClassName}`}
-      />
-    </figure>
-  );
-}
-
 function ProductGallerySlider({
   slides,
 }: {
@@ -326,7 +292,7 @@ function ArchiveChapterSection({
   marker: LandingSectionMarker;
 }) {
   const stageRef = useRef<HTMLElement>(null);
-  const states = archive.states.length > 0 ? archive.states : [];
+  const states = archive.states;
 
   useEffect(() => {
     const stage = stageRef.current;
@@ -365,9 +331,11 @@ function ArchiveChapterSection({
       if (!reduceMotion) {
         floaters.forEach((floater, index) => {
           gsap.to(floater, {
-            y: index % 2 === 0 ? -14 : 12,
-            rotation: index % 2 === 0 ? 2.5 : -2.5,
-            duration: 4.8 + index * 0.35,
+            x: index % 2 === 0 ? 10 : -12,
+            y: index % 2 === 0 ? -26 : 24,
+            rotation: index % 2 === 0 ? 5.5 : -5,
+            scale: index % 2 === 0 ? 1.035 : 1.025,
+            duration: 3.6 + index * 0.28,
             ease: "sine.inOut",
             repeat: -1,
             yoyo: true,
@@ -568,7 +536,7 @@ function CellarChapterSection({
   marker: LandingSectionMarker;
 }) {
   const stageRef = useRef<HTMLElement>(null);
-  const states = cellar.states.length > 0 ? cellar.states : [];
+  const states = cellar.states;
 
   useEffect(() => {
     const stage = stageRef.current;
@@ -590,24 +558,37 @@ function CellarChapterSection({
         "[data-cellar-copy]",
         stage,
       );
+      const cellarObjects = gsap.utils.toArray<HTMLElement>(
+        "[data-cellar-object]",
+        stage,
+      );
 
-      gsap.set(stateLayers, { autoAlpha: 0 });
+      gsap.set(stateLayers, { autoAlpha: 1 });
       gsap.set(copyLayers, { autoAlpha: 0, y: 28 });
+      gsap.set(cellarObjects, {
+        autoAlpha: 1,
+        visibility: "hidden",
+        y: () => window.innerHeight,
+        yPercent: 0,
+        scale: 0.96,
+      });
       gsap.set(stateLayers[0], { autoAlpha: 1 });
       gsap.set(copyLayers[0], { autoAlpha: 1, y: 0 });
 
       if (reduceMotion) {
-        gsap.set(`[data-cellar-state="0"] [data-cellar-object]`, {
+        gsap.set(cellarObjects.slice(0, 3), {
           autoAlpha: 1,
           yPercent: 0,
+          scale: 1,
         });
         return;
       }
 
-      if (states.length === 1) {
-        gsap.set(`[data-cellar-state="0"] [data-cellar-object]`, {
+      if (cellarObjects.length <= 3) {
+        gsap.set(cellarObjects, {
           autoAlpha: 1,
           yPercent: 0,
+          scale: 1,
         });
         return;
       }
@@ -616,7 +597,8 @@ function CellarChapterSection({
         scrollTrigger: {
           trigger: stage,
           start: "top top",
-          end: `+=${states.length * 95}%`,
+          end: () =>
+            `+=${Math.max(cellarObjects.length * window.innerHeight * 0.52, 3200)}`,
           pin: true,
           scrub: 0.85,
           anticipatePin: 1,
@@ -628,72 +610,55 @@ function CellarChapterSection({
         },
       });
 
-      // First chapter rises in from below behind the text as you scroll in.
-      timeline.fromTo(
-        `[data-cellar-state="0"] [data-cellar-object]`,
-        { yPercent: 60, autoAlpha: 0 },
-        {
-          yPercent: 0,
-          autoAlpha: 1,
-          duration: 0.6,
-          ease: "power3.out",
-          stagger: 0.08,
-        },
-        0,
-      );
+      cellarObjects.forEach((object, index) => {
+        timeline
+          .fromTo(
+            object,
+            {
+              visibility: "visible",
+              y: () => window.innerHeight - object.offsetTop + 96,
+              scale: 0.96,
+            },
+            {
+              visibility: "visible",
+              y: () => -(object.offsetTop + object.offsetHeight + 96),
+              scale: 1,
+              duration: 1.55,
+              ease: "none",
+            },
+            index,
+          )
+          .set(
+            object,
+            {
+              visibility: "hidden",
+            },
+            index + 1.55,
+          );
+      });
 
-      // Each following chapter holds, then the previous arches rise out and
-      // fade while the next set rises in from below. Transitions land on the
-      // integer beat so every chapter gets a readable hold first.
-      states.forEach((_, index) => {
-        if (index === 0) {
+      const fadeCopy = (previous: number, next: number, at: number) => {
+        if (!copyLayers[previous] || !copyLayers[next]) {
           return;
         }
 
-        const previous = index - 1;
-        const at = index;
+        timeline
+          .to(
+            `[data-cellar-copy="${previous}"]`,
+            { autoAlpha: 0, y: -30, duration: 0.35, ease: "power2.inOut" },
+            at,
+          )
+          .fromTo(
+            `[data-cellar-copy="${next}"]`,
+            { autoAlpha: 0, y: 36 },
+            { autoAlpha: 1, y: 0, duration: 0.45, ease: "power2.out" },
+            at + 0.08,
+          );
+      };
 
-        timeline.to(
-          `[data-cellar-copy="${previous}"]`,
-          { autoAlpha: 0, y: -30, duration: 0.35, ease: "power2.in" },
-          at,
-        );
-        timeline.to(
-          `[data-cellar-state="${previous}"] [data-cellar-object]`,
-          {
-            yPercent: -55,
-            autoAlpha: 0,
-            duration: 0.5,
-            ease: "power2.in",
-            stagger: 0.06,
-          },
-          at,
-        );
-        timeline.set(
-          `[data-cellar-state="${previous}"]`,
-          { autoAlpha: 0 },
-          at + 0.5,
-        );
-        timeline.set(`[data-cellar-state="${index}"]`, { autoAlpha: 1 }, at + 0.1);
-        timeline.fromTo(
-          `[data-cellar-state="${index}"] [data-cellar-object]`,
-          { yPercent: 60, autoAlpha: 0 },
-          {
-            yPercent: 0,
-            autoAlpha: 1,
-            duration: 0.6,
-            ease: "power3.out",
-            stagger: 0.08,
-          },
-          at + 0.15,
-        );
-        timeline.fromTo(
-          `[data-cellar-copy="${index}"]`,
-          { autoAlpha: 0, y: 36 },
-          { autoAlpha: 1, y: 0, duration: 0.45, ease: "power2.out" },
-          at + 0.2,
-        );
-      });
+      fadeCopy(0, 1, 3);
+      fadeCopy(1, 2, 6);
+      timeline.to({}, { duration: 0.1 }, cellarObjects.length + 0.4);
     }, stage);
 
     return () => ctx.revert();
@@ -787,6 +752,487 @@ function CellarChapterSection({
             <span className="h-px w-12 bg-current" />
           </a>
         </div>
+      </div>
+    </section>
+  );
+}
+
+function VineyardVisual({
+  state,
+  index,
+}: {
+  state: LandingContent["vineyard"]["states"][number];
+  index: number;
+}) {
+  return (
+    <div
+      data-vineyard-column
+      className="relative mx-auto h-[34svh] min-h-[250px] w-full max-w-[680px] md:h-[56svh] lg:h-full lg:max-w-none"
+    >
+      <figure
+        className="absolute left-1/2 top-1/2 h-full w-[70%] max-w-[680px] -translate-x-1/2 -translate-y-1/2 overflow-hidden md:w-[76%] lg:inset-0 lg:w-full lg:max-w-none lg:translate-x-0 lg:translate-y-0"
+        data-shutter-key={`vineyard.states.${index}.primaryImage`}
+      >
+        <Image
+          src={state.primaryImage.src}
+          alt={state.primaryImage.alt}
+          fill
+          sizes="(min-width: 1024px) 42vw, 78vw"
+          className="object-cover"
+        />
+      </figure>
+    </div>
+  );
+}
+
+function VineyardCopy({
+  state,
+  index,
+}: {
+  state: LandingContent["vineyard"]["states"][number];
+  index: number;
+}) {
+  return (
+    <article
+      data-vineyard-column
+      className="mx-auto flex w-full max-w-[680px] flex-col items-center text-center"
+    >
+      <h2
+        className="max-w-[12ch] font-display text-[clamp(2.35rem,8vw,4.1rem)] font-normal uppercase leading-[1.08] text-paper lg:text-[clamp(3.2rem,4.5vw,4.1rem)]"
+        data-shutter-key={`vineyard.states.${index}.headline`}
+      >
+        {state.headline}
+      </h2>
+      <figure
+        className="relative mt-7 h-[180px] w-[150px] overflow-hidden shadow-[0_24px_70px_rgba(0,0,0,0.32)] md:mt-8 md:h-[260px] md:w-[217px]"
+        data-shutter-key={`vineyard.states.${index}.secondaryImage`}
+      >
+        <Image
+          src={state.secondaryImage.src}
+          alt={state.secondaryImage.alt}
+          fill
+          sizes="(min-width: 1024px) 217px, 40vw"
+          className="object-cover"
+        />
+      </figure>
+      <p
+        className="mt-6 max-w-[651px] font-display text-[0.92rem] leading-[1.58] text-paper/82 md:mt-8 md:text-[1.08rem] md:leading-[1.85]"
+        data-shutter-key={`vineyard.states.${index}.body`}
+      >
+        {state.body}
+      </p>
+    </article>
+  );
+}
+
+function VineyardScrollSection({
+  vineyard,
+  marker,
+}: {
+  vineyard: LandingContent["vineyard"];
+  marker: LandingSectionMarker;
+}) {
+  const stageRef = useRef<HTMLElement>(null);
+  const states = vineyard.states;
+
+  useEffect(() => {
+    const stage = stageRef.current;
+
+    if (!stage || states.length === 0) {
+      return;
+    }
+
+    const isDesktop = window.matchMedia("(min-width: 768px)").matches;
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    if (!isDesktop) {
+      return;
+    }
+
+    const ctx = gsap.context(() => {
+      const copyLayers = states
+        .map((_, index) =>
+          stage.querySelector<HTMLElement>(`[data-vineyard-copy="${index}"]`),
+        )
+        .filter((layer): layer is HTMLElement => Boolean(layer));
+      const imageLayers = states
+        .map((_, index) =>
+          stage.querySelector<HTMLElement>(`[data-vineyard-image="${index}"]`),
+        )
+        .filter((layer): layer is HTMLElement => Boolean(layer));
+
+      gsap.set(copyLayers, {
+        visibility: "hidden",
+        opacity: 1,
+        y: 0,
+      });
+      gsap.set(imageLayers, {
+        visibility: "hidden",
+        yPercent: 110,
+        zIndex: 20,
+      });
+      gsap.set(copyLayers[0], {
+        visibility: "visible",
+        opacity: 1,
+        y: 0,
+      });
+      gsap.set(imageLayers[0], {
+        visibility: "visible",
+        yPercent: 0,
+        zIndex: 22,
+      });
+
+      if (reduceMotion || states.length === 1) {
+        return;
+      }
+
+      const timeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: stage,
+          start: "top top",
+          end: () => `+=${Math.max(states.length * window.innerHeight * 0.95, 2600)}`,
+          pin: true,
+          scrub: 0.9,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+          fastScrollEnd: true,
+          refreshPriority: 1.5,
+        },
+      });
+
+      let cursor = 0.25;
+
+      states.forEach((_, index) => {
+        if (index === 0) {
+          return;
+        }
+
+        const previousCopy = copyLayers[index - 1];
+        const nextCopy = copyLayers[index];
+        const previousImage = imageLayers[index - 1];
+        const nextImage = imageLayers[index];
+
+        if (!previousCopy || !nextCopy || !previousImage || !nextImage) {
+          return;
+        }
+
+        timeline
+          .set(nextCopy, { visibility: "visible", opacity: 1, y: 0 }, cursor)
+          .set(nextImage, { visibility: "visible", zIndex: 30 + index }, cursor)
+          .to(
+            previousImage,
+            {
+              yPercent: -110,
+              duration: 1.05,
+              ease: "none",
+            },
+            cursor,
+          )
+          .fromTo(
+            nextImage,
+            { yPercent: 110 },
+            {
+              yPercent: 0,
+              duration: 1.05,
+              ease: "none",
+            },
+            cursor,
+          )
+          .set(previousImage, { visibility: "hidden" }, cursor + 1.18)
+          .set(previousCopy, { visibility: "hidden" }, cursor + 1.18);
+
+        cursor += 1.45;
+      });
+
+      timeline.to({}, { duration: 0.6 });
+    }, stage);
+
+    return () => ctx.revert();
+  }, [states]);
+
+  if (states.length === 0) {
+    return null;
+  }
+
+  return (
+    <section
+      ref={stageRef}
+      id="vigna"
+      data-section="vigna"
+      className="relative overflow-hidden bg-[#141414] text-paper"
+    >
+      <SectionReference
+        marker={marker}
+        shutterKey="menu.sections.vigna.referenceId"
+        tone="dark"
+      />
+
+      <div className="space-y-24 px-5 pb-24 pt-[24rem] md:hidden">
+        {states.map((state, index) => (
+          <div key={`vineyard-mobile-${state.headline}-${index}`} className="grid gap-10">
+            <VineyardCopy state={state} index={index} />
+            <VineyardVisual state={state} index={index} />
+          </div>
+        ))}
+      </div>
+
+      <div
+        data-vineyard-desktop
+        className="relative hidden h-[100svh] min-h-[760px] overflow-hidden md:block"
+      >
+        <div className="mx-auto grid h-full max-w-[1560px] grid-cols-2 gap-20 px-8 pb-12 pt-[13rem]">
+          {(["left", "right"] as const).map((side) => (
+            <div
+              key={`vineyard-column-${side}`}
+              className="relative h-full overflow-hidden"
+              data-vineyard-desktop-column={side}
+            >
+              {states.map((state, index) => {
+                const imageSide = state.layout === "image-right" ? "right" : "left";
+                const copySide = imageSide === "right" ? "left" : "right";
+
+                return imageSide === side ? (
+                  <div
+                    key={`vineyard-image-${index}`}
+                    data-vineyard-image={index}
+                    className="absolute inset-0 z-20 flex items-center justify-center"
+                    aria-hidden="true"
+                  >
+                    <VineyardVisual state={state} index={index} />
+                  </div>
+                ) : copySide === side ? (
+                  <div
+                    key={`vineyard-copy-${index}`}
+                    data-vineyard-copy={index}
+                    className="absolute inset-0 z-10 flex items-center justify-center"
+                    aria-hidden={index !== 0}
+                  >
+                    <VineyardCopy state={state} index={index} />
+                  </div>
+                ) : null;
+              })}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const memoryVisualAssets = [
+  {
+    src: "/images/memory/memory-06.jpg",
+    alt: "",
+    left: 4380,
+    top: "48vh",
+    className: "h-[350px] w-[256px] rotate-[7deg]",
+  },
+  {
+    src: "/images/memory/memory-07.png",
+    alt: "",
+    left: 4780,
+    top: "54vh",
+    className: "h-[410px] w-[328px] rotate-[15deg]",
+  },
+  {
+    src: "/images/memory/memory-09.png",
+    alt: "",
+    left: 3520,
+    top: "69vh",
+    className: "h-[386px] w-[309px] rotate-180",
+  },
+  {
+    src: "/images/memory/memory-10.png",
+    alt: "",
+    left: 3880,
+    top: "8vh",
+    className: "h-[318px] w-[255px] rotate-[-161deg]",
+  },
+];
+
+const memoryImageLayouts = [
+  { top: "16vh", className: "h-[342px] w-[274px]" },
+  { top: "62vh", className: "h-[381px] w-[305px]" },
+  { top: "23vh", className: "h-[336px] w-[260px] rotate-[-0.11deg]" },
+  { top: "56vh", className: "h-[337px] w-[269px]" },
+  { top: "18vh", className: "h-[370px] w-[296px] rotate-180" },
+  { top: "51vh", className: "h-[259px] w-[345px]" },
+];
+
+function MemoryHorizontalSection({
+  memory,
+  marker,
+}: {
+  memory: LandingContent["memory"];
+  marker: LandingSectionMarker;
+}) {
+  const stageRef = useRef<HTMLElement>(null);
+  const items = memory.items;
+  const trackWidth = Math.max(5600, items.length * 880 + 1400);
+
+  useEffect(() => {
+    const stage = stageRef.current;
+
+    if (!stage || items.length === 0) {
+      return;
+    }
+
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    const ctx = gsap.context(() => {
+      const track = stage.querySelector<HTMLElement>("[data-memory-track]");
+
+      if (!track || reduceMotion) {
+        return;
+      }
+
+      const getDistance = () =>
+        Math.max(0, track.scrollWidth - window.innerWidth);
+
+      gsap.to(track, {
+        x: () => -getDistance(),
+        ease: "none",
+        scrollTrigger: {
+          trigger: stage,
+          start: "top top",
+          end: () => `+=${getDistance()}`,
+          pin: true,
+          scrub: 0.9,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+          refreshPriority: 0,
+        },
+      });
+
+      gsap.utils
+        .toArray<HTMLElement>("[data-memory-float]", stage)
+        .forEach((element, index) => {
+          gsap.to(element, {
+            y: index % 2 === 0 ? -18 : 14,
+            rotation: index % 2 === 0 ? "+=1.8" : "-=1.8",
+            duration: 5.2 + index * 0.25,
+            ease: "sine.inOut",
+            repeat: -1,
+            yoyo: true,
+          });
+        });
+    }, stage);
+
+    return () => ctx.revert();
+  }, [items.length]);
+
+  if (items.length === 0) {
+    return null;
+  }
+
+  return (
+    <section
+      ref={stageRef}
+      data-section="memoria"
+      className="relative overflow-hidden bg-[#141414] text-paper"
+    >
+      <SectionReference
+        marker={marker}
+        shutterKey="menu.sections.memoria.referenceId"
+        tone="dark"
+      />
+
+      <div
+        data-memory-track
+        className="relative h-[100svh] min-h-[760px]"
+        style={{ width: `${trackWidth}px` }}
+      >
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 font-display font-normal uppercase leading-[0.75] text-[#e0dad6]"
+        >
+          <span className="absolute left-[260px] top-[35vh] text-[11rem] md:text-[23rem]">
+            Memoria
+          </span>
+          <span className="absolute left-[1260px] top-[68vh] text-[11rem] md:text-[23rem]">
+            viva
+          </span>
+          <span className="absolute left-[2140px] top-[35vh] text-[11rem] md:text-[23rem]">
+            il sogno
+          </span>
+          <span className="absolute left-[3220px] top-[68vh] text-[11rem] md:text-[23rem]">
+            delle bollicine
+          </span>
+        </div>
+
+        {items.map((item, index) => {
+          const textLeft = 330 + index * 820;
+          const imageLeft = textLeft + (index % 2 === 0 ? 500 : 230);
+          const textTop = index % 2 === 0 ? "24vh" : "70vh";
+          const imageLayout = memoryImageLayouts[index % memoryImageLayouts.length];
+
+          return (
+            <div key={`${item.number}-${item.headline}`}>
+              {item.image ? (
+                <figure
+                  data-memory-float
+                  className={`absolute overflow-hidden ${imageLayout.className}`}
+                  style={{ left: `${imageLeft}px`, top: imageLayout.top }}
+                  data-shutter-key={`memory.items.${index}.image`}
+                >
+                  <Image
+                    src={item.image.src}
+                    alt={item.image.alt}
+                    fill
+                    sizes="(min-width: 768px) 320px, 60vw"
+                    className="object-cover"
+                  />
+                </figure>
+              ) : null}
+
+              <article
+                className="absolute z-10 max-w-[380px] text-paper"
+                style={{ left: `${textLeft}px`, top: textTop }}
+              >
+                <p
+                  className="font-display text-[2.2rem] leading-none text-paper"
+                  data-shutter-key={`memory.items.${index}.number`}
+                >
+                  ({item.number})
+                </p>
+                <h3
+                  className="mt-6 font-display text-xl uppercase leading-[1.08] text-paper md:text-[1.55rem]"
+                  data-shutter-key={`memory.items.${index}.headline`}
+                >
+                  {item.headline}
+                </h3>
+                <p
+                  className="mt-4 max-w-[350px] font-display text-lg leading-[1.35] text-paper/82"
+                  data-shutter-key={`memory.items.${index}.body`}
+                >
+                  {item.body}
+                </p>
+              </article>
+            </div>
+          );
+        })}
+
+        {memoryVisualAssets.map((asset) => (
+          <figure
+            key={asset.src}
+            data-memory-float
+            className={`absolute overflow-hidden ${asset.className}`}
+            style={{ left: `${asset.left}px`, top: asset.top }}
+            aria-hidden="true"
+          >
+            <Image
+              src={asset.src}
+              alt={asset.alt}
+              fill
+              sizes="(min-width: 768px) 360px, 64vw"
+              className="object-cover"
+            />
+          </figure>
+        ))}
       </div>
     </section>
   );
@@ -1457,102 +1903,20 @@ export default function LandingPage({ content }: LandingPageProps) {
           marker={content.menu.sections.archive}
         />
 
-        <section
-          id="vigna"
-          data-section="vigna"
-          className="relative bg-ink px-5 py-[4.5rem] text-paper md:px-8 md:py-28"
-        >
-            <SectionReference
-              marker={content.menu.sections.vigna}
-              shutterKey="menu.sections.vigna.referenceId"
-              tone="dark"
-            />
-          <div className="mx-auto grid max-w-[1380px] gap-12 lg:grid-cols-[0.58fr_0.42fr] lg:items-center">
-            <Figure
-                image={content.vineyard.image!}
-                shutterKey="vineyard.image"
-              className="aspect-[0.9] lg:aspect-[0.82]"
-              sizes="(min-width: 1024px) 50vw, 100vw"
-            />
-            <div data-reveal className="lg:pl-8">
-                <p
-                  className="font-mono text-[0.62rem] uppercase tracking-[0.22em] text-gold"
-                  data-shutter-key="vineyard.eyebrow"
-                >
-                {content.vineyard.eyebrow}
-              </p>
-                <h2
-                  className="mt-6 max-w-[9ch] font-display text-[clamp(3.3rem,7vw,7.4rem)] font-medium uppercase leading-[0.9]"
-                  data-shutter-key="vineyard.headline"
-                >
-                {content.vineyard.headline}
-              </h2>
-                <p
-                  className="mt-8 max-w-[560px] text-sm leading-7 text-paper/70 md:text-base"
-                  data-shutter-key="vineyard.body"
-                >
-                {content.vineyard.body}
-              </p>
-            </div>
-          </div>
-        </section>
+        <VineyardScrollSection
+          vineyard={content.vineyard}
+          marker={content.menu.sections.vigna}
+        />
 
         <CellarChapterSection
           cellar={content.cellar}
           marker={content.menu.sections.cantina}
         />
 
-        <section
-          data-section="memoria"
-          className="relative bg-ink px-5 py-20 text-paper md:px-8 md:py-32"
-        >
-            <SectionReference
-              marker={content.menu.sections.memoria}
-              shutterKey="menu.sections.memoria.referenceId"
-              tone="dark"
-            />
-          <div className="mx-auto max-w-[1560px]">
-            <div className="relative min-h-[640px]">
-              <h2
-                  aria-hidden="true"
-                  className="pointer-events-none absolute left-1/2 top-1/2 w-max -translate-x-1/2 -translate-y-1/2 font-display text-[clamp(8rem,27vw,27rem)] font-medium uppercase leading-none text-paper/95"
-                  data-shutter-key="memory.headline"
-                >
-                {content.memory.headline}
-              </h2>
-              <div className="relative z-10 grid gap-8 md:grid-cols-3 md:items-start">
-                {content.memory.items.map((item, index) => (
-                  <article
-                    data-reveal
-                    key={item.number}
-                    className={`max-w-[320px] border-t border-paper/30 pt-5 text-paper ${
-                      index === 1 ? "md:mt-48" : index === 2 ? "md:mt-20" : ""
-                    }`}
-                  >
-                      <p
-                        className="font-mono text-[0.62rem] uppercase tracking-[0.22em] text-gold"
-                        data-shutter-key={`memory.items.${index}.number`}
-                      >
-                      ({item.number})
-                    </p>
-                      <h3
-                        className="mt-4 font-display text-3xl font-medium leading-none"
-                        data-shutter-key={`memory.items.${index}.headline`}
-                      >
-                      {item.headline}
-                    </h3>
-                      <p
-                        className="mt-5 text-sm leading-6 text-paper/70"
-                        data-shutter-key={`memory.items.${index}.body`}
-                      >
-                      {item.body}
-                    </p>
-                  </article>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
+        <MemoryHorizontalSection
+          memory={content.memory}
+          marker={content.menu.sections.memoria}
+        />
       </main>
 
       <footer

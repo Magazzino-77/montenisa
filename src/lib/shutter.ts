@@ -21,10 +21,19 @@ export type LandingChapter = {
   image?: LandingImage;
 };
 
+export type VineyardState = {
+  headline: string;
+  body: string;
+  primaryImage: LandingImage;
+  secondaryImage: LandingImage;
+  layout: "image-left" | "image-right";
+};
+
 export type LandingMemory = {
   number: string;
   headline: string;
   body: string;
+  image?: LandingImage;
 };
 
 export type ArchiveObject = {
@@ -98,7 +107,9 @@ export type LandingContent = {
     slides: ProductSlide[];
   };
   archive: ArchiveChapter;
-  vineyard: LandingChapter;
+  vineyard: LandingChapter & {
+    states: VineyardState[];
+  };
   cellar: {
     eyebrow: string;
     cta: string;
@@ -363,11 +374,55 @@ export const fallbackLandingContent: LandingContent = {
     eyebrow: "I vigneti",
     headline: "La vigna custodisce",
     body:
-      "Dove la natura lascia il tempo al metodo. Una sezione orizzontale, più silenziosa, che alterna fotografia e testo per preparare movimenti di camera, dissolvenze e progressioni lente.",
+      "Dentro la Wunderkammer di Tenuta Montenisa, la vigna è il primo linguaggio della meraviglia. Chardonnay, Pinot Nero e Pinot Bianco diventano materia viva.",
     image: {
-      src: "/images/montenisa-vineyard.png",
-      alt: "Winter vineyard in soft light",
+      src: "/images/vineyard/vineyard-01-main-b.jpg",
+      alt: "Vigneto di Tenuta Montenisa nella luce del mattino",
     },
+    states: [
+      {
+        headline: "La vigna custodisce",
+        body:
+          "Dentro la Wunderkammer di Tenuta Montenisa, la vigna è il primo linguaggio della meraviglia. Chardonnay, Pinot Nero e Pinot Bianco diventano materia viva: lo Chardonnay porta luce e note floreali, il Pinot Nero struttura e profondità, il Pinot Bianco sapidità e mineralità. Tre varietà, tre caratteri, un’unica origine destinata a diventare cuvée.",
+        primaryImage: {
+          src: "/images/vineyard/vineyard-01-main-b.jpg",
+          alt: "Filari di vite in controluce a Tenuta Montenisa",
+        },
+        secondaryImage: {
+          src: "/images/vineyard/vineyard-01-detail.jpg",
+          alt: "Dettaglio del vigneto di Tenuta Montenisa",
+        },
+        layout: "image-left",
+      },
+      {
+        headline: "La collina di S. Stefano",
+        body:
+          "Sulla collina di S. Stefano si trovano i vigneti storici di Tenuta Montenisa. Qui luce, aria, pendenza e memoria diventano parte della materia. Il paesaggio non è solo sfondo: custodisce le uve, ne accompagna la maturazione e consegna alle cuvée profumo, equilibrio e complessità. Una stanza aperta della Wunderkammer, dove la natura prende voce.",
+        primaryImage: {
+          src: "/images/vineyard/vineyard-02-main.jpg",
+          alt: "Vigneto sulla collina di S. Stefano",
+        },
+        secondaryImage: {
+          src: "/images/vineyard/vineyard-02-detail-b.jpg",
+          alt: "Dettaglio verticale dei vigneti storici",
+        },
+        layout: "image-right",
+      },
+      {
+        headline: "Il brolo e la cura",
+        body:
+          "Accanto ai vigneti storici, Tenuta Montenisa custodisce il brolo: un appezzamento cinto da muro, raccolto e protetto. Qui la vigna diventa giardino di precisione. La scelta delle varietà e la cura dell’ambiente trasformano ogni gesto in responsabilità. Dal brolo alla bottiglia, la materia continua il suo cammino: da grappolo a carattere, da terra a cuvée.",
+        primaryImage: {
+          src: "/images/vineyard/vineyard-03-main-b.jpg",
+          alt: "Vite e luce dorata nel brolo di Tenuta Montenisa",
+        },
+        secondaryImage: {
+          src: "/images/vineyard/vineyard-03-detail.jpg",
+          alt: "Dettaglio della cura della vigna",
+        },
+        layout: "image-left",
+      },
+    ],
   },
   cellar: {
     eyebrow: "Le cantine",
@@ -461,25 +516,67 @@ export const fallbackLandingContent: LandingContent = {
   },
   memory: {
     eyebrow: "La storia",
-    headline: "Memoria viva",
+    headline: "Memoria viva il sogno delle bollicine",
     items: [
       {
         number: "01",
-        headline: "La dimora",
+        headline: "L'incontro tra due famiglie",
         body:
-          "Una casa agricola e nobile, fatta di soglie, portici e corti interne.",
+          "La memoria dei Conti Maggi si intreccia con l'esperienza dei Marchesi Antinori. Dal 1999, Tenuta Montenisa diventa il cuore della Franciacorta Antinori.",
+        image: {
+          src: "/images/memory/memory-01.png",
+          alt: "Ritratto storico legato alla memoria di Tenuta Montenisa",
+        },
       },
       {
         number: "02",
-        headline: "Il paesaggio",
+        headline: "Palazzo Piccolo Maggi",
         body:
-          "La Franciacorta come territorio di precisione, attesa e trasformazione.",
+          "Costruito nel Cinquecento, conserva preziosi affreschi attribuiti a Lattanzio Gambara. Qui la memoria diventa arte e la storia prende forma sulle pareti.",
+        image: {
+          src: "/images/memory/memory-03.png",
+          alt: "Dettaglio architettonico di Palazzo Piccolo Maggi",
+        },
       },
       {
         number: "03",
-        headline: "Il sogno delle bollicine",
+        headline: "Il sogno delle bollicine Antinori",
         body:
-          "La materia del vino incontra una forma più luminosa e contemporanea.",
+          "Dai viaggi a Reims al metodo champenois, nasce il Gran Spumante Marchese Antinori. Un vino che voleva essere degno rivale delle grandi marche di Champagne.",
+        image: {
+          src: "/images/memory/memory-02.jpg",
+          alt: "Pubblicazione storica Niccolo Antinori",
+        },
+      },
+      {
+        number: "04",
+        headline: "Conte Aymo",
+        body:
+          "Fondatore della Mille Miglia, incarna visione, coraggio e spirito pionieristico. La cuvee che porta il suo nome ne raccoglie il carattere dinamico e determinato.",
+        image: {
+          src: "/images/memory/memory-04.png",
+          alt: "Immagine storica dedicata al Conte Aymo",
+        },
+      },
+      {
+        number: "05",
+        headline: "Contessa Maggi",
+        body:
+          "Presenza discreta e profonda, legata al territorio e alla comunita. Il personaggio della Contessa Maggi racconta un'eleganza fatta di armonia, cura e sensibilita.",
+        image: {
+          src: "/images/memory/memory-05.png",
+          alt: "Ritratto ispirato alla Contessa Maggi",
+        },
+      },
+      {
+        number: "06",
+        headline: "Donna Cora Antinori",
+        body:
+          "Figura luminosa della Belle Epoque, simbolo di grazia, raffinatezza e femminilita colta e moderna. Donna Cora Saten custodisce la sua luce in una cuvee fine e armoniosa.",
+        image: {
+          src: "/images/memory/memory-08.png",
+          alt: "Immagine luminosa ispirata a Donna Cora Antinori",
+        },
       },
     ],
   },
@@ -561,6 +658,13 @@ export const landingContentAudit = [
   "vineyard.body",
   "vineyard.image.src",
   "vineyard.image.alt",
+  "vineyard.states[].headline",
+  "vineyard.states[].body",
+  "vineyard.states[].primaryImage.src",
+  "vineyard.states[].primaryImage.alt",
+  "vineyard.states[].secondaryImage.src",
+  "vineyard.states[].secondaryImage.alt",
+  "vineyard.states[].layout",
   "cellar.eyebrow",
   "cellar.cta",
   "cellar.states[].headline",
@@ -572,6 +676,8 @@ export const landingContentAudit = [
   "memory.items[].number",
   "memory.items[].headline",
   "memory.items[].body",
+  "memory.items[].image.src",
+  "memory.items[].image.alt",
   "contact.eyebrow",
   "contact.title",
   "contact.email",
@@ -714,6 +820,51 @@ const normalizeChapterPayload = (
   }) as DeepPartial<LandingChapter>;
 };
 
+const normalizeVineyardState = (
+  state: unknown,
+): DeepPartial<VineyardState> | undefined => {
+  if (!isRecord(state)) {
+    return undefined;
+  }
+
+  const headline = pickString(state, ["headline", "title", "heading"]);
+  const body = pickString(state, ["body", "copy", "description", "text"]);
+  const primaryImage = normalizeImagePayload(
+    state.primaryImage ??
+      state.image ??
+      state.mainImage ??
+      state.media ??
+      state.photo,
+  );
+  const secondaryImage =
+    normalizeImagePayload(
+      state.secondaryImage ??
+        state.detailImage ??
+        state.smallImage ??
+        state.thumbnail ??
+        state.supportingImage,
+    ) ?? primaryImage;
+  const layout = pickString(state, ["layout", "imageSide", "variant"]);
+
+  if (!headline || !body || !primaryImage?.src || !secondaryImage?.src) {
+    return undefined;
+  }
+
+  return {
+    headline,
+    body,
+    primaryImage: {
+      src: primaryImage.src,
+      alt: primaryImage.alt ?? headline,
+    },
+    secondaryImage: {
+      src: secondaryImage.src,
+      alt: secondaryImage.alt ?? headline,
+    },
+    layout: layout === "image-right" || layout === "right" ? "image-right" : "image-left",
+  } satisfies DeepPartial<VineyardState>;
+};
+
 const normalizeMemoryItem = (item: unknown): LandingMemory | undefined => {
   if (!isRecord(item)) {
     return undefined;
@@ -722,12 +873,23 @@ const normalizeMemoryItem = (item: unknown): LandingMemory | undefined => {
   const number = pickString(item, ["number", "index", "label"]);
   const headline = pickString(item, ["headline", "title", "heading"]);
   const body = pickString(item, ["body", "copy", "description", "text"]);
+  const image = normalizeImagePayload(item.image ?? item.media ?? item.photo);
 
   if (!number || !headline || !body) {
     return undefined;
   }
 
-  return { number, headline, body };
+  return {
+    number,
+    headline,
+    body,
+    image: image?.src
+      ? {
+          src: image.src,
+          alt: image.alt ?? headline,
+        }
+      : undefined,
+  };
 };
 
 export const normalizeLandingContent = (
@@ -884,7 +1046,12 @@ export const normalizeLandingContent = (
         },
       ),
     }),
-    vineyard: normalizeChapterPayload(vineyard),
+    vineyard: withoutUndefined({
+      ...normalizeChapterPayload(vineyard),
+      states: pickArray(vineyard, ["states", "chapters", "steps"])?.map(
+        normalizeVineyardState,
+      ).filter(Boolean),
+    }),
     cellar: withoutUndefined({
       eyebrow: pickString(cellar, ["eyebrow", "kicker", "overline", "label"]),
       cta: pickString(cellar, ["cta", "ctaLabel", "ctaText", "label"]),
@@ -1058,7 +1225,12 @@ const mergeContent = (
       ? (content.archive.states as ArchiveState[])
       : fallbackLandingContent.archive.states,
   },
-  vineyard: mergeChapter(fallbackLandingContent.vineyard, content.vineyard),
+  vineyard: {
+    ...mergeChapter(fallbackLandingContent.vineyard, content.vineyard),
+    states: Array.isArray(content.vineyard?.states)
+      ? (content.vineyard.states as VineyardState[])
+      : fallbackLandingContent.vineyard.states,
+  },
   cellar: {
     ...fallbackLandingContent.cellar,
     ...(isRecord(content.cellar) ? content.cellar : {}),
