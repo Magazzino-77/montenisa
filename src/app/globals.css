@@ -68,6 +68,24 @@ a {
   text-wrap: pretty;
 }
 
+/*
+ * Reveal elements are hidden up front (server-rendered) so GSAP can animate
+ * them in without a first-paint flash. They are restored when motion is
+ * reduced (no JS animation runs in that case).
+ */
+[data-reveal],
+[data-hero-reveal] {
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal],
+  [data-hero-reveal] {
+    opacity: 1;
+  }
+}
+
 .arch {
   border-radius: 999px 999px 0 0;
 }

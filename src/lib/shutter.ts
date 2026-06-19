@@ -99,9 +99,10 @@ export type LandingContent = {
   };
   archive: ArchiveChapter;
   vineyard: LandingChapter;
-  cellar: LandingChapter & {
-    secondaryImage: LandingImage;
+  cellar: {
+    eyebrow: string;
     cta: string;
+    states: ArchiveState[];
   };
   memory: {
     eyebrow: string;
@@ -370,18 +371,93 @@ export const fallbackLandingContent: LandingContent = {
   },
   cellar: {
     eyebrow: "Le cantine",
-    headline: "La stanza nascosta",
-    body:
-      "Sotto i portici della Tenuta Montenisa si apre la stanza più segreta: la cantina. Qui il racconto cambia luce e scala, con forme ad arco e immagini sospese.",
-    cta: "Le cantine e i segreti",
-    image: {
-      src: "/images/montenisa-cellar.png",
-      alt: "Hidden wine cellar with oak barrels",
-    },
-    secondaryImage: {
-      src: "/images/montenisa-vineyard.png",
-      alt: "Vineyard detail",
-    },
+    cta: "Scopri gli spumanti",
+    states: [
+      {
+        headline: "La stanza nascosta",
+        body:
+          "Sotto i portici di Tenuta Montenisa si apre la stanza più silenziosa della tenuta: le cantine di vinificazione e affinamento. Qui il racconto cambia luce. La materia raccolta nei vigneti entra in profondità e comincia il suo cammino verso la cuvée.",
+        objects: [
+          {
+            image: {
+              src: "/images/cellar/cantina-1-1.jpg",
+              alt: "Cantina con barrique della Tenuta Montenisa",
+            },
+            placement: "left-[7%] top-[13%] w-[min(22vw,300px)] aspect-[0.73]",
+          },
+          {
+            image: {
+              src: "/images/cellar/cantina-1-2.jpg",
+              alt: "Degustazione nella sala della cantina",
+            },
+            placement: "left-[37%] top-[50%] w-[min(22vw,300px)] aspect-[0.73]",
+          },
+          {
+            image: {
+              src: "/images/cellar/cantina-1-3.jpg",
+              alt: "Corridoio della cantina con botti",
+            },
+            placement: "right-[7%] top-[26%] w-[min(22vw,300px)] aspect-[0.73]",
+          },
+        ],
+      },
+      {
+        headline: "Il tempo riposa",
+        body:
+          "Nelle cantine storiche, il vino in bottiglia matura sui lieviti per lunghi periodi, superiori ai tempi minimi previsti dal disciplinare. L'attesa non è immobilità. È trasformazione lenta, paziente, invisibile: il momento in cui la materia acquista profondità, equilibrio e carattere.",
+        objects: [
+          {
+            image: {
+              src: "/images/cellar/cantina-2-1.jpg",
+              alt: "Volta della cantina storica in penombra",
+            },
+            placement: "left-[7%] top-[13%] w-[min(22vw,300px)] aspect-[0.73]",
+          },
+          {
+            image: {
+              src: "/images/cellar/cantina-2-2.jpg",
+              alt: "Botti in affinamento nella cantina",
+            },
+            placement: "left-[37%] top-[50%] w-[min(22vw,300px)] aspect-[0.73]",
+          },
+          {
+            image: {
+              src: "/images/cellar/cantina-2-3.jpg",
+              alt: "Cantina voltata con grandi botti",
+            },
+            placement: "right-[7%] top-[26%] w-[min(22vw,300px)] aspect-[0.73]",
+          },
+        ],
+      },
+      {
+        headline: "Ogni bottiglia, un gesto",
+        body:
+          "Il remuage viene ancora eseguito con la massima attenzione per ogni singola bottiglia. Un gesto preciso, ripetuto, quasi rituale. Nella stanza del tempo, la cura diventa metodo e il metodo diventa espressione del territorio.",
+        objects: [
+          {
+            image: {
+              src: "/images/cellar/cantina-3-1.jpg",
+              alt: "Bottiglie in affinamento sui lieviti",
+            },
+            placement: "left-[7%] top-[13%] w-[min(22vw,300px)] aspect-[0.73]",
+          },
+          {
+            image: {
+              src: "/images/cellar/cantina-3-2.jpg",
+              alt: "Pupitre con bottiglie durante il remuage",
+            },
+            placement: "left-[37%] top-[50%] w-[min(22vw,300px)] aspect-[0.73]",
+          },
+          {
+            image: {
+              src: "/images/cellar/cantina-3-3.jpg",
+              alt: "Il gesto del remuage sulle bottiglie",
+            },
+            placement: "right-[7%] top-[26%] w-[min(22vw,300px)] aspect-[0.73]",
+          },
+        ],
+      },
+    ],
   },
   memory: {
     eyebrow: "La storia",
@@ -486,13 +562,11 @@ export const landingContentAudit = [
   "vineyard.image.src",
   "vineyard.image.alt",
   "cellar.eyebrow",
-  "cellar.headline",
-  "cellar.body",
   "cellar.cta",
-  "cellar.image.src",
-  "cellar.image.alt",
-  "cellar.secondaryImage.src",
-  "cellar.secondaryImage.alt",
+  "cellar.states[].headline",
+  "cellar.states[].body",
+  "cellar.states[].objects[].image.src",
+  "cellar.states[].objects[].image.alt",
   "memory.eyebrow",
   "memory.headline",
   "memory.items[].number",
@@ -812,11 +886,49 @@ export const normalizeLandingContent = (
     }),
     vineyard: normalizeChapterPayload(vineyard),
     cellar: withoutUndefined({
-      ...normalizeChapterPayload(cellar),
-      cta: pickString(cellar, ["cta", "ctaLabel", "ctaText"]),
-      secondaryImage: normalizeImagePayload(
-        cellar?.secondaryImage ?? cellar?.secondaryMedia ?? cellar?.detailImage,
-      ),
+      eyebrow: pickString(cellar, ["eyebrow", "kicker", "overline", "label"]),
+      cta: pickString(cellar, ["cta", "ctaLabel", "ctaText", "label"]),
+      states: pickArray(cellar, ["states", "chapters", "steps"])?.map((state) => {
+        if (!isRecord(state)) {
+          return undefined;
+        }
+
+        const objects = pickArray(state, ["objects", "items", "assets", "images"])
+          ?.map((object) => {
+            if (!isRecord(object)) {
+              return undefined;
+            }
+
+            const image = normalizeImagePayload(
+              object.image ?? object.media ?? object.asset,
+            );
+
+            if (!image?.src || !image.alt) {
+              return undefined;
+            }
+
+            return {
+              image: { src: image.src, alt: image.alt },
+              placement:
+                pickString(object, ["placement", "className", "position"]) ??
+                "",
+            } satisfies ArchiveObject;
+          })
+          .filter((object): object is ArchiveObject => Boolean(object));
+
+        const headline = pickString(state, ["headline", "title", "heading"]);
+        const body = pickString(state, ["body", "copy", "description", "text"]);
+
+        if (!headline || !body) {
+          return undefined;
+        }
+
+        return {
+          headline,
+          body,
+          objects,
+        } satisfies DeepPartial<ArchiveState>;
+      }),
     }),
     memory: withoutUndefined({
       eyebrow: pickString(memory, ["eyebrow", "kicker", "overline", "label"]),
@@ -948,13 +1060,11 @@ const mergeContent = (
   },
   vineyard: mergeChapter(fallbackLandingContent.vineyard, content.vineyard),
   cellar: {
-    ...mergeChapter(fallbackLandingContent.cellar, content.cellar),
-    secondaryImage: {
-      ...fallbackLandingContent.cellar.secondaryImage,
-      ...(isRecord(content.cellar?.secondaryImage)
-        ? content.cellar.secondaryImage
-        : {}),
-    },
+    ...fallbackLandingContent.cellar,
+    ...(isRecord(content.cellar) ? content.cellar : {}),
+    states: Array.isArray(content.cellar?.states)
+      ? (content.cellar.states as ArchiveState[])
+      : fallbackLandingContent.cellar.states,
   },
   memory: {
     ...fallbackLandingContent.memory,

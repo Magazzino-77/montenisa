@@ -73,11 +73,47 @@ function ProductGallerySlider({
       return;
     }
 
-    gsap.set(frameRefs.current.filter(Boolean), {
-      autoAlpha: 0,
-      scale: 1.025,
-      clipPath: "inset(0% 0% 0% 100%)",
-    });
+    const frames = frameRefs.current.filter(
+      (frame): frame is HTMLElement => Boolean(frame),
+    );
+    const thumbs = thumbRefs.current.filter(
+      (thumb): thumb is HTMLButtonElement => Boolean(thumb),
+    );
+    const headline = headlineRef.current;
+    const animatable = [...frames, ...thumbs, headline].filter(Boolean);
+
+    // Cancel any in-flight tweens so rapid prev/next clicks can't strand a
+    // frame in a half-revealed state.
+    gsap.killTweensOf(animatable);
+
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    if (reduceMotion) {
+      gsap.set(frames, {
+        autoAlpha: 0,
+        scale: 1,
+        clipPath: "inset(0% 0% 0% 0%)",
+      });
+      gsap.set(activeFrame, { autoAlpha: 1 });
+      gsap.set(thumbs, { autoAlpha: 1, y: 0 });
+      if (headline) {
+        gsap.set(headline, { autoAlpha: 1, y: 0 });
+      }
+      return;
+    }
+
+    // Crossfade the outgoing frame instead of hard-cutting it.
+    gsap.to(
+      frames.filter((frame) => frame !== activeFrame),
+      {
+        autoAlpha: 0,
+        scale: 1.025,
+        duration: 0.5,
+        ease: "power2.out",
+      },
+    );
     gsap.fromTo(
       activeFrame,
       {
@@ -94,7 +130,7 @@ function ProductGallerySlider({
       },
     );
     gsap.fromTo(
-      thumbRefs.current.filter(Boolean),
+      thumbs,
       {
         y: 12,
         autoAlpha: 0.42,
@@ -108,9 +144,9 @@ function ProductGallerySlider({
       },
     );
 
-    if (headlineRef.current) {
+    if (headline) {
       gsap.fromTo(
-        headlineRef.current,
+        headline,
         { autoAlpha: 0, y: 18 },
         { autoAlpha: 1, y: 0, duration: 0.65, ease: "power2.out" },
       );
@@ -134,7 +170,6 @@ function ProductGallerySlider({
     <>
       <h2
         ref={headlineRef}
-        data-reveal
         className="font-display text-[clamp(2.7rem,7vw,7.4rem)] font-medium italic leading-none"
         data-shutter-key={`product.slides.${activeIndex}.headline`}
       >
@@ -153,7 +188,9 @@ function ProductGallerySlider({
               ref={(element) => {
                 frameRefs.current[index] = element;
               }}
-              className="pointer-events-none absolute inset-0"
+              className={`pointer-events-none absolute inset-0 ${
+                index === activeIndex ? "" : "opacity-0"
+              }`}
               data-shutter-key={`product.slides.${index}.image`}
               aria-hidden={activeIndex !== index}
             >
@@ -302,115 +339,125 @@ function ArchiveChapterSection({
       "(prefers-reduced-motion: reduce)",
     ).matches;
 
-    const stateLayers = gsap.utils.toArray<HTMLElement>(
-      "[data-archive-state]",
-      stage,
-    );
-    const copyLayers = gsap.utils.toArray<HTMLElement>(
-      "[data-archive-copy]",
-      stage,
-    );
-    const objects = gsap.utils.toArray<HTMLElement>(
-      "[data-archive-object]",
-      stage,
-    );
+    // Everything created inside the context is reverted on cleanup — including
+    // the infinite "float" tweens, which previously leaked across re-renders.
+    const ctx = gsap.context(() => {
+      const stateLayers = gsap.utils.toArray<HTMLElement>(
+        "[data-archive-state]",
+        stage,
+      );
+      const copyLayers = gsap.utils.toArray<HTMLElement>(
+        "[data-archive-copy]",
+        stage,
+      );
+      const floaters = gsap.utils.toArray<HTMLElement>(
+        "[data-archive-float]",
+        stage,
+      );
 
-    gsap.set(stateLayers, { autoAlpha: 0 });
-    gsap.set(copyLayers, { autoAlpha: 0, y: 28 });
-    gsap.set(stateLayers[0], { autoAlpha: 1 });
-    gsap.set(copyLayers[0], { autoAlpha: 1, y: 0 });
+      gsap.set(stateLayers, { autoAlpha: 0 });
+      gsap.set(copyLayers, { autoAlpha: 0, y: 28 });
+      gsap.set(stateLayers[0], { autoAlpha: 1 });
+      gsap.set(copyLayers[0], { autoAlpha: 1, y: 0 });
 
-    if (reduceMotion || states.length === 1) {
-      return;
-    }
+      // Idle drift lives on an inner wrapper so it never competes with the
+      // scroll-driven entrance transform on [data-archive-object].
+      if (!reduceMotion) {
+        floaters.forEach((floater, index) => {
+          gsap.to(floater, {
+            y: index % 2 === 0 ? -14 : 12,
+            rotation: index % 2 === 0 ? 2.5 : -2.5,
+            duration: 4.8 + index * 0.35,
+            ease: "sine.inOut",
+            repeat: -1,
+            yoyo: true,
+          });
+        });
+      }
 
-    const timeline = gsap.timeline({
-      scrollTrigger: {
-        trigger: stage,
-        start: "top top",
-        end: `+=${states.length * 95}%`,
-        pin: true,
-        scrub: 0.85,
-        anticipatePin: 1,
-      },
-    });
-
-    states.forEach((_, index) => {
-      if (index === 0) {
+      if (reduceMotion || states.length === 1) {
         return;
       }
 
-      const previous = index - 1;
-      const transitionStart = previous;
-
-      timeline.to(
-        `[data-archive-copy="${previous}"]`,
-        {
-          autoAlpha: 0,
-          y: -24,
-          duration: 0.35,
-          ease: "power2.inOut",
+      const timeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: stage,
+          start: "top top",
+          end: `+=${states.length * 95}%`,
+          pin: true,
+          scrub: 0.85,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+          fastScrollEnd: true,
+          // Middle of the three page pins (tenuta=3, archive=2, cantina=1) so
+          // spacers are measured top-to-bottom; see the tenuta ScrollTrigger.
+          refreshPriority: 2,
         },
-        transitionStart,
-      );
-      timeline.to(
-        `[data-archive-state="${previous}"]`,
-        {
-          autoAlpha: 0,
-          duration: 0.35,
-          ease: "power2.inOut",
-        },
-        transitionStart,
-      );
-      timeline.fromTo(
-        `[data-archive-copy="${index}"]`,
-        { autoAlpha: 0, y: 36 },
-        {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.45,
-          ease: "power2.out",
-        },
-        transitionStart + 0.08,
-      );
-      timeline.fromTo(
-        `[data-archive-state="${index}"] [data-archive-object]`,
-        { y: 120, autoAlpha: 0 },
-        {
-          y: 0,
-          autoAlpha: 1,
-          duration: 0.7,
-          ease: "power3.out",
-          stagger: 0.08,
-        },
-        transitionStart + 0.04,
-      );
-      timeline.to(
-        `[data-archive-state="${index}"]`,
-        {
-          autoAlpha: 1,
-          duration: 0.2,
-          ease: "none",
-        },
-        transitionStart + 0.04,
-      );
-    });
-
-    objects.forEach((object, index) => {
-      gsap.to(object, {
-        y: index % 2 === 0 ? -14 : 12,
-        rotation: index % 2 === 0 ? 2.5 : -2.5,
-        duration: 4.8 + index * 0.35,
-        ease: "sine.inOut",
-        repeat: -1,
-        yoyo: true,
       });
-    });
 
-    return () => {
-      timeline.scrollTrigger?.kill();
-      timeline.kill();
-    };
+      states.forEach((_, index) => {
+        if (index === 0) {
+          return;
+        }
+
+        const previous = index - 1;
+        const transitionStart = previous;
+
+        timeline.to(
+          `[data-archive-copy="${previous}"]`,
+          {
+            autoAlpha: 0,
+            y: -24,
+            duration: 0.35,
+            ease: "power2.inOut",
+          },
+          transitionStart,
+        );
+        timeline.to(
+          `[data-archive-state="${previous}"]`,
+          {
+            autoAlpha: 0,
+            duration: 0.35,
+            ease: "power2.inOut",
+          },
+          transitionStart,
+        );
+        timeline.fromTo(
+          `[data-archive-copy="${index}"]`,
+          { autoAlpha: 0, y: 36 },
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.45,
+            ease: "power2.out",
+          },
+          transitionStart + 0.08,
+        );
+        timeline.fromTo(
+          `[data-archive-state="${index}"] [data-archive-object]`,
+          { y: 120, autoAlpha: 0 },
+          {
+            y: 0,
+            autoAlpha: 1,
+            duration: 0.7,
+            ease: "power3.out",
+            stagger: 0.08,
+          },
+          transitionStart + 0.04,
+        );
+        timeline.to(
+          `[data-archive-state="${index}"]`,
+          {
+            autoAlpha: 1,
+            duration: 0.2,
+            ease: "none",
+          },
+          transitionStart + 0.04,
+        );
+      });
+    }, stage);
+
+    return () => ctx.revert();
   }, [states]);
 
   if (states.length === 0) {
@@ -441,16 +488,18 @@ function ArchiveChapterSection({
                 <div
                   key={`${object.image.src}-${objectIndex}`}
                   data-archive-object
-                  className={`absolute ${object.placement ?? ""} relative`}
+                  className={`absolute ${object.placement ?? ""}`}
                   data-shutter-key={`archive.states.${stateIndex}.objects.${objectIndex}.image`}
                 >
-                  <Image
-                    src={object.image.src}
-                    alt={object.image.alt}
-                    fill
-                    sizes="(min-width: 1024px) 320px, 42vw"
-                    className="object-contain mix-blend-lighten"
-                  />
+                  <div data-archive-float className="absolute inset-0">
+                    <Image
+                      src={object.image.src}
+                      alt={object.image.alt}
+                      fill
+                      sizes="(min-width: 1024px) 320px, 42vw"
+                      className="object-contain mix-blend-lighten"
+                    />
+                  </div>
                 </div>
               ))}
             </div>
@@ -504,6 +553,238 @@ function ArchiveChapterSection({
               aria-hidden="true"
               className="opacity-72"
             />
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CellarChapterSection({
+  cellar,
+  marker,
+}: {
+  cellar: LandingContent["cellar"];
+  marker: LandingSectionMarker;
+}) {
+  const stageRef = useRef<HTMLElement>(null);
+  const states = cellar.states.length > 0 ? cellar.states : [];
+
+  useEffect(() => {
+    const stage = stageRef.current;
+
+    if (!stage || states.length === 0) {
+      return;
+    }
+
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    const ctx = gsap.context(() => {
+      const stateLayers = gsap.utils.toArray<HTMLElement>(
+        "[data-cellar-state]",
+        stage,
+      );
+      const copyLayers = gsap.utils.toArray<HTMLElement>(
+        "[data-cellar-copy]",
+        stage,
+      );
+
+      gsap.set(stateLayers, { autoAlpha: 0 });
+      gsap.set(copyLayers, { autoAlpha: 0, y: 28 });
+      gsap.set(stateLayers[0], { autoAlpha: 1 });
+      gsap.set(copyLayers[0], { autoAlpha: 1, y: 0 });
+
+      if (reduceMotion) {
+        gsap.set(`[data-cellar-state="0"] [data-cellar-object]`, {
+          autoAlpha: 1,
+          yPercent: 0,
+        });
+        return;
+      }
+
+      if (states.length === 1) {
+        gsap.set(`[data-cellar-state="0"] [data-cellar-object]`, {
+          autoAlpha: 1,
+          yPercent: 0,
+        });
+        return;
+      }
+
+      const timeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: stage,
+          start: "top top",
+          end: `+=${states.length * 95}%`,
+          pin: true,
+          scrub: 0.85,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+          fastScrollEnd: true,
+          // Lowest of the three page pins (tenuta=3, archive=2, cantina=1) so
+          // its spacer is measured after the ones above it.
+          refreshPriority: 1,
+        },
+      });
+
+      // First chapter rises in from below behind the text as you scroll in.
+      timeline.fromTo(
+        `[data-cellar-state="0"] [data-cellar-object]`,
+        { yPercent: 60, autoAlpha: 0 },
+        {
+          yPercent: 0,
+          autoAlpha: 1,
+          duration: 0.6,
+          ease: "power3.out",
+          stagger: 0.08,
+        },
+        0,
+      );
+
+      // Each following chapter holds, then the previous arches rise out and
+      // fade while the next set rises in from below. Transitions land on the
+      // integer beat so every chapter gets a readable hold first.
+      states.forEach((_, index) => {
+        if (index === 0) {
+          return;
+        }
+
+        const previous = index - 1;
+        const at = index;
+
+        timeline.to(
+          `[data-cellar-copy="${previous}"]`,
+          { autoAlpha: 0, y: -30, duration: 0.35, ease: "power2.in" },
+          at,
+        );
+        timeline.to(
+          `[data-cellar-state="${previous}"] [data-cellar-object]`,
+          {
+            yPercent: -55,
+            autoAlpha: 0,
+            duration: 0.5,
+            ease: "power2.in",
+            stagger: 0.06,
+          },
+          at,
+        );
+        timeline.set(
+          `[data-cellar-state="${previous}"]`,
+          { autoAlpha: 0 },
+          at + 0.5,
+        );
+        timeline.set(`[data-cellar-state="${index}"]`, { autoAlpha: 1 }, at + 0.1);
+        timeline.fromTo(
+          `[data-cellar-state="${index}"] [data-cellar-object]`,
+          { yPercent: 60, autoAlpha: 0 },
+          {
+            yPercent: 0,
+            autoAlpha: 1,
+            duration: 0.6,
+            ease: "power3.out",
+            stagger: 0.08,
+          },
+          at + 0.15,
+        );
+        timeline.fromTo(
+          `[data-cellar-copy="${index}"]`,
+          { autoAlpha: 0, y: 36 },
+          { autoAlpha: 1, y: 0, duration: 0.45, ease: "power2.out" },
+          at + 0.2,
+        );
+      });
+    }, stage);
+
+    return () => ctx.revert();
+  }, [states]);
+
+  if (states.length === 0) {
+    return null;
+  }
+
+  return (
+    <section
+      ref={stageRef}
+      id="cantina"
+      data-section="cantina"
+      className="relative overflow-hidden bg-paper"
+    >
+      <SectionReference
+        marker={marker}
+        shutterKey="menu.sections.cantina.referenceId"
+      />
+      <div className="relative mx-auto flex min-h-[100svh] max-w-[1560px] items-center px-5 py-[4.5rem] md:px-8 md:py-32">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          {states.map((state, stateIndex) => (
+            <div
+              key={`cellar-state-${stateIndex}`}
+              data-cellar-state={stateIndex}
+              className="absolute inset-0"
+              aria-hidden={stateIndex !== 0}
+            >
+              {state.objects.map((object, objectIndex) => (
+                <div
+                  key={`${object.image.src}-${objectIndex}`}
+                  data-cellar-object
+                  className={`absolute ${object.placement ?? ""}`}
+                  data-shutter-key={`cellar.states.${stateIndex}.objects.${objectIndex}.image`}
+                >
+                  <Image
+                    src={object.image.src}
+                    alt={object.image.alt}
+                    fill
+                    sizes="(min-width: 768px) 300px, 40vw"
+                    className="object-cover mix-blend-multiply"
+                  />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+
+        <div className="relative z-10 mx-auto w-full max-w-[1180px] text-center">
+          <p
+            className="font-mono text-[0.62rem] uppercase tracking-[0.22em] text-wine"
+            data-shutter-key="cellar.eyebrow"
+          >
+            {cellar.eyebrow}
+          </p>
+
+          <div className="relative mt-6 min-h-[clamp(16rem,40vw,26rem)]">
+            {states.map((state, stateIndex) => (
+              <div
+                key={`cellar-copy-${stateIndex}`}
+                data-cellar-copy={stateIndex}
+                className={
+                  stateIndex === 0 ? "relative" : "absolute inset-x-0 top-0"
+                }
+                aria-hidden={stateIndex !== 0}
+              >
+                <h2
+                  className="mx-auto max-w-[14ch] font-display text-[clamp(2.7rem,7vw,7rem)] font-medium uppercase leading-[0.9] text-ink"
+                  data-shutter-key={`cellar.states.${stateIndex}.headline`}
+                >
+                  {state.headline}
+                </h2>
+                <p
+                  className="mx-auto mt-7 max-w-[620px] text-sm uppercase leading-7 tracking-[0.04em] text-ink/74 md:text-[0.95rem]"
+                  data-shutter-key={`cellar.states.${stateIndex}.body`}
+                >
+                  {state.body}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <a
+            href="#spumanti"
+            className="relative z-10 mt-10 inline-flex items-center gap-4 font-mono text-[0.62rem] uppercase tracking-[0.18em] text-ink transition hover:text-wine"
+            data-shutter-key="cellar.cta"
+          >
+            <span className="h-px w-12 bg-current" />
+            {cellar.cta}
+            <span className="h-px w-12 bg-current" />
           </a>
         </div>
       </div>
@@ -756,19 +1037,14 @@ export default function LandingPage({ content }: LandingPageProps) {
       return;
     }
 
-    const scrollState = {
-      y: window.scrollY,
-    };
-
-    gsap.to(scrollState, {
-      y: Math.max(0, targetY),
+    gsap.to(window, {
       duration: 1.15,
       ease: "power3.inOut",
-      onUpdate: () => {
-        window.scrollTo(0, scrollState.y);
-      },
+      // ScrollToPlugin keeps in sync with ScrollTrigger; autoKill yields the
+      // tween the moment the user scrolls, so it never fights manual input.
+      scrollTo: { y: Math.max(0, targetY), autoKill: true },
+      overwrite: "auto",
       onComplete: () => {
-        window.scrollTo(0, Math.max(0, targetY));
         window.history.pushState(null, "", hash);
       },
     });
@@ -809,25 +1085,36 @@ export default function LandingPage({ content }: LandingPageProps) {
       ).matches;
 
       if (!reduceMotion) {
-        gsap.from("[data-hero-reveal]", {
-          y: 34,
-          opacity: 0,
-          duration: 1.2,
-          ease: "power3.out",
-          stagger: 0.12,
-        });
+        // fromTo (not from): the reveal targets are hidden via CSS for SSR, so
+        // an explicit start state is required or they would animate 0 -> 0.
+        gsap.fromTo(
+          "[data-hero-reveal]",
+          { y: 34, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 1.2,
+            ease: "power3.out",
+            stagger: 0.12,
+          },
+        );
 
         gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((element) => {
-          gsap.from(element, {
-            y: 46,
-            opacity: 0,
-            duration: 0.95,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: element,
-              start: "top 82%",
+          gsap.fromTo(
+            element,
+            { y: 46, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.95,
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: element,
+                start: "top 82%",
+                once: true,
+              },
             },
-          });
+          );
         });
 
         gsap.utils.toArray<HTMLElement>("[data-drift]").forEach((element) => {
@@ -916,20 +1203,29 @@ export default function LandingPage({ content }: LandingPageProps) {
                 pinSpacing: true,
                 anticipatePin: 1,
                 invalidateOnRefresh: true,
+                // Highest of the three page pins (tenuta=3, archive=2,
+                // cantina=1) so spacers are restored top-to-bottom during
+                // refresh; otherwise lower pins (created earlier, in child
+                // effects) measure their start before this spacer exists and
+                // engage too early.
+                refreshPriority: 3,
                 scrub: true,
                 onUpdate: (self) => setTenutaMaskProgress(self.progress),
               },
             })
-            .to(
+            .fromTo(
               tenutaStage,
+              { scaleX: 1, scaleY: 1 },
               {
-                width: () => window.innerWidth,
-                minWidth: () => window.innerWidth,
-                maxWidth: "none",
-                height: () => window.innerHeight,
-                minHeight: () => window.innerHeight,
-                x: () => -(window.innerWidth - tenutaStage.offsetWidth) / 2,
-                y: () => -(window.innerHeight - tenutaStage.offsetHeight) / 2,
+                // Grow to fill the viewport with GPU transforms instead of
+                // animating layout width/height. This removes the per-frame
+                // reflow jank and the conflict with ScrollTrigger's pin spacer.
+                // The stage is already centred at pin start and transform-origin
+                // is centre, so no x/y compensation is needed.
+                scaleX: () => window.innerWidth / tenutaStage.offsetWidth,
+                scaleY: () => window.innerHeight / tenutaStage.offsetHeight,
+                transformOrigin: "center center",
+                force3D: true,
                 ease: "none",
               },
               0,
@@ -957,6 +1253,12 @@ export default function LandingPage({ content }: LandingPageProps) {
             );
         }
       }
+
+      // Recompute trigger positions once webfonts have swapped in; otherwise
+      // the layout shift leaves pins and reveals starting at the wrong scroll Y.
+      if (typeof document !== "undefined" && "fonts" in document) {
+        document.fonts.ready.then(() => ScrollTrigger.refresh());
+      }
     }, rootRef);
 
     return () => context.revert();
@@ -973,7 +1275,7 @@ export default function LandingPage({ content }: LandingPageProps) {
       <main id="top">
         <section
           data-section="hero"
-          className="relative flex min-h-[100svh] items-center justify-center bg-ink px-5 pb-16 pt-36 text-paper md:px-8 md:pt-48"
+          className="relative flex min-h-[100svh] flex-col bg-ink px-5 pb-14 pt-36 text-paper md:px-8 md:pt-44"
         >
           <SectionReference
             marker={content.menu.sections.hero}
@@ -992,7 +1294,7 @@ export default function LandingPage({ content }: LandingPageProps) {
           </div>
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,16,17,0.28),rgba(16,16,17,0.84)_68%),linear-gradient(180deg,rgba(16,16,17,0.28),rgba(16,16,17,0.9))]" />
 
-          <div className="relative mx-auto flex min-h-[78svh] w-full max-w-[1560px] flex-col justify-between">
+          <div className="relative z-10 flex w-full flex-1 items-center justify-center">
             <div className="mx-auto max-w-[920px] text-center">
                 <p
                   data-hero-reveal
@@ -1016,17 +1318,17 @@ export default function LandingPage({ content }: LandingPageProps) {
                   {content.hero.body}
                 </p>
             </div>
+          </div>
 
-            <div
-              data-hero-reveal
-              className="mx-auto flex items-center gap-4 font-mono text-[0.64rem] uppercase tracking-[0.18em] text-paper/72"
-            >
-              <span className="h-px w-14 bg-paper/34" />
-              <span data-shutter-key="hero.scrollLabel">
-                {content.hero.scrollLabel}
-              </span>
-              <span className="h-px w-14 bg-paper/34" />
-            </div>
+          <div
+            data-hero-reveal
+            className="relative z-10 mx-auto flex items-center gap-4 font-mono text-[0.64rem] uppercase tracking-[0.18em] text-paper/72"
+          >
+            <span className="h-px w-14 bg-paper/34" />
+            <span data-shutter-key="hero.scrollLabel">
+              {content.hero.scrollLabel}
+            </span>
+            <span className="h-px w-14 bg-paper/34" />
           </div>
         </section>
 
@@ -1062,7 +1364,7 @@ export default function LandingPage({ content }: LandingPageProps) {
                   src={content.introduction.image!.src}
                   alt=""
                   fill
-                  sizes="(min-width: 768px) 1120px, 118vw"
+                  sizes="100vw"
                   className="scale-105 object-cover object-[50%_52%]"
                 />
                 <div className="absolute inset-0 bg-ink/16" />
@@ -1195,65 +1497,10 @@ export default function LandingPage({ content }: LandingPageProps) {
           </div>
         </section>
 
-        <section
-          id="cantina"
-          data-section="cantina"
-          className="relative bg-paper px-5 py-[4.5rem] md:px-8 md:py-28"
-        >
-            <SectionReference
-              marker={content.menu.sections.cantina}
-              shutterKey="menu.sections.cantina.referenceId"
-            />
-          <div className="mx-auto max-w-[1320px]">
-            <div className="relative min-h-[780px] md:min-h-[900px]">
-              <Figure
-                  image={content.cellar.image!}
-                  shutterKey="cellar.image"
-                className="arch absolute left-0 top-0 aspect-[0.58] w-[54%] max-w-[470px] md:w-[34%]"
-                sizes="(min-width: 768px) 34vw, 54vw"
-              />
-              <Figure
-                  image={content.cellar.secondaryImage}
-                  shutterKey="cellar.secondaryImage"
-                className="arch absolute right-0 top-[230px] aspect-[0.72] w-[48%] max-w-[390px] md:right-[8%] md:w-[28%]"
-                imageClassName="object-[48%_50%]"
-                sizes="(min-width: 768px) 28vw, 48vw"
-              />
-              <div
-                data-reveal
-                className="absolute left-1/2 top-[250px] w-[min(92vw,720px)] -translate-x-1/2 text-center md:top-[300px]"
-              >
-                  <p
-                    className="font-mono text-[0.62rem] uppercase tracking-[0.22em] text-wine"
-                    data-shutter-key="cellar.eyebrow"
-                  >
-                  {content.cellar.eyebrow}
-                </p>
-                  <h2
-                    className="mt-5 font-display text-[clamp(3rem,7vw,7.6rem)] font-medium uppercase leading-[0.9] text-ink"
-                    data-shutter-key="cellar.headline"
-                  >
-                  {content.cellar.headline}
-                </h2>
-                  <p
-                    className="mx-auto mt-7 max-w-[560px] text-sm uppercase leading-7 tracking-[0.04em] text-ink/74"
-                    data-shutter-key="cellar.body"
-                  >
-                  {content.cellar.body}
-                </p>
-                <a
-                    href="#contatti"
-                    className="mt-8 inline-flex items-center gap-4 font-mono text-[0.62rem] uppercase tracking-[0.18em] text-ink transition hover:text-wine"
-                    data-shutter-key="cellar.cta"
-                  >
-                  <span className="h-px w-10 bg-current" />
-                  {content.cellar.cta}
-                  <span className="h-px w-10 bg-current" />
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
+        <CellarChapterSection
+          cellar={content.cellar}
+          marker={content.menu.sections.cantina}
+        />
 
         <section
           data-section="memoria"
