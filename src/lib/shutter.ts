@@ -1154,7 +1154,7 @@ const mergeByIndex = <T extends Record<string, unknown>>(
 
   return items.map((item, index) => ({
     ...fallback[index],
-    ...(isRecord(item) ? item : {}),
+    ...(isRecord(item) ? withoutUndefined(item) : {}),
   })) as T[];
 };
 
