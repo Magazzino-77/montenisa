@@ -745,6 +745,10 @@ const pickArray = (
     if (Array.isArray(value)) {
       return value;
     }
+
+    if (isRecord(value) && Array.isArray(value.items)) {
+      return value.items;
+    }
   }
 
   return undefined;
@@ -1131,8 +1135,28 @@ const mergeChapter = <T extends LandingChapter>(
   image:
     isRecord(content?.image) && fallback.image
       ? { ...fallback.image, ...content.image }
-      : (content?.image as T["image"]) ?? fallback.image,
+    : (content?.image as T["image"]) ?? fallback.image,
 });
+
+const mergeByIndex = <T extends Record<string, unknown>>(
+  fallback: T[],
+  content: unknown,
+): T[] => {
+  const items = Array.isArray(content)
+    ? content
+    : isRecord(content) && Array.isArray(content.items)
+      ? content.items
+      : undefined;
+
+  if (!items) {
+    return fallback;
+  }
+
+  return items.map((item, index) => ({
+    ...fallback[index],
+    ...(isRecord(item) ? item : {}),
+  })) as T[];
+};
 
 const mergeSectionMarkers = (
   content: DeepPartial<LandingContent["menu"]["sections"]> | undefined,
@@ -1214,16 +1238,18 @@ const mergeContent = (
   ),
   product: {
     ...mergeChapter(fallbackLandingContent.product, content.product),
-    slides: Array.isArray(content.product?.slides)
-      ? (content.product.slides as ProductSlide[])
-      : fallbackLandingContent.product.slides,
+    slides: mergeByIndex(
+      fallbackLandingContent.product.slides,
+      content.product?.slides,
+    ) as ProductSlide[],
   },
   archive: {
     ...fallbackLandingContent.archive,
     ...(isRecord(content.archive) ? content.archive : {}),
-    states: Array.isArray(content.archive?.states)
-      ? (content.archive.states as ArchiveState[])
-      : fallbackLandingContent.archive.states,
+    states: mergeByIndex(
+      fallbackLandingContent.archive.states,
+      content.archive?.states,
+    ) as ArchiveState[],
   },
   vineyard: {
     ...mergeChapter(fallbackLandingContent.vineyard, content.vineyard),
@@ -1234,16 +1260,18 @@ const mergeContent = (
   cellar: {
     ...fallbackLandingContent.cellar,
     ...(isRecord(content.cellar) ? content.cellar : {}),
-    states: Array.isArray(content.cellar?.states)
-      ? (content.cellar.states as ArchiveState[])
-      : fallbackLandingContent.cellar.states,
+    states: mergeByIndex(
+      fallbackLandingContent.cellar.states,
+      content.cellar?.states,
+    ) as ArchiveState[],
   },
   memory: {
     ...fallbackLandingContent.memory,
     ...(isRecord(content.memory) ? content.memory : {}),
-    items: Array.isArray(content.memory?.items)
-      ? (content.memory.items as LandingMemory[])
-      : fallbackLandingContent.memory.items,
+    items: mergeByIndex(
+      fallbackLandingContent.memory.items,
+      content.memory?.items,
+    ) as LandingMemory[],
   },
   contact: {
     ...fallbackLandingContent.contact,
@@ -1252,7 +1280,11 @@ const mergeContent = (
 });
 
 export const resolveLandingPageContent = (payload: ContentPayload) =>
-  mergeContent(normalizeLandingContent(payload));
+  mergeContent(
+    normalizeLandingContent(
+      isRecord(payload.content) ? (payload.content as ContentPayload) : payload,
+    ),
+  );
 
 export async function getLandingPageContent(): Promise<LandingContent> {
   const endpoint =

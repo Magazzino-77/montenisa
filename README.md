@@ -36,7 +36,7 @@ Fallback page content lives in [src/lib/shutter.ts](src/lib/shutter.ts). It is s
 When Shutter exposes the landing page JSON, set one of these server-side environment variables in Vercel:
 
 ```bash
-SHUTTER_CONTENT_ENDPOINT=
+SHUTTER_CONTENT_ENDPOINT=https://<m77-shutter-domain>/api/shutter/public/montenisa/content?page=home&locale=it
 SHUTTER_LANDING_ENDPOINT=
 SHUTTER_IMAGE_HOSTNAMES=
 ```
@@ -44,6 +44,15 @@ SHUTTER_IMAGE_HOSTNAMES=
 The endpoint can return any subset of the `LandingContent` shape and the app will merge it with the fallback content. `headline` is the canonical key for visible page headings, including the hero H1. Legacy aliases such as `title`, `heading`, `heroHeadline`, `subheadline`, `copy`, `description`, `imageUrl`, and `ctaLabel` are also accepted by the adapter. `SHUTTER_IMAGE_HOSTNAMES` is a comma-separated list of HTTPS hostnames used by Shutter-hosted images, for example `assets.shutter.m77.dev,cdn.example.com`.
 
 You can audit the active mapping at [http://localhost:3000/api/shutter-audit](http://localhost:3000/api/shutter-audit). It returns the configured endpoint status, every mapped visible field, fallback content, and the resolved content currently powering the homepage.
+
+This repo is Shutter-discoverable because it includes:
+
+```text
+shutter/schema.json
+shutter/content/home.it.json
+```
+
+When the repo is pushed to Magazzino-77, the Shutter dashboard can discover it automatically and seed the editable page content from `shutter/content/home.it.json`.
 
 For a quick end-to-end CMS test, the endpoint can return a small partial payload like:
 

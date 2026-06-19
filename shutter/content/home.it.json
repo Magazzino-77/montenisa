@@ -1,0 +1,150 @@
+{
+  "site": "montenisa",
+  "page": "home",
+  "locale": "it",
+  "schemaVersion": "2.0.0",
+  "content": {
+    "brand": {
+      "name": "Tenuta Montenisa",
+      "mark": "M77"
+    },
+    "navigation": [
+      { "_id": "tenuta", "label": "La Tenuta", "href": "#tenuta" },
+      { "_id": "spumanti", "label": "Gli Spumanti", "href": "#spumanti" },
+      { "_id": "cantina", "label": "Visita la Cantina", "href": "#cantina" },
+      { "_id": "contatti", "label": "Contatti", "href": "#contatti" }
+    ],
+    "hero": {
+      "eyebrow": "Tenuta Montenisa",
+      "secondaryEyebrow": "Franciacorta",
+      "scrollLabel": "Scroll",
+      "headline": "Nel cuore della Franciacorta",
+      "subtitle": "Una storia che custodisce meraviglia.",
+      "body": "Tra stanze di pietra, vigne ordinate e archivi di famiglia, Montenisa diventa una dimora narrativa: ogni sezione della homepage apre un capitolo, pronto per essere animato in dettaglio.",
+      "image": {
+        "src": "/images/montenisa-estate-hero.png",
+        "alt": "Historic wine estate at dusk"
+      }
+    },
+    "introduction": {
+      "eyebrow": "La tenuta",
+      "headline": "Dove ogni meraviglia ha inizio",
+      "body": "La storica Tenuta Montenisa accoglie attraverso un luogo che custodisce vini, gesti e memoria. Questa pagina imposta il ritmo generale del prototipo: ingresso, scoperta, prodotto, archivio, vigna, cantina e memoria.",
+      "cta": "Scopri le meraviglie della tenuta",
+      "image": {
+        "src": "/images/montenisa-estate-hero.png",
+        "alt": "Arches and garden of the estate"
+      }
+    },
+    "product": {
+      "eyebrow": "Le meraviglie della tenuta",
+      "headline": "Il Corallo Rosa",
+      "body": "Una sezione scura e scenografica per il racconto dello spumante: un oggetto centrale, dettagli laterali e un ritmo più contemplativo, pronto per slider, parallax e micro-interazioni.",
+      "image": {
+        "src": "/images/montenisa-corallo-rosa.png",
+        "alt": "Rose bottle still life with coral form"
+      },
+      "slides": [
+        {
+          "_id": "corallo",
+          "headline": "Il Corallo Rosa",
+          "image": { "src": "/images/corallo-3d.png", "alt": "Pink coral sculpture" },
+          "thumbnail": { "src": "/images/montenisa-corallo-rosa.png", "alt": "Rose Franciacorta bottle thumbnail" }
+        },
+        {
+          "_id": "conchiglia",
+          "headline": "La Conchiglia",
+          "image": { "src": "/images/conchiglia-3d.png", "alt": "Ivory shell sculpture" },
+          "thumbnail": { "src": "/images/montenisa-conchiglia.png", "alt": "Blanc de Blancs bottle thumbnail" }
+        },
+        {
+          "_id": "chiave",
+          "headline": "La Chiave Antica",
+          "image": { "src": "/images/chiave-3d.png", "alt": "Ornate golden key sculpture" },
+          "thumbnail": { "src": "/images/montenisa-chiave-antica.png", "alt": "Cuvee Royale bottle thumbnail" }
+        }
+      ]
+    },
+    "archive": {
+      "cta": "Scopri le meraviglie della tenuta",
+      "states": [
+        {
+          "_id": "curtes-francae",
+          "headline": "Curtes Francae",
+          "body": "Ogni meraviglia comincia da un nome. E ogni nome custodisce una storia. C'e chi racconta che Franciacorta derivi da Petite France, il nome affettuoso che Carlo Magno avrebbe dato a questa terra. Ma la traccia piu antica conduce altrove: alle Curtes Francae, corti monastiche medievali libere da alcuni tributi, luoghi di lavoro, sapere e custodia."
+        },
+        {
+          "_id": "petite-france",
+          "headline": "Petite France",
+          "body": "Alcuni racconti preferiscono un'origine piu intima: una piccola Francia affacciata sulle colline bresciane, dove il linguaggio, le abitudini e la cultura lasciavano tracce leggibili ancora oggi."
+        },
+        {
+          "_id": "traccia-antica",
+          "headline": "La traccia piu antica",
+          "body": "Piu probabilmente il nome nasce dalle Curtes Francae: comunita monastiche che qui coltivavano la terra, conservavano saperi e difendevano un equilibrio tra lavoro e contemplazione."
+        }
+      ]
+    },
+    "vineyard": {
+      "eyebrow": "I vigneti",
+      "headline": "La vigna custodisce",
+      "body": "Dove la natura lascia il tempo al metodo. Una sezione orizzontale, piu silenziosa, che alterna fotografia e testo per preparare movimenti di camera, dissolvenze e progressioni lente.",
+      "image": {
+        "src": "/images/montenisa-vineyard.png",
+        "alt": "Winter vineyard in soft light"
+      }
+    },
+    "cellar": {
+      "eyebrow": "Le cantine",
+      "cta": "Scopri gli spumanti",
+      "states": [
+        {
+          "_id": "stanza-nascosta",
+          "headline": "La stanza nascosta",
+          "body": "Sotto i portici di Tenuta Montenisa si apre la stanza piu silenziosa della tenuta: le cantine di vinificazione e affinamento. Qui il racconto cambia luce."
+        },
+        {
+          "_id": "tempo-riposa",
+          "headline": "Il tempo riposa",
+          "body": "Nelle cantine storiche, il vino in bottiglia matura sui lieviti per lunghi periodi, superiori ai tempi minimi previsti dal disciplinare."
+        },
+        {
+          "_id": "ogni-bottiglia",
+          "headline": "Ogni bottiglia, un gesto",
+          "body": "Il remuage viene ancora eseguito con la massima attenzione per ogni singola bottiglia. Un gesto preciso, ripetuto, quasi rituale."
+        }
+      ]
+    },
+    "memory": {
+      "eyebrow": "La storia",
+      "headline": "Memoria viva",
+      "items": [
+        {
+          "_id": "dimora",
+          "number": "01",
+          "headline": "La dimora",
+          "body": "Una casa agricola e nobile, fatta di soglie, portici e corti interne."
+        },
+        {
+          "_id": "paesaggio",
+          "number": "02",
+          "headline": "Il paesaggio",
+          "body": "La Franciacorta come territorio di precisione, attesa e trasformazione."
+        },
+        {
+          "_id": "sogno",
+          "number": "03",
+          "headline": "Il sogno delle bollicine",
+          "body": "La materia del vino incontra una forma piu luminosa e contemporanea."
+        }
+      ]
+    },
+    "contact": {
+      "eyebrow": "Dove siamo",
+      "title": "Tenuta Montenisa",
+      "email": "studio@montenisa.it",
+      "location": "Calino, Franciacorta",
+      "legal": "Prototype foundation by M77. Content ready for Shutter."
+    }
+  }
+}
