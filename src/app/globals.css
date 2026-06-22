@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Snell Roundhand Local";
+  src:
+    url("/fonts/SnellRoundhand.ttc") format("truetype-collection"),
+    local("Snell Roundhand"),
+    local("SnellRoundhand");
+  font-display: swap;
+}
+
 :root {
   --background: #ede9e3;
   --foreground: #101011;
@@ -24,6 +33,7 @@
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
   --font-menu: var(--font-menu);
+  --font-snell: "Snell Roundhand Local", "Snell Roundhand", var(--font-display);
 }
 
 * {
@@ -68,6 +78,11 @@ a {
   text-wrap: pretty;
 }
 
+[data-hero-char] {
+  display: inline-block;
+  will-change: color, text-shadow;
+}
+
 /*
  * Reveal elements are hidden up front (server-rendered) so GSAP can animate
  * them in without a first-paint flash. They are restored when motion is
@@ -83,6 +98,10 @@ a {
   [data-reveal],
   [data-hero-reveal] {
     opacity: 1;
+  }
+
+  [data-hero-char] {
+    color: rgba(247, 244, 239, 0.96);
   }
 }
 

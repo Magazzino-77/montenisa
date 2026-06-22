@@ -29,7 +29,7 @@ const mono = IBM_Plex_Mono({
 const menu = Playfair_Display({
   variable: "--font-menu",
   subsets: ["latin"],
-  weight: ["600", "700", "900"],
+  weight: ["400", "500", "600", "700", "900"],
   display: "swap",
 });
 

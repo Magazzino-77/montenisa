@@ -16,6 +16,33 @@ import type {
 
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
+const heroStatement = `Tenuta Montenisa,
+nel cuore della Franciacorta,
+è uno scrigno che custodisce Meraviglie.
+Tra stanze di luce e memoria,
+ogni oggetto conserva
+una Traccia che rivela una Storia.
+Qui la terra diventa materia,
+i vigneti origine, le cantine tempo,
+il servizio rito. Le cuvée sono Tesori,
+protetti dalla Tenuta e svelati una a una a chi sa guardare.
+Perché ogni meraviglia attende solo
+di essere scoperta.`;
+
+const renderHeroStatement = () =>
+  Array.from(heroStatement).map((character, index) =>
+    character === "\n" ? (
+      <br key={`hero-break-${index}`} />
+    ) : (
+      <span
+        key={`hero-char-${index}`}
+        data-hero-char={character.trim() ? "true" : undefined}
+      >
+        {character}
+      </span>
+    ),
+  );
+
 type LandingPageProps = {
   content: LandingContent;
 };
@@ -136,7 +163,7 @@ function ProductGallerySlider({
     <>
       <h2
         ref={headlineRef}
-        className="font-display text-[clamp(2.7rem,7vw,7.4rem)] font-medium italic leading-none"
+        className="font-snell text-[clamp(2.7rem,7vw,7.4rem)] font-medium italic leading-none"
         data-shutter-key={`product.slides.${activeIndex}.headline`}
       >
         {activeSlide.headline}
@@ -206,7 +233,7 @@ function ProductGallerySlider({
           </button>
         </div>
 
-        <div className="mx-auto mt-8 flex max-w-[760px] items-end justify-center gap-3 md:gap-6">
+        <div className="mx-auto mt-8 flex max-w-[860px] items-end justify-center gap-3 md:gap-7">
           {safeSlides.map((slide, index) => {
             const isActive = activeIndex === index;
 
@@ -229,8 +256,8 @@ function ProductGallerySlider({
                 }}
                 className={`group relative shrink-0 overflow-hidden transition duration-500 ${
                   isActive
-                    ? "h-[120px] w-[160px] md:h-[172px] md:w-[230px]"
-                    : "h-[94px] w-[126px] md:h-[136px] md:w-[182px]"
+                    ? "h-[176px] w-[122px] md:h-[248px] md:w-[172px]"
+                    : "h-[146px] w-[102px] md:h-[208px] md:w-[144px]"
                 } ${
                   isActive
                     ? "opacity-100"
@@ -243,8 +270,8 @@ function ProductGallerySlider({
                   src={slide.thumbnail.src}
                   alt={slide.thumbnail.alt}
                   fill
-                  sizes="(min-width: 768px) 220px, 30vw"
-                  className={`object-contain transition duration-700 ${
+                  sizes="(min-width: 768px) 172px, 34vw"
+                  className={`object-cover transition duration-700 ${
                     isActive ? "scale-105" : "scale-100 group-hover:scale-105"
                   }`}
                 />
@@ -259,26 +286,6 @@ function ProductGallerySlider({
         </div>
       </div>
     </>
-  );
-}
-
-function Crest({
-  className = "",
-  label,
-  shutterKey,
-}: {
-  className?: string;
-  label: string;
-  shutterKey?: string;
-}) {
-  return (
-    <div
-      className={`font-display text-[1.35rem] font-semibold leading-none ${className}`}
-      data-shutter-key={shutterKey}
-      aria-hidden="true"
-    >
-      {label}
-    </div>
   );
 }
 
@@ -460,12 +467,10 @@ function ArchiveChapterSection({
                   data-shutter-key={`archive.states.${stateIndex}.objects.${objectIndex}.image`}
                 >
                   <div data-archive-float className="absolute inset-0">
-                    <Image
+                    <img
                       src={object.image.src}
                       alt={object.image.alt}
-                      fill
-                      sizes="(min-width: 1024px) 320px, 42vw"
-                      className="object-contain mix-blend-lighten"
+                      className="absolute inset-0 h-full w-full object-contain"
                     />
                   </div>
                 </div>
@@ -488,13 +493,13 @@ function ArchiveChapterSection({
                 aria-hidden={stateIndex !== 0}
               >
                 <h2
-                  className="mx-auto max-w-[12ch] font-display text-[clamp(3rem,8vw,8rem)] font-medium uppercase leading-[0.9] text-ink"
+                  className="mx-auto max-w-[12ch] font-menu text-[clamp(3rem,8vw,8rem)] font-medium uppercase leading-[0.9] text-ink"
                   data-shutter-key={`archive.states.${stateIndex}.headline`}
                 >
                   {state.headline}
                 </h2>
                 <p
-                  className="mx-auto mt-8 max-w-[680px] text-sm uppercase leading-7 tracking-[0.06em] text-ink/72 md:text-[0.95rem]"
+                  className="mx-auto mt-8 max-w-[680px] font-menu text-sm uppercase leading-7 tracking-[0.06em] text-ink/72 md:text-[0.95rem]"
                   data-shutter-key={`archive.states.${stateIndex}.body`}
                 >
                   {state.body}
@@ -700,7 +705,7 @@ function CellarChapterSection({
                     alt={object.image.alt}
                     fill
                     sizes="(min-width: 768px) 300px, 40vw"
-                    className="object-cover mix-blend-multiply"
+                    className="object-contain"
                   />
                 </div>
               ))}
@@ -727,13 +732,13 @@ function CellarChapterSection({
                 aria-hidden={stateIndex !== 0}
               >
                 <h2
-                  className="mx-auto max-w-[14ch] font-display text-[clamp(2.7rem,7vw,7rem)] font-medium uppercase leading-[0.9] text-ink"
+                  className="mx-auto max-w-[14ch] font-menu text-[clamp(2.7rem,7vw,7rem)] font-medium uppercase leading-[0.9] text-ink"
                   data-shutter-key={`cellar.states.${stateIndex}.headline`}
                 >
                   {state.headline}
                 </h2>
                 <p
-                  className="mx-auto mt-7 max-w-[620px] text-sm uppercase leading-7 tracking-[0.04em] text-ink/74 md:text-[0.95rem]"
+                  className="mx-auto mt-7 max-w-[620px] font-menu text-sm uppercase leading-7 tracking-[0.04em] text-ink/74 md:text-[0.95rem]"
                   data-shutter-key={`cellar.states.${stateIndex}.body`}
                 >
                   {state.body}
@@ -798,7 +803,7 @@ function VineyardCopy({
       className="mx-auto flex w-full max-w-[680px] flex-col items-center text-center"
     >
       <h2
-        className="max-w-[12ch] font-display text-[clamp(2.35rem,8vw,4.1rem)] font-normal uppercase leading-[1.08] text-paper lg:text-[clamp(3.2rem,4.5vw,4.1rem)]"
+        className="max-w-[12ch] font-menu text-[clamp(2.35rem,8vw,4.1rem)] font-normal uppercase leading-[1.08] text-paper lg:text-[clamp(3.2rem,4.5vw,4.1rem)]"
         data-shutter-key={`vineyard.states.${index}.headline`}
       >
         {state.headline}
@@ -816,7 +821,7 @@ function VineyardCopy({
         />
       </figure>
       <p
-        className="mt-6 max-w-[651px] font-display text-[0.92rem] leading-[1.58] text-paper/82 md:mt-8 md:text-[1.08rem] md:leading-[1.85]"
+        className="mt-6 max-w-[651px] font-menu text-[0.92rem] leading-[1.58] text-paper/82 md:mt-8 md:text-[1.08rem] md:leading-[1.85]"
         data-shutter-key={`vineyard.states.${index}.body`}
       >
         {state.body}
@@ -1148,7 +1153,7 @@ function MemoryHorizontalSection({
       >
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 font-display font-normal uppercase leading-[0.75] text-[#e0dad6]"
+          className="pointer-events-none absolute inset-0 font-menu font-normal uppercase leading-[0.75] text-[#e0dad6]"
         >
           <span className="absolute left-[260px] top-[35vh] text-[11rem] md:text-[23rem]">
             Memoria
@@ -1194,19 +1199,19 @@ function MemoryHorizontalSection({
                 style={{ left: `${textLeft}px`, top: textTop }}
               >
                 <p
-                  className="font-display text-[2.2rem] leading-none text-paper"
+                  className="font-menu text-[2.2rem] leading-none text-paper"
                   data-shutter-key={`memory.items.${index}.number`}
                 >
                   ({item.number})
                 </p>
                 <h3
-                  className="mt-6 font-display text-xl uppercase leading-[1.08] text-paper md:text-[1.55rem]"
+                  className="mt-6 font-menu text-xl uppercase leading-[1.08] text-paper md:text-[1.55rem]"
                   data-shutter-key={`memory.items.${index}.headline`}
                 >
                   {item.headline}
                 </h3>
                 <p
-                  className="mt-4 max-w-[350px] font-display text-lg leading-[1.35] text-paper/82"
+                  className="mt-4 max-w-[350px] font-menu text-lg leading-[1.35] text-paper/82"
                   data-shutter-key={`memory.items.${index}.body`}
                 >
                   {item.body}
@@ -1282,7 +1287,7 @@ function SiteMenu({
 }) {
   const tone = menuState.isDark
     ? {
-        background: "bg-[#1d1d1b]",
+        background: "bg-ink",
         text: "text-[#f1efee]",
         rule: "bg-[#f1efee]/36",
         logo: content.brand.wordmark.light,
@@ -1297,23 +1302,6 @@ function SiteMenu({
         crest: content.brand.crest.dark,
         diamond: content.brand.diamond.dark,
       };
-
-  const hrefToSection: Record<string, LandingSectionKey> = {
-    "#top": "hero",
-    [`#${content.menu.sections.hero.referenceId}`]: "hero",
-    "#tenuta": "tenuta",
-    [`#${content.menu.sections.tenuta.referenceId}`]: "tenuta",
-    "#spumanti": "corallo",
-    [`#${content.menu.sections.corallo.referenceId}`]: "corallo",
-    [`#${content.menu.sections.archive.referenceId}`]: "archive",
-    "#vigna": "vigna",
-    [`#${content.menu.sections.vigna.referenceId}`]: "vigna",
-    "#cantina": "cantina",
-    [`#${content.menu.sections.cantina.referenceId}`]: "cantina",
-    [`#${content.menu.sections.memoria.referenceId}`]: "memoria",
-    "#contatti": "contatti",
-    [`#${content.menu.sections.contatti.referenceId}`]: "contatti",
-  };
 
   return (
     <header
@@ -1357,14 +1345,10 @@ function SiteMenu({
             className="hidden items-center gap-[2.15rem] font-menu text-[0.78rem] font-semibold uppercase leading-none tracking-[0.08em] md:flex"
           >
             {content.navigation.map((item, index) => {
-              const isActive = hrefToSection[item.href] === menuState.activeSection;
-
               return (
                 <a
                   key={item.href}
-                    className={`whitespace-nowrap transition-opacity hover:opacity-65 ${
-                      isActive ? "font-black" : ""
-                    }`}
+                    className="whitespace-nowrap transition-opacity hover:opacity-65"
                     data-shutter-key={`navigation.${index}.label`}
                     href={item.href}
                   >
@@ -1576,19 +1560,89 @@ export default function LandingPage({ content }: LandingPageProps) {
           });
         });
 
+        const heroCharacters =
+          gsap.utils.toArray<HTMLElement>("[data-hero-char]");
+        const heroVideo =
+          document.querySelector<HTMLVideoElement>("[data-hero-video]");
+
+        if (heroCharacters.length > 0) {
+          gsap.set(heroCharacters, {
+            color: "rgba(247, 244, 239, 0.24)",
+            textShadow: "0 0 0 rgba(247, 244, 239, 0)",
+          });
+
+          const heroTimeline = gsap.timeline({
+            scrollTrigger: {
+              trigger: "[data-section='hero']",
+              start: "top top",
+              end: "+=4200",
+              pin: true,
+              pinSpacing: true,
+              anticipatePin: 1,
+              refreshPriority: 4,
+              scrub: 0.7,
+            },
+          });
+
+          heroTimeline.to(
+            heroCharacters,
+            {
+              color: "rgba(247, 244, 239, 0.96)",
+              textShadow: "0 0 18px rgba(247, 244, 239, 0.28)",
+              ease: "none",
+              stagger: 0.018,
+            },
+            0,
+          );
+
+          if (heroVideo) {
+            const scrubVideo = () => {
+              const duration = heroVideo.duration;
+
+              if (!Number.isFinite(duration) || duration <= 0) {
+                return;
+              }
+
+              heroTimeline.to(
+                heroVideo,
+                {
+                  currentTime: Math.max(0, duration - 0.04),
+                  ease: "none",
+                },
+                0,
+              );
+              ScrollTrigger.refresh();
+            };
+
+            heroVideo.pause();
+            heroVideo.currentTime = 0;
+
+            if (heroVideo.readyState >= 1) {
+              scrubVideo();
+            } else {
+              heroVideo.addEventListener("loadedmetadata", scrubVideo, {
+                once: true,
+              });
+            }
+          }
+        }
+
         const tenutaStage = document.querySelector<HTMLElement>(
           "[data-tenuta-reveal]",
         );
 
         if (tenutaStage) {
+          const tenutaVisual = tenutaStage.querySelector<HTMLElement>(
+            "[data-tenuta-visual]",
+          );
           const maskOpenings = {
-            left: tenutaStage.querySelector<SVGPathElement>(
+            left: tenutaVisual?.querySelector<SVGPathElement>(
               '[data-tenuta-mask-opening="left"]',
             ),
-            center: tenutaStage.querySelector<SVGPathElement>(
+            center: tenutaVisual?.querySelector<SVGPathElement>(
               '[data-tenuta-mask-opening="center"]',
             ),
-            right: tenutaStage.querySelector<SVGPathElement>(
+            right: tenutaVisual?.querySelector<SVGPathElement>(
               '[data-tenuta-mask-opening="right"]',
             ),
           };
@@ -1639,7 +1693,12 @@ export default function LandingPage({ content }: LandingPageProps) {
 
           setTenutaMaskProgress(0);
 
-          gsap
+          const tenutaScrubVideo =
+            tenutaStage.querySelector<HTMLVideoElement>(
+              "[data-tenuta-scrub-video]",
+            );
+
+          const tenutaTimeline = gsap
             .timeline({
               scrollTrigger: {
                 trigger: tenutaStage,
@@ -1660,17 +1719,17 @@ export default function LandingPage({ content }: LandingPageProps) {
               },
             })
             .fromTo(
-              tenutaStage,
-              { scaleX: 1, scaleY: 1 },
+              tenutaVisual ?? tenutaStage,
+              { scale: 1 },
               {
-                // Grow to fill the viewport with GPU transforms instead of
-                // animating layout width/height. This removes the per-frame
-                // reflow jank and the conflict with ScrollTrigger's pin spacer.
-                // The stage is already centred at pin start and transform-origin
-                // is centre, so no x/y compensation is needed.
-                scaleX: () => window.innerWidth / tenutaStage.offsetWidth,
-                scaleY: () => window.innerHeight / tenutaStage.offsetHeight,
-                transformOrigin: "center center",
+                scale: () =>
+                  Math.max(
+                    window.innerWidth /
+                      (tenutaVisual?.offsetWidth ?? tenutaStage.offsetWidth),
+                    window.innerHeight /
+                      (tenutaVisual?.offsetHeight ?? tenutaStage.offsetHeight),
+                  ),
+                transformOrigin: "center top",
                 force3D: true,
                 ease: "none",
               },
@@ -1697,6 +1756,49 @@ export default function LandingPage({ content }: LandingPageProps) {
               },
               0,
             );
+
+          if (tenutaScrubVideo) {
+            const scrubTenutaVideo = () => {
+              const duration = tenutaScrubVideo.duration;
+
+              if (!Number.isFinite(duration) || duration <= 0) {
+                return;
+              }
+
+              tenutaTimeline.to(
+                tenutaScrubVideo,
+                {
+                  currentTime: Math.max(0, duration - 0.04),
+                  ease: "none",
+                },
+                0,
+              );
+              ScrollTrigger.refresh();
+            };
+
+            tenutaScrubVideo.pause();
+            tenutaScrubVideo.currentTime = 0;
+
+            if (tenutaScrubVideo.readyState >= 1) {
+              scrubTenutaVideo();
+            } else {
+              tenutaScrubVideo.addEventListener(
+                "loadedmetadata",
+                scrubTenutaVideo,
+                { once: true },
+              );
+            }
+          }
+
+          tenutaTimeline.to(
+            "[data-tenuta-copy]",
+            {
+              y: 220,
+              autoAlpha: 0,
+              ease: "none",
+            },
+            0.08,
+          );
         }
       }
 
@@ -1728,41 +1830,34 @@ export default function LandingPage({ content }: LandingPageProps) {
             shutterKey="menu.sections.hero.referenceId"
             tone="dark"
           />
-          <div className="absolute inset-0 opacity-[0.48]">
-              <Image
-                src={content.hero.image.src}
-                alt={content.hero.image.alt}
-              fill
-              priority
-              sizes="100vw"
-              className="scale-105 object-cover"
-            />
+          <div className="absolute inset-0 opacity-[0.68]">
+            <video
+              data-hero-video
+              className="h-full w-full scale-105 object-cover"
+              muted
+              playsInline
+              preload="auto"
+              poster={content.hero.image.src}
+              aria-label={content.hero.image.alt}
+            >
+              <source
+                src="/videos/capitole-entrance-scrub.mp4"
+                type="video/mp4"
+              />
+            </video>
           </div>
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,16,17,0.28),rgba(16,16,17,0.84)_68%),linear-gradient(180deg,rgba(16,16,17,0.28),rgba(16,16,17,0.9))]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,16,17,0.14),rgba(16,16,17,0.56)_72%),linear-gradient(180deg,rgba(16,16,17,0.12),rgba(16,16,17,0.62))]" />
 
           <div className="relative z-10 flex w-full flex-1 items-center justify-center">
-            <div className="mx-auto max-w-[920px] text-center">
-                <p
-                  data-hero-reveal
-                  className="font-display text-[clamp(1.55rem,3vw,3.7rem)] italic leading-tight text-paper/88"
-                  data-shutter-key="hero.subtitle"
-                >
-                {content.hero.subtitle}
-              </p>
+            <div className="mx-auto max-w-[1180px] text-center">
                 <h1
                   data-hero-reveal
-                  className="mx-auto mt-5 max-w-[12ch] font-display text-[clamp(3rem,12vw,3.45rem)] font-semibold leading-[0.86] text-paper md:text-[clamp(3.8rem,9vw,10.5rem)] md:leading-[0.84]"
+                  data-hero-text
+                  className="mx-auto max-w-[34ch] font-snell text-[clamp(1.35rem,3.05vw,3.35rem)] font-normal leading-[1.05] text-paper md:leading-[1]"
                   data-shutter-key="hero.headline"
                 >
-                  {content.hero.headline}
+                  {renderHeroStatement()}
                 </h1>
-                <p
-                  data-hero-reveal
-                  className="mx-auto mt-7 max-w-[620px] text-pretty text-sm leading-7 text-paper/76 md:text-base"
-                  data-shutter-key="hero.body"
-                >
-                  {content.hero.body}
-                </p>
             </div>
           </div>
 
@@ -1781,7 +1876,7 @@ export default function LandingPage({ content }: LandingPageProps) {
         <section
           id="tenuta"
           data-section="tenuta"
-          className="relative bg-paper px-5 py-[4.5rem] md:px-8 md:py-28"
+          className="relative bg-paper px-5 pb-0 pt-[4.5rem] md:px-8 md:pt-28"
         >
           <SectionReference
             marker={content.menu.sections.tenuta}
@@ -1790,73 +1885,81 @@ export default function LandingPage({ content }: LandingPageProps) {
           <div className="mx-auto max-w-[1560px]">
             <h2
               data-reveal
-              className="mx-auto max-w-[18ch] text-center font-display text-[clamp(2.25rem,5vw,5.8rem)] font-medium leading-[0.95] text-ink"
+              className="mx-auto max-w-[18ch] text-center font-snell text-[clamp(2.25rem,5vw,5.8rem)] font-medium leading-[0.95] text-ink"
               data-shutter-key="introduction.headline"
             >
               {content.introduction.headline}
             </h2>
 
-            <div
-              className="relative mx-auto mt-14 h-[58vw] min-h-[320px] w-full overflow-hidden outline-none md:h-[590px] md:w-[1120px]"
-              data-tenuta-reveal
-              data-shutter-key="introduction.videoPlaceholder"
-            >
+            <div className="relative mx-auto mt-14 w-full md:w-[1120px]" data-tenuta-reveal>
               <div
-                className="absolute inset-0 z-0"
-                data-tenuta-video
-                aria-hidden="true"
+                className="relative z-20 h-[58vw] min-h-[320px] w-full overflow-hidden outline-none md:h-[590px]"
+                data-tenuta-visual
+                data-shutter-key="introduction.videoPlaceholder"
               >
-                <Image
-                  src={content.introduction.image!.src}
-                  alt=""
-                  fill
-                  sizes="100vw"
-                  className="scale-105 object-cover object-[50%_52%]"
-                />
-                <div className="absolute inset-0 bg-ink/16" />
+                <div
+                  className="absolute inset-0 z-0"
+                  data-tenuta-video
+                  aria-hidden="true"
+                >
+                  <video
+                    data-tenuta-scrub-video
+                    className="h-full w-full scale-105 object-cover object-[50%_52%]"
+                    muted
+                    playsInline
+                    preload="auto"
+                    poster={content.introduction.image!.src}
+                    aria-label={content.introduction.image!.alt}
+                  >
+                    <source
+                      src="/videos/tenuta-entrance-scroll.mp4"
+                      type="video/mp4"
+                    />
+                  </video>
+                  <div className="absolute inset-0 bg-ink/16" />
+                </div>
+                <svg
+                  className="absolute -inset-[1px] z-10 h-[calc(100%+2px)] w-[calc(100%+2px)]"
+                  viewBox="0 0 1200 700"
+                  preserveAspectRatio="none"
+                  aria-hidden="true"
+                >
+                  <defs>
+                    <mask id="tenuta-arch-openings">
+                      <rect width="1200" height="700" fill="white" />
+                      <path
+                        data-tenuta-mask-opening="left"
+                        d="M82 650 L82 320 A150 150 0 0 1 382 320 L382 650 Z"
+                        fill="black"
+                      />
+                      <path
+                        data-tenuta-mask-opening="center"
+                        d="M450 650 L450 300 A150 150 0 0 1 750 300 L750 650 Z"
+                        fill="black"
+                      />
+                      <path
+                        data-tenuta-mask-opening="right"
+                        d="M818 650 L818 320 A150 150 0 0 1 1118 320 L1118 650 Z"
+                        fill="black"
+                      />
+                    </mask>
+                  </defs>
+                  <rect
+                    data-tenuta-mask-surface
+                    x="-8"
+                    y="-8"
+                    width="1216"
+                    height="716"
+                    fill="var(--paper)"
+                    mask="url(#tenuta-arch-openings)"
+                  />
+                </svg>
               </div>
-              <svg
-                className="absolute -inset-[1px] z-10 h-[calc(100%+2px)] w-[calc(100%+2px)]"
-                viewBox="0 0 1200 700"
-                preserveAspectRatio="none"
-                aria-hidden="true"
-              >
-                <defs>
-                  <mask id="tenuta-arch-openings">
-                    <rect width="1200" height="700" fill="white" />
-                    <path
-                      data-tenuta-mask-opening="left"
-                      d="M82 650 L82 320 A150 150 0 0 1 382 320 L382 650 Z"
-                      fill="black"
-                    />
-                    <path
-                      data-tenuta-mask-opening="center"
-                      d="M450 650 L450 300 A150 150 0 0 1 750 300 L750 650 Z"
-                      fill="black"
-                    />
-                    <path
-                      data-tenuta-mask-opening="right"
-                      d="M818 650 L818 320 A150 150 0 0 1 1118 320 L1118 650 Z"
-                      fill="black"
-                    />
-                  </mask>
-                </defs>
-                <rect
-                  data-tenuta-mask-surface
-                  x="-8"
-                  y="-8"
-                  width="1216"
-                  height="716"
-                  fill="var(--paper)"
-                  mask="url(#tenuta-arch-openings)"
-                />
-              </svg>
-            </div>
 
-            <div
-              data-reveal
-              className="mx-auto mt-14 max-w-[720px] text-center text-sm leading-7 text-ink/68 md:text-base"
-            >
+              <div
+                data-tenuta-copy
+                className="relative z-0 mx-auto mt-8 max-w-[720px] text-center font-menu text-sm leading-7 text-ink/68 md:text-base"
+              >
                 <p data-shutter-key="introduction.body">
                   {content.introduction.body}
                 </p>
@@ -1870,6 +1973,7 @@ export default function LandingPage({ content }: LandingPageProps) {
                 <span className="h-px w-12 bg-current" />
               </a>
             </div>
+          </div>
           </div>
         </section>
 
@@ -1888,7 +1992,7 @@ export default function LandingPage({ content }: LandingPageProps) {
               <ProductGallerySlider slides={content.product.slides} />
               <p
                   data-reveal
-                  className="mx-auto max-w-[620px] text-sm leading-7 text-paper/70 md:text-base"
+                  className="mx-auto max-w-[620px] font-menu text-sm leading-7 text-paper/70 md:text-base"
                   data-shutter-key="product.body"
                 >
                 {content.product.body}
@@ -1920,55 +2024,66 @@ export default function LandingPage({ content }: LandingPageProps) {
       </main>
 
       <footer
+        id="contatti"
         data-section="contatti"
-        className="relative bg-paper px-5 py-12 text-ink md:px-8 md:py-16"
+        className="relative bg-[#f1f1f1] px-5 py-16 text-black md:px-8 md:py-24"
       >
-          <SectionReference
-            marker={content.menu.sections.contatti}
-            shutterKey="menu.sections.contatti.referenceId"
-          />
-        <div className="mx-auto grid max-w-[1560px] gap-8 border-y border-ink/18 py-8 md:grid-cols-[1fr_auto_1fr] md:items-center">
-          <div>
-              <p
-                className="font-mono text-[0.62rem] uppercase tracking-[0.18em] text-ink/60"
-                data-shutter-key="contact.eyebrow"
-              >
-              {content.contact.eyebrow}
-            </p>
-              <p
-                className="mt-2 font-display text-2xl"
-                data-shutter-key="contact.location"
-              >
-              {content.contact.location}
-            </p>
+        <div className="mx-auto flex min-h-[360px] max-w-[1560px] flex-col justify-between gap-16 font-menu uppercase tracking-[0.08em] md:min-h-[348px]">
+          <div className="grid gap-10 md:grid-cols-[1fr_1fr_1.05fr] md:items-start">
+            <div className="max-w-[270px] text-[0.72rem] font-medium leading-[1.75] md:text-[0.82rem]">
+              <p className="font-bold">Dove siamo</p>
+              <p>Via Paolo VI, 62 - 25046 Cazzago San Martino BS</p>
+            </div>
+
+            <div className="max-w-[360px] text-[0.72rem] font-medium leading-[1.75] md:text-[0.82rem]">
+              <p className="font-bold">Wine Shop/Visite</p>
+              <p>+39 345 0443240</p>
+              <p>T. +39 030 7750838</p>
+            </div>
+
+            <div className="grid gap-8 text-[0.72rem] font-medium leading-[1.75] md:grid-cols-[1fr_auto] md:text-right md:text-[0.82rem]">
+              <div>
+                <p className="font-bold">Seguici</p>
+                <div className="mt-6 flex gap-7 md:justify-end">
+                  <a className="underline underline-offset-4 transition hover:text-wine" href="#">
+                    Facebook
+                  </a>
+                  <a className="underline underline-offset-4 transition hover:text-wine" href="#">
+                    Instagram
+                  </a>
+                </div>
+              </div>
+              <div>
+                <p className="font-bold">Lingua</p>
+                <p className="mt-6">
+                  <span className="font-extrabold">ITA</span>
+                  <span className="px-5"> </span>
+                  <span>ENG</span>
+                </p>
+              </div>
+            </div>
           </div>
-          <div className="text-center">
-              <Crest
-                label={content.brand.mark}
-                shutterKey="brand.mark"
-                className="text-center"
-              />
-              <p
-                className="mt-3 font-display text-xl leading-none"
-                data-shutter-key="contact.title"
-              >
-              {content.contact.title}
-            </p>
-          </div>
-          <div className="md:text-right">
-            <a
-                className="font-display text-2xl transition hover:text-wine"
-                data-shutter-key="contact.email"
-                href={`mailto:${content.contact.email}`}
-              >
-              {content.contact.email}
-            </a>
-              <p
-                className="mt-3 font-mono text-[0.58rem] uppercase tracking-[0.16em] text-ink/54"
-                data-shutter-key="contact.legal"
-              >
-              {content.contact.legal}
-            </p>
+
+          <div className="grid gap-8 md:grid-cols-[1fr_auto_1fr] md:items-center">
+            <div className="space-y-5 md:self-end">
+              <div className="h-px w-full bg-black/30" />
+              <p className="text-[0.48rem] font-bold leading-none tracking-[0.16em] md:text-[0.54rem]">
+                ©MarchesiAntinori 2027
+              </p>
+            </div>
+
+            <img
+              src="/figma/footer/livello-8.svg"
+              alt="Marchese Antinori crest"
+              className="mx-auto aspect-[128.109/97.6713] w-[128px] object-contain md:w-[142px]"
+            />
+
+            <div className="space-y-5 text-left md:self-end md:text-right">
+              <div className="h-px w-full bg-black/30" />
+              <p className="text-[0.48rem] font-bold leading-none tracking-[0.16em] md:text-[0.54rem]">
+                Privacy&nbsp;&nbsp;.&nbsp;&nbsp; Terms&nbsp;&nbsp;.&nbsp;&nbsp; Cookies
+              </p>
+            </div>
           </div>
         </div>
       </footer>

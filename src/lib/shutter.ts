@@ -298,7 +298,7 @@ export const fallbackLandingContent: LandingContent = {
         objects: [
           {
             image: {
-              src: "/images/archive-sigillo.png",
+              src: "/images/archive-sigillo-alpha.png",
               alt: "Sigillo di cera con stemma",
             },
             placement:
@@ -306,7 +306,7 @@ export const fallbackLandingContent: LandingContent = {
           },
           {
             image: {
-              src: "/images/archive-piuma.png",
+              src: "/images/archive-piuma-alpha.png",
               alt: "Piuma d'oca",
             },
             placement:
@@ -326,48 +326,64 @@ export const fallbackLandingContent: LandingContent = {
         headline: "Petite France",
         body:
           "Alcuni racconti preferiscono un'origine più intima: una “piccola Francia” affacciata sulle colline bresciane, dove il linguaggio, le abitudini e la cultura lasciavano tracce leggibili ancora oggi. È una leggenda affettuosa, nutrita di memoria orale e di sguardi che riconoscono in questo paesaggio un volto familiare.",
-        objects: [
-          {
-            image: {
-              src: "/images/archive-piuma.png",
-              alt: "Piuma d'oca",
+          objects: [
+            {
+              image: {
+                src: "/images/archive-foglia.png",
+                alt: "Foglia di vite",
+              },
+              placement:
+                "bottom-[5%] left-[2%] h-[min(30vw,380px)] w-[min(32vw,420px)] -rotate-[10deg]",
             },
-            placement:
-              "bottom-[8%] left-[4%] h-[min(36vw,460px)] w-[min(26vw,340px)] -rotate-[8deg]",
-          },
-          {
-            image: {
-              src: "/images/archive-sigillo.png",
-              alt: "Sigillo di cera con stemma",
+            {
+              image: {
+                src: "/images/archive-roccia.png",
+                alt: "Roccia stratificata",
+              },
+              placement:
+                "right-[5%] top-[12%] h-[min(24vw,310px)] w-[min(26vw,340px)] rotate-[-6deg]",
             },
-            placement:
-              "right-[8%] top-[18%] h-[min(20vw,250px)] w-[min(20vw,250px)] rotate-[-6deg]",
-          },
-        ],
-      },
+            {
+              image: {
+                src: "/images/archive-cristallo.png",
+                alt: "Cristallo trasparente",
+              },
+              placement:
+                "right-[7%] bottom-[8%] h-[min(18vw,230px)] w-[min(18vw,230px)] rotate-[10deg]",
+            },
+          ],
+        },
       {
         headline: "La traccia più antica",
         body:
           "Più probabilmente il nome nasce dalle Curtes Francae: comunità monastiche che qui coltivavano la terra, conservavano saperi e difendevano un equilibrio tra lavoro e contemplazione. È da quelle corti franchigiate che la Franciacorta trae il proprio carattere: un territorio fatto di disciplina, paesaggio e attesa.",
-        objects: [
-          {
-            image: {
-              src: "/images/archive-moneta.png",
-              alt: "Moneta antica",
+          objects: [
+            {
+              image: {
+                src: "/images/archive-tappo.png",
+                alt: "Tappo da spumante",
+              },
+              placement:
+                "bottom-[5%] left-[4%] h-[min(30vw,390px)] w-[min(24vw,310px)] rotate-[-10deg]",
             },
-            placement:
-              "right-[6%] bottom-[12%] h-[min(22vw,280px)] w-[min(22vw,280px)] rotate-[4deg]",
-          },
-          {
-            image: {
-              src: "/images/archive-sigillo.png",
-              alt: "Sigillo di cera con stemma",
+            {
+              image: {
+                src: "/images/archive-bollicine.png",
+                alt: "Bollicine dorate",
+              },
+              placement:
+                "right-[6%] top-[8%] h-[min(26vw,340px)] w-[min(21vw,270px)] rotate-[4deg]",
             },
-            placement:
-              "left-[6%] top-[14%] h-[min(18vw,230px)] w-[min(18vw,230px)] rotate-[-10deg]",
-          },
-        ],
-      },
+            {
+              image: {
+                src: "/images/archive-scudo.png",
+                alt: "Scudo decorativo 1995",
+              },
+              placement:
+                "right-[3%] bottom-[8%] h-[min(24vw,310px)] w-[min(28vw,360px)] rotate-[6deg]",
+            },
+          ],
+        },
     ],
   },
   vineyard: {
@@ -435,21 +451,21 @@ export const fallbackLandingContent: LandingContent = {
         objects: [
           {
             image: {
-              src: "/images/cellar/cantina-1-1.jpg",
+              src: "/images/cellar/la-stanza-nascosta-1.png",
               alt: "Cantina con barrique della Tenuta Montenisa",
             },
             placement: "left-[7%] top-[13%] w-[min(22vw,300px)] aspect-[0.73]",
           },
           {
             image: {
-              src: "/images/cellar/cantina-1-2.jpg",
+              src: "/images/cellar/la-stanza-nascosta-2.png",
               alt: "Degustazione nella sala della cantina",
             },
             placement: "left-[37%] top-[50%] w-[min(22vw,300px)] aspect-[0.73]",
           },
           {
             image: {
-              src: "/images/cellar/cantina-1-3.jpg",
+              src: "/images/cellar/la-stanza-nascosta-3.png",
               alt: "Corridoio della cantina con botti",
             },
             placement: "right-[7%] top-[26%] w-[min(22vw,300px)] aspect-[0.73]",
@@ -463,21 +479,21 @@ export const fallbackLandingContent: LandingContent = {
         objects: [
           {
             image: {
-              src: "/images/cellar/cantina-2-1.jpg",
+              src: "/images/cellar/il-tempo-riposa-1.png",
               alt: "Volta della cantina storica in penombra",
             },
             placement: "left-[7%] top-[13%] w-[min(22vw,300px)] aspect-[0.73]",
           },
           {
             image: {
-              src: "/images/cellar/cantina-2-2.jpg",
+              src: "/images/cellar/il-tempo-riposa-2.png",
               alt: "Botti in affinamento nella cantina",
             },
             placement: "left-[37%] top-[50%] w-[min(22vw,300px)] aspect-[0.73]",
           },
           {
             image: {
-              src: "/images/cellar/cantina-2-3.jpg",
+              src: "/images/cellar/il-tempo-riposa-3.png",
               alt: "Cantina voltata con grandi botti",
             },
             placement: "right-[7%] top-[26%] w-[min(22vw,300px)] aspect-[0.73]",
@@ -491,21 +507,21 @@ export const fallbackLandingContent: LandingContent = {
         objects: [
           {
             image: {
-              src: "/images/cellar/cantina-3-1.jpg",
+              src: "/images/cellar/ogni-bottiglia-un-gesto-1.png",
               alt: "Bottiglie in affinamento sui lieviti",
             },
             placement: "left-[7%] top-[13%] w-[min(22vw,300px)] aspect-[0.73]",
           },
           {
             image: {
-              src: "/images/cellar/cantina-3-2.jpg",
+              src: "/images/cellar/ogni-bottiglia-un-gesto-2.png",
               alt: "Pupitre con bottiglie durante il remuage",
             },
             placement: "left-[37%] top-[50%] w-[min(22vw,300px)] aspect-[0.73]",
           },
           {
             image: {
-              src: "/images/cellar/cantina-3-3.jpg",
+              src: "/images/cellar/ogni-bottiglia-un-gesto-3.png",
               alt: "Il gesto del remuage sulle bottiglie",
             },
             placement: "right-[7%] top-[26%] w-[min(22vw,300px)] aspect-[0.73]",
