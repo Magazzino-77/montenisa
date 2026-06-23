@@ -1309,10 +1309,10 @@ function SiteMenu({
       data-menu-theme={menuState.isDark ? "dark" : "light"}
     >
       <div className="mx-auto max-w-[1568px] px-5 pt-4 md:px-8 md:pt-7">
-        <div className="relative flex h-[74px] items-center justify-between md:h-[122px]">
+        <div className="relative flex h-[74px] items-center justify-between md:h-[100px]">
           <a
             href="#top"
-            className="relative block h-[36px] w-[178px] shrink-0 md:h-[61px] md:w-[300px]"
+            className="relative block h-[36px] w-[178px] shrink-0 md:h-[49px] md:w-[240px]"
             aria-label={content.brand.homeAriaLabel}
           >
             <Image
@@ -1320,14 +1320,14 @@ function SiteMenu({
               alt={tone.logo.alt}
               fill
               priority
-              sizes="(min-width: 768px) 300px, 178px"
+              sizes="(min-width: 768px) 240px, 178px"
               className="object-contain"
             />
           </a>
 
           <a
             href="#top"
-            className="absolute left-1/2 top-1/2 block h-[62px] w-[82px] -translate-x-1/2 -translate-y-1/2 md:h-[98px] md:w-[128px]"
+            className="absolute left-1/2 top-1/2 block h-[62px] w-[82px] -translate-x-1/2 -translate-y-1/2 md:h-[77px] md:w-[100px]"
             aria-label={content.brand.crestAriaLabel}
           >
             <Image
@@ -1335,7 +1335,7 @@ function SiteMenu({
               alt={tone.crest.alt}
               fill
               priority
-              sizes="(min-width: 768px) 128px, 82px"
+              sizes="(min-width: 768px) 100px, 82px"
               className="object-contain"
             />
           </a>
@@ -1566,6 +1566,12 @@ export default function LandingPage({ content }: LandingPageProps) {
           document.querySelector<HTMLVideoElement>("[data-hero-video]");
 
         if (heroCharacters.length > 0) {
+          const heroCharacterStagger = 0.018;
+          const heroLetterGlowDuration = 0.5;
+          const heroReadingDuration =
+            heroLetterGlowDuration +
+            Math.max(0, heroCharacters.length - 1) * heroCharacterStagger;
+
           gsap.set(heroCharacters, {
             color: "rgba(247, 244, 239, 0.24)",
             textShadow: "0 0 0 rgba(247, 244, 239, 0)",
@@ -1589,8 +1595,9 @@ export default function LandingPage({ content }: LandingPageProps) {
             {
               color: "rgba(247, 244, 239, 0.96)",
               textShadow: "0 0 18px rgba(247, 244, 239, 0.28)",
+              duration: heroLetterGlowDuration,
               ease: "none",
-              stagger: 0.018,
+              stagger: heroCharacterStagger,
             },
             0,
           );
@@ -1607,6 +1614,7 @@ export default function LandingPage({ content }: LandingPageProps) {
                 heroVideo,
                 {
                   currentTime: Math.max(0, duration - 0.04),
+                  duration: heroReadingDuration,
                   ease: "none",
                 },
                 0,
@@ -1853,7 +1861,7 @@ export default function LandingPage({ content }: LandingPageProps) {
                 <h1
                   data-hero-reveal
                   data-hero-text
-                  className="mx-auto max-w-[34ch] font-snell text-[clamp(1.35rem,3.05vw,3.35rem)] font-normal leading-[1.05] text-paper md:leading-[1]"
+                  className="mx-auto max-w-[34ch] font-snell text-[clamp(1.2rem,2.1vw,2.25rem)] font-normal leading-[1.05] text-paper md:leading-[1]"
                   data-shutter-key="hero.headline"
                 >
                   {renderHeroStatement()}
