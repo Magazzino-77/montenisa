@@ -163,7 +163,7 @@ function ProductGallerySlider({
     <>
       <h2
         ref={headlineRef}
-        className="font-snell text-[clamp(2.7rem,7vw,7.4rem)] font-medium italic leading-none"
+        className="font-snell text-[clamp(2.7rem,4.65vw,4rem)] font-medium italic leading-none"
         data-shutter-key={`product.slides.${activeIndex}.headline`}
       >
         {activeSlide.headline}
@@ -987,7 +987,7 @@ function VineyardScrollSection({
         data-vineyard-desktop
         className="relative hidden h-[100svh] min-h-[760px] overflow-hidden md:block"
       >
-        <div className="mx-auto grid h-full max-w-[1560px] grid-cols-2 gap-20 px-8 pb-12 pt-[13rem]">
+        <div className="mx-auto grid h-full max-w-[1560px] grid-cols-2 gap-20">
           {(["left", "right"] as const).map((side) => (
             <div
               key={`vineyard-column-${side}`}
@@ -1285,6 +1285,7 @@ function SiteMenu({
   content: LandingContent;
   menuState: MenuState;
 }) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const tone = menuState.isDark
     ? {
         background: "bg-ink",
@@ -1342,36 +1343,81 @@ function SiteMenu({
 
           <nav
             aria-label="Primary navigation"
-            className="hidden items-center gap-[2.15rem] font-menu text-[0.78rem] font-semibold uppercase leading-none tracking-[0.08em] md:flex"
+            className="hidden items-center gap-[2.15rem] font-menu text-[0.78rem] font-semibold uppercase leading-none tracking-[0.08em] xl:flex"
           >
             {content.navigation.map((item, index) => {
               return (
                 <a
                   key={item.href}
-                    className="whitespace-nowrap transition-opacity hover:opacity-65"
-                    data-shutter-key={`navigation.${index}.label`}
-                    href={item.href}
-                  >
+                  className="whitespace-nowrap transition-opacity hover:opacity-65"
+                  data-shutter-key={`navigation.${index}.label`}
+                  href={item.href}
+                >
                   {item.label}
                 </a>
               );
             })}
           </nav>
+
+          <button
+            type="button"
+            className="relative z-10 grid h-10 w-10 place-items-center border border-current/22 transition hover:bg-current/8 xl:hidden"
+            aria-label={isMenuOpen ? "Chiudi menu" : "Apri menu"}
+            aria-expanded={isMenuOpen}
+            aria-controls="site-mobile-menu"
+            onClick={() => setIsMenuOpen((open) => !open)}
+          >
+            <span className="sr-only">
+              {isMenuOpen ? "Chiudi menu" : "Apri menu"}
+            </span>
+            <span className="flex w-4 flex-col gap-[5px]" aria-hidden="true">
+              <span
+                className={`h-px w-full bg-current transition ${
+                  isMenuOpen ? "translate-y-[6px] rotate-45" : ""
+                }`}
+              />
+              <span
+                className={`h-px w-full bg-current transition ${
+                  isMenuOpen ? "opacity-0" : "opacity-100"
+                }`}
+              />
+              <span
+                className={`h-px w-full bg-current transition ${
+                  isMenuOpen ? "-translate-y-[6px] -rotate-45" : ""
+                }`}
+              />
+            </span>
+          </button>
         </div>
 
         <div className={`h-px w-full ${tone.rule}`} />
 
-        <div className="menu-row-scroll flex gap-6 overflow-x-auto py-3 font-menu text-[0.7rem] font-semibold uppercase tracking-[0.08em] md:hidden">
-            {content.navigation.map((item, index) => (
-              <a
-                key={item.href}
-                className="shrink-0"
-                data-shutter-key={`navigation.${index}.label`}
-                href={item.href}
-              >
-              {item.label}
-            </a>
-          ))}
+        <div
+          id="site-mobile-menu"
+          className={`grid transition-[grid-template-rows,opacity] duration-300 xl:hidden ${
+            isMenuOpen
+              ? "grid-rows-[1fr] opacity-100"
+              : "grid-rows-[0fr] opacity-0"
+          }`}
+        >
+          <div className="flex justify-center overflow-hidden">
+            <nav
+              aria-label="Primary navigation"
+              className="grid w-full max-w-[520px] gap-3 py-4 font-menu text-[0.72rem] font-semibold uppercase tracking-[0.1em] sm:grid-cols-2"
+            >
+              {content.navigation.map((item, index) => (
+                <a
+                  key={item.href}
+                  className="border border-current/12 px-3 py-3 text-center transition hover:bg-current/8"
+                  data-shutter-key={`navigation.${index}.label`}
+                  href={item.href}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {item.label}
+                </a>
+              ))}
+            </nav>
+          </div>
         </div>
 
         <div
@@ -1861,7 +1907,7 @@ export default function LandingPage({ content }: LandingPageProps) {
                 <h1
                   data-hero-reveal
                   data-hero-text
-                  className="mx-auto max-w-[34ch] font-snell text-[clamp(1.2rem,2.1vw,2.25rem)] font-normal leading-[1.05] text-paper md:leading-[1]"
+                  className="mx-auto max-w-[34ch] font-snell text-[clamp(1.2rem,2.1vw,2.25rem)] font-normal italic leading-[1.05] text-paper md:leading-[1]"
                   data-shutter-key="hero.headline"
                 >
                   {renderHeroStatement()}
@@ -1893,7 +1939,7 @@ export default function LandingPage({ content }: LandingPageProps) {
           <div className="mx-auto max-w-[1560px]">
             <h2
               data-reveal
-              className="mx-auto max-w-[18ch] text-center font-snell text-[clamp(2.25rem,5vw,5.8rem)] font-medium leading-[0.95] text-ink"
+              className="mx-auto max-w-[18ch] text-center font-snell text-[clamp(2.25rem,3.78vw,4rem)] font-medium italic leading-[0.95] text-ink"
               data-shutter-key="introduction.headline"
             >
               {content.introduction.headline}

@@ -1,12 +1,27 @@
 @import "tailwindcss";
 
 @font-face {
-  font-family: "Snell Roundhand Local";
-  src:
-    url("/fonts/SnellRoundhand.ttc") format("truetype-collection"),
-    local("Snell Roundhand"),
-    local("SnellRoundhand");
+  font-family: "Millionaire Trial";
+  src: url("/fonts/millionairetrial-roman.otf") format("opentype");
   font-display: swap;
+  font-style: normal;
+  font-weight: 400 700;
+}
+
+@font-face {
+  font-family: "Millionaire Trial";
+  src: url("/fonts/millionairetrial-italic.otf") format("opentype");
+  font-display: swap;
+  font-style: italic;
+  font-weight: 400 700;
+}
+
+@font-face {
+  font-family: "Millionaire Trial Script";
+  src: url("/fonts/millionairetrial-script.otf") format("opentype");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400 700;
 }
 
 :root {
@@ -33,7 +48,7 @@
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
   --font-menu: var(--font-menu);
-  --font-snell: "Snell Roundhand Local", "Snell Roundhand", var(--font-display);
+  --font-snell: "Millionaire Trial", "Millionaire Trial Script", var(--font-display);
 }
 
 * {
