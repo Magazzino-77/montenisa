@@ -8,7 +8,6 @@ import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import type {
   ArchiveChapter,
   LandingContent,
-  LandingImage,
   LandingSectionKey,
   LandingSectionMarker,
   ProductSlide,
@@ -16,36 +15,127 @@ import type {
 
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
-const heroStatement = `Tenuta Montenisa,
-nel cuore della Franciacorta,
-è uno scrigno che custodisce Meraviglie.
-Tra stanze di luce e memoria,
-ogni oggetto conserva
-una Traccia che rivela una Storia.
-Qui la terra diventa materia,
-i vigneti origine, le cantine tempo,
-il servizio rito. Le cuvée sono Tesori,
-protetti dalla Tenuta e svelati una a una a chi sa guardare.
-Perché ogni meraviglia attende solo
-di essere scoperta.`;
+const renderHeroChars = (text: string, keyPrefix: string) =>
+  Array.from(text).map((character, index) => (
+    <span
+      key={`${keyPrefix}-${index}`}
+      data-hero-char={character.trim() ? "true" : undefined}
+    >
+      {character}
+    </span>
+  ));
 
-const renderHeroStatement = () =>
-  Array.from(heroStatement).map((character, index) =>
-    character === "\n" ? (
-      <br key={`hero-break-${index}`} />
-    ) : (
-      <span
-        key={`hero-char-${index}`}
-        data-hero-char={character.trim() ? "true" : undefined}
-      >
-        {character}
+const renderHeroLine = (text: string, keyPrefix: string, className = "") => (
+  <span className={`block ${className}`}>{renderHeroChars(text, keyPrefix)}</span>
+);
+
+const renderHeroStatement = () => {
+  const wrapRows = [
+    {
+      left: "Tra stanze di",
+      right: "luce e memoria,",
+      leftClass: "-mr-[0.35em]",
+      rightClass: "-ml-[0.35em]",
+    },
+    {
+      left: "ogni oggetto",
+      right: "conserva",
+      leftClass: "-mr-[1.1em]",
+      rightClass: "-ml-[1.1em]",
+    },
+    {
+      left: "una Traccia che",
+      right: "rivela una Storia.",
+      leftClass: "-mr-[0.65em]",
+      rightClass: "-ml-[0.65em]",
+    },
+    {
+      left: "Qui la terra",
+      right: "diventa materia,",
+      leftClass: "-mr-[1.15em]",
+      rightClass: "-ml-[1.15em]",
+    },
+    {
+      left: "i vigneti origine,",
+      right: "le cantine tempo,",
+      leftClass: "-mr-[0.55em]",
+      rightClass: "-ml-[0.55em]",
+    },
+    {
+      left: "il servizio rito.",
+      right: "Le cuvée sono Tesori,",
+      leftClass: "-mr-[0.1em]",
+      rightClass: "-ml-[0.1em]",
+    },
+  ];
+
+  return (
+    <>
+      {renderHeroLine("Tenuta Montenisa,", "hero-top-1", "font-medium")}
+      {renderHeroLine("nel cuore della Franciacorta,", "hero-top-2")}
+      {renderHeroLine(
+        "è uno scrigno che custodisce Meraviglie.",
+        "hero-top-3",
+      )}
+
+      <span className="relative mx-auto my-0 grid w-full max-w-[29ch] grid-cols-[minmax(0,1fr)_clamp(78px,10vw,136px)_minmax(0,1fr)] items-center gap-x-0.5 md:my-1 md:gap-x-1.5">
+        <span className="relative z-10 col-start-2 row-span-6 row-start-1 block aspect-[1.12] w-[112%] -translate-x-[5%] self-center">
+          <Image
+            src="/images/hero-scrigno.png"
+            alt=""
+            fill
+            sizes="(min-width: 1024px) 150px, (min-width: 768px) 118px, 88px"
+            className="object-contain drop-shadow-[0_10px_22px_rgba(0,0,0,0.45)]"
+            aria-hidden="true"
+          />
+        </span>
+
+        {wrapRows.flatMap(({ left, right, leftClass, rightClass }, rowIndex) => [
+          <span
+            key={`hero-wrap-left-${rowIndex}`}
+            className={`col-start-1 text-right leading-[1.03] ${leftClass}`}
+          >
+            {renderHeroChars(left, `hero-wrap-left-${rowIndex}`)}
+          </span>,
+          <span
+            key={`hero-wrap-right-${rowIndex}`}
+            className={`col-start-3 text-left leading-[1.03] ${rightClass}`}
+          >
+            {renderHeroChars(right, `hero-wrap-right-${rowIndex}`)}
+          </span>,
+        ])}
       </span>
-    ),
+
+      {renderHeroLine(
+        "protetti dalla Tenuta e svelati una a una a chi sa guardare.",
+        "hero-bottom-1",
+      )}
+      {renderHeroLine(
+        "Perché ogni meraviglia attende solo",
+        "hero-bottom-2",
+        "mt-1 font-medium",
+      )}
+      {renderHeroLine("di essere scoperta.", "hero-bottom-3", "font-medium")}
+    </>
   );
+};
 
 type LandingPageProps = {
   content: LandingContent;
 };
+
+function CtaDivider({ className = "" }: { className?: string }) {
+  return (
+    <Image
+      src="/images/cta-divider.svg"
+      alt=""
+      width={218}
+      height={17}
+      className={`h-auto w-[218px] object-contain ${className}`}
+      aria-hidden="true"
+    />
+  );
+}
 
 function ProductGallerySlider({
   slides,
@@ -158,6 +248,23 @@ function ProductGallerySlider({
     setActiveIndex((current) =>
       current === safeSlides.length - 1 ? 0 : current + 1,
     );
+  const visibleThumbs =
+    safeSlides.length > 2
+      ? [-1, 0, 1].map((offset) => {
+          const index =
+            (activeIndex + offset + safeSlides.length) % safeSlides.length;
+
+          return {
+            index,
+            offset,
+            slide: safeSlides[index],
+          };
+        })
+      : safeSlides.map((slide, index) => ({
+          index,
+          offset: index === activeIndex ? 0 : index < activeIndex ? -1 : 1,
+          slide,
+        }));
 
   return (
     <>
@@ -174,7 +281,7 @@ function ProductGallerySlider({
         data-active-slide={activeIndex}
         data-product-slider
       >
-        <div className="relative mx-auto aspect-[0.75] w-full max-w-[420px] overflow-hidden">
+        <div className="relative mx-auto aspect-[0.75] w-full max-w-[420px] overflow-visible">
           {safeSlides.map((slide, index) => (
             <figure
               key={`${slide.image.src}-${index}`}
@@ -209,10 +316,16 @@ function ProductGallerySlider({
                 goToPrevious();
               }
             }}
-            className="absolute left-3 top-1/2 z-30 grid h-11 w-11 -translate-y-1/2 place-items-center border border-paper/24 bg-ink/42 font-display text-2xl leading-none text-paper backdrop-blur-sm transition hover:bg-paper hover:text-ink"
+            className="absolute left-[-0.8rem] top-1/2 z-30 grid h-[72px] w-[72px] -translate-y-1/2 place-items-center opacity-82 transition hover:opacity-100 md:left-[-4.5rem] md:h-[91px] md:w-[91px]"
             aria-label="Previous image"
           >
-            ‹
+            <Image
+              src="/images/spumanti-arrow.svg"
+              alt=""
+              width={91}
+              height={91}
+              className="h-[91px] w-[91px] max-w-none object-contain"
+            />
           </button>
           <button
             type="button"
@@ -226,20 +339,30 @@ function ProductGallerySlider({
                 goToNext();
               }
             }}
-            className="absolute right-3 top-1/2 z-30 grid h-11 w-11 -translate-y-1/2 place-items-center border border-paper/24 bg-ink/42 font-display text-2xl leading-none text-paper backdrop-blur-sm transition hover:bg-paper hover:text-ink"
+            className="absolute right-[-0.8rem] top-1/2 z-30 grid h-[72px] w-[72px] -translate-y-1/2 place-items-center opacity-82 transition hover:opacity-100 md:right-[-4.5rem] md:h-[91px] md:w-[91px]"
             aria-label="Next image"
           >
-            ›
+            <Image
+              src="/images/spumanti-arrow.svg"
+              alt=""
+              width={91}
+              height={91}
+              className="h-[91px] w-[91px] max-w-none rotate-180 object-contain"
+            />
           </button>
         </div>
 
-        <div className="mx-auto mt-8 flex max-w-[860px] items-end justify-center gap-3 md:gap-7">
-          {safeSlides.map((slide, index) => {
+        <div className="mx-auto mt-8 flex max-w-[980px] items-end justify-center gap-4 md:gap-8">
+          {visibleThumbs.map(({ slide, index, offset }) => {
             const isActive = activeIndex === index;
+            const sideOverlay =
+              offset < 0
+                ? "bg-[linear-gradient(90deg,rgba(16,16,17,0.72),rgba(16,16,17,0.38)_58%,rgba(16,16,17,0.18))]"
+                : "bg-[linear-gradient(270deg,rgba(16,16,17,0.72),rgba(16,16,17,0.38)_58%,rgba(16,16,17,0.18))]";
 
             return (
               <button
-                key={`thumb-${slide.thumbnail.src}-${index}`}
+                key={`thumb-${slide.thumbnail.src}-${index}-${offset}`}
                 ref={(element) => {
                   thumbRefs.current[index] = element;
                 }}
@@ -256,12 +379,12 @@ function ProductGallerySlider({
                 }}
                 className={`group relative shrink-0 overflow-hidden transition duration-500 ${
                   isActive
-                    ? "h-[176px] w-[122px] md:h-[248px] md:w-[172px]"
-                    : "h-[146px] w-[102px] md:h-[208px] md:w-[144px]"
+                    ? "h-[204px] w-[142px] md:h-[286px] md:w-[198px]"
+                    : "h-[180px] w-[126px] md:h-[246px] md:w-[170px]"
                 } ${
                   isActive
                     ? "opacity-100"
-                    : "opacity-48 hover:opacity-90"
+                    : "opacity-86 hover:opacity-100"
                 }`}
                 aria-label={`Show ${slide.headline}`}
                 aria-current={isActive ? "true" : undefined}
@@ -275,6 +398,14 @@ function ProductGallerySlider({
                     isActive ? "scale-105" : "scale-100 group-hover:scale-105"
                   }`}
                 />
+                {!isActive ? (
+                  <>
+                    <span
+                      className={`pointer-events-none absolute inset-0 ${sideOverlay} transition-opacity duration-500 group-hover:opacity-70`}
+                    />
+                    <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,16,17,0.08),rgba(16,16,17,0.46))] transition-opacity duration-500 group-hover:opacity-70" />
+                  </>
+                ) : null}
                 <span
                   className={`absolute inset-x-0 bottom-0 h-px origin-left bg-paper transition-transform duration-500 ${
                     isActive ? "scale-x-100" : "scale-x-0"
@@ -291,11 +422,9 @@ function ProductGallerySlider({
 
 function ArchiveChapterSection({
   archive,
-  diamond,
   marker,
 }: {
   archive: ArchiveChapter;
-  diamond: LandingImage;
   marker: LandingSectionMarker;
 }) {
   const stageRef = useRef<HTMLElement>(null);
@@ -510,22 +639,11 @@ function ArchiveChapterSection({
 
           <a
             href="#tenuta"
-            className="relative z-10 mt-12 inline-flex flex-col items-center gap-4 font-mono text-[0.62rem] uppercase tracking-[0.18em] text-ink/58 transition hover:text-wine"
+            className="relative z-10 mt-12 inline-flex flex-col items-center gap-3 font-menu text-[0.72rem] uppercase tracking-[0.18em] text-ink/58 transition hover:text-wine"
             data-shutter-key="archive.cta"
           >
-            <span className="flex items-center gap-4">
-              <span className="h-px w-12 bg-current" />
-              {archive.cta}
-              <span className="h-px w-12 bg-current" />
-            </span>
-            <Image
-              src={diamond.src}
-              alt=""
-              width={18}
-              height={18}
-              aria-hidden="true"
-              className="opacity-72"
-            />
+            <span>{archive.cta}</span>
+            <CtaDivider />
           </a>
         </div>
       </div>
@@ -603,7 +721,7 @@ function CellarChapterSection({
           trigger: stage,
           start: "top top",
           end: () =>
-            `+=${Math.max(cellarObjects.length * window.innerHeight * 0.52, 3200)}`,
+            `+=${Math.max(cellarObjects.length * window.innerHeight * 0.44, 2800)}`,
           pin: true,
           scrub: 0.85,
           anticipatePin: 1,
@@ -621,14 +739,14 @@ function CellarChapterSection({
             object,
             {
               visibility: "visible",
-              y: () => window.innerHeight - object.offsetTop + 96,
+              y: () => window.innerHeight - object.offsetTop + 48,
               scale: 0.96,
             },
             {
               visibility: "visible",
-              y: () => -(object.offsetTop + object.offsetHeight + 96),
+              y: () => -(object.offsetTop + object.offsetHeight + 48),
               scale: 1,
-              duration: 1.55,
+              duration: 1.42,
               ease: "none",
             },
             index,
@@ -638,7 +756,7 @@ function CellarChapterSection({
             {
               visibility: "hidden",
             },
-            index + 1.55,
+            index + 1.42,
           );
       });
 
@@ -714,14 +832,7 @@ function CellarChapterSection({
         </div>
 
         <div className="relative z-10 mx-auto w-full max-w-[1180px] text-center">
-          <p
-            className="font-mono text-[0.62rem] uppercase tracking-[0.22em] text-wine"
-            data-shutter-key="cellar.eyebrow"
-          >
-            {cellar.eyebrow}
-          </p>
-
-          <div className="relative mt-6 min-h-[clamp(16rem,40vw,26rem)]">
+          <div className="relative min-h-[clamp(16rem,40vw,26rem)]">
             {states.map((state, stateIndex) => (
               <div
                 key={`cellar-copy-${stateIndex}`}
@@ -749,12 +860,11 @@ function CellarChapterSection({
 
           <a
             href="#spumanti"
-            className="relative z-10 mt-10 inline-flex items-center gap-4 font-mono text-[0.62rem] uppercase tracking-[0.18em] text-ink transition hover:text-wine"
+            className="relative z-10 mt-10 inline-flex flex-col items-center gap-3 font-menu text-[0.72rem] uppercase tracking-[0.18em] text-ink transition hover:text-wine"
             data-shutter-key="cellar.cta"
           >
-            <span className="h-px w-12 bg-current" />
-            {cellar.cta}
-            <span className="h-px w-12 bg-current" />
+            <span>{cellar.cta}</span>
+            <CtaDivider />
           </a>
         </div>
       </div>
@@ -1026,44 +1136,13 @@ function VineyardScrollSection({
   );
 }
 
-const memoryVisualAssets = [
-  {
-    src: "/images/memory/memory-06.jpg",
-    alt: "",
-    left: 4380,
-    top: "48vh",
-    className: "h-[350px] w-[256px] rotate-[7deg]",
-  },
-  {
-    src: "/images/memory/memory-07.png",
-    alt: "",
-    left: 4780,
-    top: "54vh",
-    className: "h-[410px] w-[328px] rotate-[15deg]",
-  },
-  {
-    src: "/images/memory/memory-09.png",
-    alt: "",
-    left: 3520,
-    top: "69vh",
-    className: "h-[386px] w-[309px] rotate-180",
-  },
-  {
-    src: "/images/memory/memory-10.png",
-    alt: "",
-    left: 3880,
-    top: "8vh",
-    className: "h-[318px] w-[255px] rotate-[-161deg]",
-  },
-];
-
 const memoryImageLayouts = [
-  { top: "16vh", className: "h-[342px] w-[274px]" },
-  { top: "62vh", className: "h-[381px] w-[305px]" },
-  { top: "23vh", className: "h-[336px] w-[260px] rotate-[-0.11deg]" },
-  { top: "56vh", className: "h-[337px] w-[269px]" },
-  { top: "18vh", className: "h-[370px] w-[296px] rotate-180" },
-  { top: "51vh", className: "h-[259px] w-[345px]" },
+  { y: "18vh", className: "h-[342px] w-[274px] rotate-[4deg]" },
+  { y: "58vh", className: "h-[381px] w-[305px] rotate-[-5deg]" },
+  { y: "20vh", className: "h-[336px] w-[260px] rotate-[2deg]" },
+  { y: "56vh", className: "h-[337px] w-[269px] rotate-[6deg]" },
+  { y: "17vh", className: "h-[370px] w-[296px] rotate-[-2deg]" },
+  { y: "55vh", className: "h-[259px] w-[345px] rotate-[-3deg]" },
 ];
 
 function MemoryHorizontalSection({
@@ -1075,7 +1154,7 @@ function MemoryHorizontalSection({
 }) {
   const stageRef = useRef<HTMLElement>(null);
   const items = memory.items;
-  const trackWidth = Math.max(5600, items.length * 880 + 1400);
+  const trackWidth = Math.max(5600, items.length * 900 + 1450);
 
   useEffect(() => {
     const stage = stageRef.current;
@@ -1090,21 +1169,33 @@ function MemoryHorizontalSection({
 
     const ctx = gsap.context(() => {
       const track = stage.querySelector<HTMLElement>("[data-memory-track]");
+      const images = gsap.utils.toArray<HTMLElement>(
+        "[data-memory-image]",
+        stage,
+      );
 
-      if (!track || reduceMotion) {
+      if (!track) {
+        return;
+      }
+
+      gsap.set(images, {
+        autoAlpha: 0,
+        y: () => window.innerHeight * 0.68,
+        scale: 0.96,
+      });
+
+      if (reduceMotion) {
+        gsap.set(images, { autoAlpha: 1, y: 0, scale: 1 });
         return;
       }
 
       const getDistance = () =>
         Math.max(0, track.scrollWidth - window.innerWidth);
-
-      gsap.to(track, {
-        x: () => -getDistance(),
-        ease: "none",
+      const timeline = gsap.timeline({
         scrollTrigger: {
           trigger: stage,
           start: "top top",
-          end: () => `+=${getDistance()}`,
+          end: () => `+=${Math.max(getDistance(), 4200)}`,
           pin: true,
           scrub: 0.9,
           anticipatePin: 1,
@@ -1113,22 +1204,50 @@ function MemoryHorizontalSection({
         },
       });
 
-      gsap.utils
-        .toArray<HTMLElement>("[data-memory-float]", stage)
-        .forEach((element, index) => {
-          gsap.to(element, {
-            y: index % 2 === 0 ? -18 : 14,
-            rotation: index % 2 === 0 ? "+=1.8" : "-=1.8",
-            duration: 5.2 + index * 0.25,
-            ease: "sine.inOut",
-            repeat: -1,
-            yoyo: true,
-          });
-        });
+      timeline.to(
+        track,
+        {
+          x: () => -getDistance(),
+          duration: items.length,
+          ease: "none",
+        },
+        0,
+      );
+
+      images.forEach((image, index) => {
+        const start = index * 0.82;
+
+        timeline.fromTo(
+          image,
+          {
+            autoAlpha: 0,
+            y: () => window.innerHeight * 0.72,
+            scale: 0.96,
+          },
+          {
+            autoAlpha: 1,
+            y: () => -window.innerHeight * 0.78,
+            scale: 1,
+            duration: 0.96,
+            ease: "none",
+          },
+          start,
+        );
+
+        timeline.to(
+          image,
+          {
+            autoAlpha: 0,
+            duration: 0.14,
+            ease: "none",
+          },
+          start + 0.82,
+        );
+      });
     }, stage);
 
     return () => ctx.revert();
-  }, [items.length]);
+  }, [items]);
 
   if (items.length === 0) {
     return null;
@@ -1155,34 +1274,47 @@ function MemoryHorizontalSection({
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 font-menu font-normal uppercase leading-[0.75] text-[#e0dad6]"
         >
-          <span className="absolute left-[260px] top-[35vh] text-[11rem] md:text-[23rem]">
+          <span
+            data-memory-word
+            className="absolute left-[170px] top-[19vh] text-[10rem] opacity-[0.2] md:text-[22rem]"
+          >
             Memoria
           </span>
-          <span className="absolute left-[1260px] top-[68vh] text-[11rem] md:text-[23rem]">
+          <span
+            data-memory-word
+            className="absolute left-[1260px] top-[66vh] text-[9rem] opacity-[0.16] md:text-[20rem]"
+          >
             viva
           </span>
-          <span className="absolute left-[2140px] top-[35vh] text-[11rem] md:text-[23rem]">
+          <span
+            data-memory-word
+            className="absolute left-[2080px] top-[20vh] text-[9rem] opacity-[0.16] md:text-[19rem]"
+          >
             il sogno
           </span>
-          <span className="absolute left-[3220px] top-[68vh] text-[11rem] md:text-[23rem]">
+          <span
+            data-memory-word
+            className="absolute left-[3240px] top-[63vh] text-[9rem] opacity-[0.15] md:text-[19rem]"
+          >
             delle bollicine
           </span>
         </div>
 
         {items.map((item, index) => {
           const textLeft = 330 + index * 820;
-          const imageLeft = textLeft + (index % 2 === 0 ? 500 : 230);
-          const textTop = index % 2 === 0 ? "24vh" : "70vh";
+          const imageLeft = textLeft + (index % 2 === 0 ? 510 : 240);
+          const textTop = index % 2 === 0 ? "27vh" : "64vh";
           const imageLayout = memoryImageLayouts[index % memoryImageLayouts.length];
 
           return (
             <div key={`${item.number}-${item.headline}`}>
               {item.image ? (
                 <figure
-                  data-memory-float
-                  className={`absolute overflow-hidden ${imageLayout.className}`}
-                  style={{ left: `${imageLeft}px`, top: imageLayout.top }}
+                  data-memory-image
+                  className={`pointer-events-none absolute z-0 overflow-hidden shadow-[0_38px_90px_rgba(0,0,0,0.34)] ${imageLayout.className}`}
+                  style={{ left: `${imageLeft}px`, top: imageLayout.y }}
                   data-shutter-key={`memory.items.${index}.image`}
+                  aria-hidden="true"
                 >
                   <Image
                     src={item.image.src}
@@ -1195,23 +1327,24 @@ function MemoryHorizontalSection({
               ) : null}
 
               <article
-                className="absolute z-10 max-w-[380px] text-paper"
+                data-memory-panel
+                className="absolute z-10 max-w-[360px] text-paper"
                 style={{ left: `${textLeft}px`, top: textTop }}
               >
                 <p
-                  className="font-menu text-[2.2rem] leading-none text-paper"
+                  className="font-menu text-[1.7rem] leading-none text-paper md:text-[2.15rem]"
                   data-shutter-key={`memory.items.${index}.number`}
                 >
                   ({item.number})
                 </p>
                 <h3
-                  className="mt-6 font-menu text-xl uppercase leading-[1.08] text-paper md:text-[1.55rem]"
+                  className="mt-5 font-menu text-lg uppercase leading-[1.08] text-paper md:text-[1.35rem]"
                   data-shutter-key={`memory.items.${index}.headline`}
                 >
                   {item.headline}
                 </h3>
                 <p
-                  className="mt-4 max-w-[350px] font-menu text-lg leading-[1.35] text-paper/82"
+                  className="mt-4 max-w-[330px] font-menu text-base leading-[1.38] text-paper/82 md:text-[1.08rem]"
                   data-shutter-key={`memory.items.${index}.body`}
                 >
                   {item.body}
@@ -1220,24 +1353,6 @@ function MemoryHorizontalSection({
             </div>
           );
         })}
-
-        {memoryVisualAssets.map((asset) => (
-          <figure
-            key={asset.src}
-            data-memory-float
-            className={`absolute overflow-hidden ${asset.className}`}
-            style={{ left: `${asset.left}px`, top: asset.top }}
-            aria-hidden="true"
-          >
-            <Image
-              src={asset.src}
-              alt={asset.alt}
-              fill
-              sizes="(min-width: 768px) 360px, 64vw"
-              className="object-cover"
-            />
-          </figure>
-        ))}
       </div>
     </section>
   );
@@ -1310,10 +1425,10 @@ function SiteMenu({
       data-menu-theme={menuState.isDark ? "dark" : "light"}
     >
       <div className="mx-auto max-w-[1568px] px-5 pt-4 md:px-8 md:pt-7">
-        <div className="relative flex h-[74px] items-center justify-between md:h-[100px]">
+        <div className="relative flex h-[74px] items-center justify-between md:h-[80px] md:items-end md:pb-5">
           <a
             href="#top"
-            className="relative block h-[36px] w-[178px] shrink-0 md:h-[49px] md:w-[240px]"
+            className="relative block h-[36px] w-[178px] shrink-0 md:h-[41px] md:w-[200px]"
             aria-label={content.brand.homeAriaLabel}
           >
             <Image
@@ -1321,14 +1436,14 @@ function SiteMenu({
               alt={tone.logo.alt}
               fill
               priority
-              sizes="(min-width: 768px) 240px, 178px"
+              sizes="(min-width: 768px) 200px, 178px"
               className="object-contain"
             />
           </a>
 
           <a
             href="#top"
-            className="absolute left-1/2 top-1/2 block h-[62px] w-[82px] -translate-x-1/2 -translate-y-1/2 md:h-[77px] md:w-[100px]"
+            className="absolute left-1/2 top-1/2 block h-[62px] w-[82px] -translate-x-1/2 -translate-y-1/2 md:h-[65px] md:w-[84px]"
             aria-label={content.brand.crestAriaLabel}
           >
             <Image
@@ -1336,7 +1451,7 @@ function SiteMenu({
               alt={tone.crest.alt}
               fill
               priority
-              sizes="(min-width: 768px) 100px, 82px"
+              sizes="(min-width: 768px) 84px, 82px"
               className="object-contain"
             />
           </a>
@@ -1429,7 +1544,7 @@ function SiteMenu({
           aria-hidden={!menuState.showSectionLabel}
         >
           <div className="overflow-hidden">
-            <div className="flex items-center justify-center gap-4 py-3 md:py-4">
+            <div className="flex items-center justify-center gap-4 py-3 md:py-[8.5px]">
               <Image
                 src={tone.diamond.src}
                 alt={tone.diamond.alt}
@@ -1438,7 +1553,7 @@ function SiteMenu({
                 className="h-[11px] w-[11px] md:h-[15px] md:w-[15px]"
               />
               <p
-                className="font-menu text-[0.78rem] font-bold uppercase leading-none tracking-[0.16em] md:text-base"
+                className="font-menu text-[0.78rem] font-bold uppercase leading-none tracking-[0.16em] md:text-sm"
                 data-shutter-key={`menu.sections.${menuState.activeSection}.menuLabel`}
               >
                 {menuState.sectionLabel}
@@ -1915,16 +2030,6 @@ export default function LandingPage({ content }: LandingPageProps) {
             </div>
           </div>
 
-          <div
-            data-hero-reveal
-            className="relative z-10 mx-auto flex items-center gap-4 font-mono text-[0.64rem] uppercase tracking-[0.18em] text-paper/72"
-          >
-            <span className="h-px w-14 bg-paper/34" />
-            <span data-shutter-key="hero.scrollLabel">
-              {content.hero.scrollLabel}
-            </span>
-            <span className="h-px w-14 bg-paper/34" />
-          </div>
         </section>
 
         <section
@@ -2019,12 +2124,11 @@ export default function LandingPage({ content }: LandingPageProps) {
                 </p>
                 <a
                   href="#spumanti"
-                  className="mt-8 inline-flex items-center gap-4 font-mono text-[0.64rem] uppercase tracking-[0.18em] text-ink transition hover:text-wine"
+                  className="mt-8 inline-flex flex-col items-center gap-3 font-menu text-[0.72rem] uppercase tracking-[0.18em] text-ink transition hover:text-wine"
                   data-shutter-key="introduction.cta"
                 >
-                <span className="h-px w-12 bg-current" />
-                {content.introduction.cta}
-                <span className="h-px w-12 bg-current" />
+                <span>{content.introduction.cta}</span>
+                <CtaDivider />
               </a>
             </div>
           </div>
@@ -2057,7 +2161,6 @@ export default function LandingPage({ content }: LandingPageProps) {
 
         <ArchiveChapterSection
           archive={content.archive}
-          diamond={content.brand.diamond.light}
           marker={content.menu.sections.archive}
         />
 
@@ -2080,7 +2183,7 @@ export default function LandingPage({ content }: LandingPageProps) {
       <footer
         id="contatti"
         data-section="contatti"
-        className="relative bg-[#f1f1f1] px-5 py-16 text-black md:px-8 md:py-24"
+        className="relative bg-[#f1f1f1] px-5 py-16 text-black md:px-8 md:py-16"
       >
         <div className="mx-auto flex min-h-[360px] max-w-[1560px] flex-col justify-between gap-16 font-menu uppercase tracking-[0.08em] md:min-h-[348px]">
           <div className="grid gap-10 md:grid-cols-[1fr_1fr_1.05fr] md:items-start">
@@ -2129,7 +2232,7 @@ export default function LandingPage({ content }: LandingPageProps) {
             <img
               src="/figma/footer/livello-8.svg"
               alt="Marchese Antinori crest"
-              className="mx-auto aspect-[128.109/97.6713] w-[128px] object-contain md:w-[142px]"
+              className="mx-auto aspect-[128.109/97.6713] w-[100px] object-contain"
             />
 
             <div className="space-y-5 text-left md:self-end md:text-right">
