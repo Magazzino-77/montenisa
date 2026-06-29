@@ -198,7 +198,7 @@ function ProductGallerySlider({
       gsap.set(activeFrame, { autoAlpha: 1 });
       gsap.set(thumbs, { autoAlpha: 1, y: 0 });
       if (headline) {
-        gsap.set(headline, { autoAlpha: 1, y: 0 });
+        gsap.set(headline, { autoAlpha: 1, x: 0 });
       }
       return;
     }
@@ -246,8 +246,8 @@ function ProductGallerySlider({
     if (headline) {
       gsap.fromTo(
         headline,
-        { autoAlpha: 0, y: 18 },
-        { autoAlpha: 1, y: 0, duration: 0.65, ease: "power2.out" },
+        { autoAlpha: 0, x: -92 },
+        { autoAlpha: 1, x: 0, duration: 0.72, ease: "power3.out" },
       );
     }
   }, [activeIndex]);
@@ -286,7 +286,7 @@ function ProductGallerySlider({
     <>
       <h2
         ref={headlineRef}
-        className="font-snell text-[clamp(2.7rem,4.65vw,4rem)] font-medium italic leading-none"
+        className="font-snell text-[clamp(2.25rem,3.25vw,3.25rem)] font-medium italic leading-none 2xl:text-[clamp(2.7rem,4.65vw,4rem)]"
         data-shutter-key={`product.slides.${activeIndex}.headline`}
       >
         {activeSlide.headline}
@@ -297,7 +297,7 @@ function ProductGallerySlider({
         data-active-slide={activeIndex}
         data-product-slider
       >
-        <div className="relative mx-auto aspect-[0.75] w-full max-w-[420px] overflow-visible">
+        <div className="relative mx-auto aspect-[0.75] w-full max-w-[310px] overflow-visible lg:max-w-[340px] 2xl:max-w-[420px]">
           {safeSlides.map((slide, index) => (
             <figure
               key={`${slide.image.src}-${index}`}
@@ -314,7 +314,7 @@ function ProductGallerySlider({
                 src={slide.image.src}
                 alt={slide.image.alt}
                 fill
-                sizes="(min-width: 768px) 420px, 86vw"
+                sizes="(min-width: 1536px) 420px, (min-width: 1024px) 340px, (min-width: 768px) 310px, 86vw"
                 className="object-contain object-[50%_50%] mix-blend-lighten"
               />
             </figure>
@@ -332,7 +332,7 @@ function ProductGallerySlider({
                 goToPrevious();
               }
             }}
-            className="absolute left-[-0.8rem] top-1/2 z-30 grid h-[72px] w-[72px] -translate-y-1/2 place-items-center opacity-82 transition hover:opacity-100 md:left-[-4.5rem] md:h-[91px] md:w-[91px]"
+            className="absolute left-[-0.8rem] top-1/2 z-30 grid h-[58px] w-[58px] -translate-y-1/2 place-items-center opacity-82 transition hover:opacity-100 md:left-[-3.2rem] md:h-[64px] md:w-[64px] 2xl:left-[-4.5rem] 2xl:h-[91px] 2xl:w-[91px]"
             aria-label="Previous image"
           >
             <Image
@@ -340,7 +340,7 @@ function ProductGallerySlider({
               alt=""
               width={91}
               height={91}
-              className="h-[91px] w-[91px] max-w-none object-contain"
+              className="h-[64px] w-[64px] max-w-none object-contain 2xl:h-[91px] 2xl:w-[91px]"
             />
           </button>
           <button
@@ -355,7 +355,7 @@ function ProductGallerySlider({
                 goToNext();
               }
             }}
-            className="absolute right-[-0.8rem] top-1/2 z-30 grid h-[72px] w-[72px] -translate-y-1/2 place-items-center opacity-82 transition hover:opacity-100 md:right-[-4.5rem] md:h-[91px] md:w-[91px]"
+            className="absolute right-[-0.8rem] top-1/2 z-30 grid h-[58px] w-[58px] -translate-y-1/2 place-items-center opacity-82 transition hover:opacity-100 md:right-[-3.2rem] md:h-[64px] md:w-[64px] 2xl:right-[-4.5rem] 2xl:h-[91px] 2xl:w-[91px]"
             aria-label="Next image"
           >
             <Image
@@ -363,12 +363,12 @@ function ProductGallerySlider({
               alt=""
               width={91}
               height={91}
-              className="h-[91px] w-[91px] max-w-none rotate-180 object-contain"
+              className="h-[64px] w-[64px] max-w-none rotate-180 object-contain 2xl:h-[91px] 2xl:w-[91px]"
             />
           </button>
         </div>
 
-        <div className="mx-auto mt-8 flex max-w-[980px] items-end justify-center gap-4 md:gap-8">
+        <div className="mx-auto mt-6 flex max-w-[980px] items-end justify-center gap-3 md:gap-5 2xl:mt-8 2xl:gap-8">
           {visibleThumbs.map(({ slide, index, offset }) => {
             const isActive = activeIndex === index;
             const sideOverlay =
@@ -395,8 +395,8 @@ function ProductGallerySlider({
                 }}
                 className={`group relative shrink-0 overflow-hidden transition duration-500 ${
                   isActive
-                    ? "h-[204px] w-[142px] md:h-[286px] md:w-[198px]"
-                    : "h-[180px] w-[126px] md:h-[246px] md:w-[170px]"
+                    ? "h-[184px] w-[128px] md:h-[190px] md:w-[132px] lg:h-[212px] lg:w-[147px] 2xl:h-[286px] 2xl:w-[198px]"
+                    : "h-[160px] w-[112px] md:h-[166px] md:w-[115px] lg:h-[186px] lg:w-[129px] 2xl:h-[246px] 2xl:w-[170px]"
                 } ${
                   isActive
                     ? "opacity-100"
@@ -595,7 +595,7 @@ function ArchiveChapterSection({
         marker={marker}
         shutterKey="menu.sections.archive.referenceId"
       />
-      <div className="relative mx-auto flex min-h-[100svh] max-w-[1560px] items-center px-5 py-[4.5rem] md:px-8 md:py-32">
+      <div className="relative mx-auto flex min-h-[100svh] max-w-[1560px] items-center px-5 py-[4.5rem] md:px-8 md:py-24 2xl:py-32">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           {states.map((state, stateIndex) => (
             <div
@@ -625,7 +625,7 @@ function ArchiveChapterSection({
         </div>
 
         <div className="relative z-10 mx-auto w-full max-w-[1180px] text-center">
-          <div className="relative min-h-[clamp(18rem,42vw,28rem)]">
+          <div className="relative min-h-[clamp(16rem,35vw,24rem)] 2xl:min-h-[clamp(18rem,42vw,28rem)]">
             {states.map((state, stateIndex) => (
               <div
                 key={`archive-copy-${stateIndex}`}
@@ -638,13 +638,13 @@ function ArchiveChapterSection({
                 aria-hidden={stateIndex !== 0}
               >
                 <h2
-                  className="mx-auto max-w-[12ch] font-menu text-[clamp(3rem,8vw,8rem)] font-medium uppercase leading-[0.9] text-ink"
+                  className="mx-auto max-w-[12ch] font-menu text-[clamp(2.75rem,6.6vw,6.5rem)] font-medium uppercase leading-[0.9] text-ink 2xl:text-[clamp(3rem,8vw,8rem)]"
                   data-shutter-key={`archive.states.${stateIndex}.headline`}
                 >
                   {state.headline}
                 </h2>
                 <p
-                  className="mx-auto mt-8 max-w-[680px] font-menu text-sm uppercase leading-7 tracking-[0.06em] text-ink/72 md:text-[0.95rem]"
+                  className="mx-auto mt-6 max-w-[640px] font-menu text-sm uppercase leading-6 tracking-[0.05em] text-ink/72 md:text-[0.9rem] md:leading-7 2xl:mt-8 2xl:max-w-[680px] 2xl:text-[0.95rem]"
                   data-shutter-key={`archive.states.${stateIndex}.body`}
                 >
                   {state.body}
@@ -655,7 +655,7 @@ function ArchiveChapterSection({
 
           <a
             href="#tenuta"
-            className="relative z-10 mt-12 inline-flex flex-col items-center gap-3 font-menu text-[0.72rem] uppercase tracking-[0.18em] text-ink/58 transition hover:text-wine"
+            className="relative z-10 mt-8 inline-flex flex-col items-center gap-3 font-menu text-[0.68rem] uppercase tracking-[0.16em] text-ink/58 transition hover:text-wine 2xl:mt-12 2xl:text-[0.72rem] 2xl:tracking-[0.18em]"
             data-shutter-key="archive.cta"
           >
             <span>{archive.cta}</span>
@@ -818,7 +818,7 @@ function CellarChapterSection({
         marker={marker}
         shutterKey="menu.sections.cantina.referenceId"
       />
-      <div className="relative mx-auto flex min-h-[100svh] max-w-[1560px] items-center px-5 py-[4.5rem] md:px-8 md:py-32">
+      <div className="relative mx-auto flex min-h-[100svh] max-w-[1560px] items-center px-5 py-[4.5rem] md:px-8 md:py-24 2xl:py-32">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           {states.map((state, stateIndex) => (
             <div
@@ -848,7 +848,7 @@ function CellarChapterSection({
         </div>
 
         <div className="relative z-10 mx-auto w-full max-w-[1180px] text-center">
-          <div className="relative min-h-[clamp(16rem,40vw,26rem)]">
+          <div className="relative min-h-[clamp(15rem,34vw,23rem)] 2xl:min-h-[clamp(16rem,40vw,26rem)]">
             {states.map((state, stateIndex) => (
               <div
                 key={`cellar-copy-${stateIndex}`}
@@ -859,13 +859,13 @@ function CellarChapterSection({
                 aria-hidden={stateIndex !== 0}
               >
                 <h2
-                  className="mx-auto max-w-[14ch] font-menu text-[clamp(2.7rem,7vw,7rem)] font-medium uppercase leading-[0.9] text-ink"
+                  className="mx-auto max-w-[14ch] font-menu text-[clamp(2.5rem,6.1vw,6rem)] font-medium uppercase leading-[0.9] text-ink 2xl:text-[clamp(2.7rem,7vw,7rem)]"
                   data-shutter-key={`cellar.states.${stateIndex}.headline`}
                 >
                   {state.headline}
                 </h2>
                 <p
-                  className="mx-auto mt-7 max-w-[620px] font-menu text-sm uppercase leading-7 tracking-[0.04em] text-ink/74 md:text-[0.95rem]"
+                  className="mx-auto mt-6 max-w-[590px] font-menu text-sm uppercase leading-6 tracking-[0.04em] text-ink/74 md:text-[0.9rem] md:leading-7 2xl:mt-7 2xl:max-w-[620px] 2xl:text-[0.95rem]"
                   data-shutter-key={`cellar.states.${stateIndex}.body`}
                 >
                   {state.body}
@@ -876,7 +876,7 @@ function CellarChapterSection({
 
           <a
             href="#spumanti"
-            className="relative z-10 mt-10 inline-flex flex-col items-center gap-3 font-menu text-[0.72rem] uppercase tracking-[0.18em] text-ink transition hover:text-wine"
+            className="relative z-10 mt-8 inline-flex flex-col items-center gap-3 font-menu text-[0.68rem] uppercase tracking-[0.16em] text-ink transition hover:text-wine 2xl:mt-10 2xl:text-[0.72rem] 2xl:tracking-[0.18em]"
             data-shutter-key="cellar.cta"
           >
             <span>{cellar.cta}</span>
@@ -929,7 +929,7 @@ function VineyardCopy({
       className="mx-auto flex w-full max-w-[680px] flex-col items-center text-center"
     >
       <h2
-        className="max-w-[12ch] font-menu text-[clamp(2.35rem,8vw,4.1rem)] font-normal uppercase leading-[1.08] text-paper lg:text-[clamp(3.2rem,4.5vw,4.1rem)]"
+        className="max-w-[12ch] font-menu text-[clamp(2.35rem,8vw,4.1rem)] font-normal uppercase leading-[1.08] text-paper lg:text-[clamp(2.8rem,3.75vw,3.75rem)] 2xl:text-[clamp(3.2rem,4.5vw,4.1rem)]"
         data-shutter-key={`vineyard.states.${index}.headline`}
       >
         {state.headline}
@@ -947,7 +947,7 @@ function VineyardCopy({
         />
       </figure>
       <p
-        className="mt-6 max-w-[651px] font-menu text-[0.92rem] leading-[1.58] text-paper/82 md:mt-8 md:text-[1.08rem] md:leading-[1.85]"
+        className="mt-6 max-w-[620px] font-menu text-[0.92rem] leading-[1.58] text-paper/82 md:mt-7 md:text-[1rem] md:leading-[1.75] 2xl:mt-8 2xl:max-w-[651px] 2xl:text-[1.08rem] 2xl:leading-[1.85]"
         data-shutter-key={`vineyard.states.${index}.body`}
       >
         {state.body}
@@ -1111,7 +1111,7 @@ function VineyardScrollSection({
 
       <div
         data-vineyard-desktop
-        className="relative hidden h-[100svh] min-h-[760px] overflow-hidden md:block"
+        className="relative hidden h-[100svh] min-h-[640px] overflow-hidden md:block lg:min-h-[700px] 2xl:min-h-[760px]"
       >
         <div className="mx-auto grid h-full max-w-[1560px] grid-cols-2 gap-20">
           {(["left", "right"] as const).map((side) => (
@@ -1283,7 +1283,7 @@ function MemoryHorizontalSection({
 
       <div
         data-memory-track
-        className="relative h-[100svh] min-h-[760px]"
+        className="relative h-[100svh] min-h-[640px] lg:min-h-[700px] 2xl:min-h-[760px]"
         style={{ width: `${trackWidth}px` }}
       >
         <div
@@ -1292,25 +1292,25 @@ function MemoryHorizontalSection({
         >
           <span
             data-memory-word
-            className="absolute left-[170px] top-[19vh] text-[10rem] opacity-[0.2] md:text-[22rem]"
+            className="absolute left-[170px] top-[6vh] text-[9rem] opacity-[0.12] md:text-[14rem] lg:text-[16rem] 2xl:top-[19vh] 2xl:text-[22rem] 2xl:opacity-[0.2]"
           >
             Memoria
           </span>
           <span
             data-memory-word
-            className="absolute left-[1260px] top-[66vh] text-[9rem] opacity-[0.16] md:text-[20rem]"
+            className="absolute left-[1260px] top-[35vh] text-[8rem] opacity-[0.1] md:text-[13rem] lg:text-[15rem] 2xl:top-[66vh] 2xl:text-[20rem] 2xl:opacity-[0.16]"
           >
             viva
           </span>
           <span
             data-memory-word
-            className="absolute left-[2080px] top-[20vh] text-[9rem] opacity-[0.16] md:text-[19rem]"
+            className="absolute left-[2080px] top-[6vh] text-[8rem] opacity-[0.1] md:text-[13rem] lg:text-[15rem] 2xl:top-[20vh] 2xl:text-[19rem] 2xl:opacity-[0.16]"
           >
             il sogno
           </span>
           <span
             data-memory-word
-            className="absolute left-[3240px] top-[63vh] text-[9rem] opacity-[0.15] md:text-[19rem]"
+            className="absolute left-[3240px] top-[35vh] text-[8rem] opacity-[0.1] md:text-[13rem] lg:text-[15rem] 2xl:top-[63vh] 2xl:text-[19rem] 2xl:opacity-[0.15]"
           >
             delle bollicine
           </span>
@@ -1319,7 +1319,7 @@ function MemoryHorizontalSection({
         {items.map((item, index) => {
           const textLeft = 330 + index * 820;
           const imageLeft = textLeft + (index % 2 === 0 ? 510 : 240);
-          const textTop = index % 2 === 0 ? "27vh" : "64vh";
+          const textTop = index % 2 === 0 ? "36vh" : "66vh";
           const imageLayout = memoryImageLayouts[index % memoryImageLayouts.length];
 
           return (
@@ -1344,7 +1344,7 @@ function MemoryHorizontalSection({
 
               <article
                 data-memory-panel
-                className="absolute z-10 max-w-[360px] text-paper"
+                className="absolute z-20 max-w-[360px] text-paper"
                 style={{ left: `${textLeft}px`, top: textTop }}
               >
                 <p
@@ -1377,28 +1377,20 @@ function MemoryHorizontalSection({
 function SectionReference({
   marker,
   shutterKey,
-  tone = "light",
 }: {
   marker: LandingSectionMarker;
   shutterKey?: string;
   tone?: "light" | "dark";
 }) {
   const id = marker.referenceId;
-  const toneClass =
-    tone === "dark"
-      ? "border-paper/12 bg-paper/[0.035] text-paper/36 hover:text-paper/70"
-      : "border-ink/10 bg-ink/[0.025] text-ink/32 hover:text-ink/62";
 
   return (
-    <a
+    <span
       id={id}
-      href={`#${id}`}
-      className={`absolute left-5 top-36 z-20 scroll-mt-36 border px-2 py-1 font-mono text-[0.58rem] uppercase tracking-[0.16em] transition md:left-8 md:top-44 ${toneClass}`}
+      className="pointer-events-none absolute left-0 top-0 h-px w-px scroll-mt-36 overflow-hidden opacity-0"
       data-shutter-key={shutterKey}
-      aria-label={`Section reference ${id}`}
-    >
-      #{id}
-    </a>
+      aria-hidden="true"
+    />
   );
 }
 
@@ -1440,11 +1432,11 @@ function SiteMenu({
       className={`fixed inset-x-0 top-0 z-40 ${tone.background} ${tone.text} transition-colors duration-500`}
       data-menu-theme={menuState.isDark ? "dark" : "light"}
     >
-      <div className="mx-auto max-w-[1568px] px-5 pt-4 md:px-8 md:pt-7">
-        <div className="relative flex h-[74px] items-center justify-between md:h-[80px] md:items-end md:pb-5">
+      <div className="mx-auto max-w-[1568px] px-5 pt-3 md:px-8 md:pt-4 2xl:pt-7">
+        <div className="relative flex h-[64px] items-center justify-between md:h-[68px] md:items-end md:pb-4 2xl:h-[80px] 2xl:pb-5">
           <a
             href="#top"
-            className="relative block h-[36px] w-[178px] shrink-0 md:h-[41px] md:w-[200px]"
+            className="relative block h-[32px] w-[158px] shrink-0 md:h-[37px] md:w-[180px] 2xl:h-[41px] 2xl:w-[200px]"
             aria-label={content.brand.homeAriaLabel}
           >
             <Image
@@ -1452,14 +1444,14 @@ function SiteMenu({
               alt={tone.logo.alt}
               fill
               priority
-              sizes="(min-width: 768px) 200px, 178px"
+              sizes="(min-width: 1536px) 200px, (min-width: 768px) 180px, 158px"
               className="object-contain"
             />
           </a>
 
           <a
             href="#top"
-            className="absolute left-1/2 top-1/2 block h-[62px] w-[82px] -translate-x-1/2 -translate-y-1/2 md:h-[65px] md:w-[84px]"
+            className="absolute left-1/2 top-1/2 block h-[54px] w-[72px] -translate-x-1/2 -translate-y-1/2 md:h-[56px] md:w-[72px] 2xl:h-[65px] 2xl:w-[84px]"
             aria-label={content.brand.crestAriaLabel}
           >
             <Image
@@ -1467,14 +1459,14 @@ function SiteMenu({
               alt={tone.crest.alt}
               fill
               priority
-              sizes="(min-width: 768px) 84px, 82px"
+              sizes="(min-width: 1536px) 84px, (min-width: 768px) 72px, 72px"
               className="object-contain"
             />
           </a>
 
           <nav
             aria-label="Primary navigation"
-            className="hidden items-center gap-[2.15rem] font-menu text-[0.78rem] font-semibold uppercase leading-none tracking-[0.08em] xl:flex"
+            className="hidden items-center gap-[1.55rem] font-menu text-[0.7rem] font-semibold uppercase leading-none tracking-[0.07em] xl:flex 2xl:gap-[2.15rem] 2xl:text-[0.78rem] 2xl:tracking-[0.08em]"
           >
             {content.navigation.map((item, index) => {
               return (
@@ -1492,7 +1484,7 @@ function SiteMenu({
 
           <button
             type="button"
-            className="relative z-10 grid h-10 w-10 place-items-center border border-current/22 transition hover:bg-current/8 xl:hidden"
+            className="relative z-10 grid h-9 w-9 place-items-center border border-current/22 transition hover:bg-current/8 xl:hidden"
             aria-label={isMenuOpen ? "Chiudi menu" : "Apri menu"}
             aria-expanded={isMenuOpen}
             aria-controls="site-mobile-menu"
@@ -1534,12 +1526,12 @@ function SiteMenu({
           <div className="flex justify-center overflow-hidden">
             <nav
               aria-label="Primary navigation"
-              className="grid w-full max-w-[520px] gap-3 py-4 font-menu text-[0.72rem] font-semibold uppercase tracking-[0.1em] sm:grid-cols-2"
+              className="grid w-full max-w-[520px] gap-2 py-3 font-menu text-[0.68rem] font-semibold uppercase tracking-[0.09em] sm:grid-cols-2"
             >
               {content.navigation.map((item, index) => (
                 <a
                   key={item.href}
-                  className="border border-current/12 px-3 py-3 text-center transition hover:bg-current/8"
+                  className="border border-current/12 px-3 py-2.5 text-center transition hover:bg-current/8"
                   data-shutter-key={`navigation.${index}.label`}
                   href={item.href}
                   onClick={() => setIsMenuOpen(false)}
@@ -1560,16 +1552,16 @@ function SiteMenu({
           aria-hidden={!menuState.showSectionLabel}
         >
           <div className="overflow-hidden">
-            <div className="flex items-center justify-center gap-4 py-3 md:py-[8.5px]">
+            <div className="flex items-center justify-center gap-3 py-2 md:py-1.5 2xl:gap-4 2xl:py-[8.5px]">
               <Image
                 src={tone.diamond.src}
                 alt={tone.diamond.alt}
                 width={15}
                 height={15}
-                className="h-[11px] w-[11px] md:h-[15px] md:w-[15px]"
+                className="h-[10px] w-[10px] md:h-[11px] md:w-[11px] 2xl:h-[15px] 2xl:w-[15px]"
               />
               <p
-                className="font-menu text-[0.78rem] font-bold uppercase leading-none tracking-[0.16em] md:text-sm"
+                className="font-menu text-[0.68rem] font-bold uppercase leading-none tracking-[0.14em] md:text-[0.72rem] 2xl:text-sm 2xl:tracking-[0.16em]"
                 data-shutter-key={`menu.sections.${menuState.activeSection}.menuLabel`}
               >
                 {menuState.sectionLabel}
@@ -1579,7 +1571,7 @@ function SiteMenu({
                 alt={tone.diamond.alt}
                 width={15}
                 height={15}
-                className="h-[11px] w-[11px] md:h-[15px] md:w-[15px]"
+                className="h-[10px] w-[10px] md:h-[11px] md:w-[11px] 2xl:h-[15px] 2xl:w-[15px]"
               />
             </div>
             <div className={`h-px w-full ${tone.rule}`} />
@@ -1661,6 +1653,8 @@ export default function LandingPage({ content }: LandingPageProps) {
     if (!rootRef.current) {
       return;
     }
+
+    let heroVideoTicker: (() => void) | null = null;
 
     const context = gsap.context(() => {
       const darkMenuSections = new Set(content.menu.darkSections);
@@ -1763,7 +1757,7 @@ export default function LandingPage({ content }: LandingPageProps) {
               pinSpacing: true,
               anticipatePin: 1,
               refreshPriority: 4,
-              scrub: 0.7,
+              scrub: 0.45,
             },
           });
 
@@ -1787,15 +1781,55 @@ export default function LandingPage({ content }: LandingPageProps) {
                 return;
               }
 
-              heroTimeline.to(
-                heroVideo,
-                {
-                  currentTime: Math.max(0, duration - 0.04),
-                  duration: heroReadingDuration,
-                  ease: "none",
-                },
-                0,
-              );
+              const maxTime = Math.max(0, duration - 0.04);
+              let targetTime = 0;
+              let renderedTime = heroVideo.currentTime || 0;
+
+              if (heroVideoTicker) {
+                gsap.ticker.remove(heroVideoTicker);
+              }
+
+              heroVideo.muted = true;
+              heroVideo.playsInline = true;
+              heroVideo.preload = "auto";
+              heroVideo.setAttribute("webkit-playsinline", "true");
+
+              void heroVideo
+                .play()
+                .then(() => {
+                  heroVideo.pause();
+                  heroVideo.currentTime = renderedTime;
+                })
+                .catch(() => {
+                  heroVideo.pause();
+                });
+
+              heroTimeline.eventCallback("onUpdate", () => {
+                const timelineProgress = Math.min(
+                  heroTimeline.time() / heroReadingDuration,
+                  1,
+                );
+                targetTime = timelineProgress * maxTime;
+              });
+
+              heroVideoTicker = () => {
+                const delta = targetTime - renderedTime;
+
+                if (Math.abs(delta) < 0.001) {
+                  return;
+                }
+
+                renderedTime += delta * 0.22;
+
+                if (Math.abs(heroVideo.currentTime - renderedTime) > 0.01) {
+                  heroVideo.currentTime = Math.max(
+                    0,
+                    Math.min(maxTime, renderedTime),
+                  );
+                }
+              };
+
+              gsap.ticker.add(heroVideoTicker);
               ScrollTrigger.refresh();
             };
 
@@ -1994,7 +2028,12 @@ export default function LandingPage({ content }: LandingPageProps) {
       }
     }, rootRef);
 
-    return () => context.revert();
+    return () => {
+      if (heroVideoTicker) {
+        gsap.ticker.remove(heroVideoTicker);
+      }
+      context.revert();
+    };
   }, [content.menu.darkSections, content.menu.sections]);
 
   return (
@@ -2008,7 +2047,7 @@ export default function LandingPage({ content }: LandingPageProps) {
       <main id="top">
         <section
           data-section="hero"
-          className="relative flex min-h-[100svh] flex-col bg-ink px-5 pb-14 pt-36 text-paper md:px-8 md:pt-44"
+          className="relative flex min-h-[100svh] flex-col bg-ink px-5 pb-12 pt-28 text-paper md:px-8 md:pt-32 2xl:pb-14 2xl:pt-44"
         >
           <SectionReference
             marker={content.menu.sections.hero}
@@ -2021,6 +2060,7 @@ export default function LandingPage({ content }: LandingPageProps) {
               className="h-full w-full scale-105 object-cover"
               muted
               playsInline
+              disablePictureInPicture
               preload="auto"
               poster={content.hero.image.src}
               aria-label={content.hero.image.alt}
@@ -2038,7 +2078,7 @@ export default function LandingPage({ content }: LandingPageProps) {
                 <h1
                   data-hero-reveal
                   data-hero-text
-                  className="mx-auto max-w-[58ch] font-menu text-[clamp(1.2rem,2.1vw,2.25rem)] font-normal leading-[1.05] text-paper md:leading-[1]"
+                  className="mx-auto max-w-[46ch] font-menu text-[clamp(1.1rem,1.82vw,2rem)] font-normal leading-[1.05] text-paper md:leading-[1] 2xl:max-w-[58ch] 2xl:text-[clamp(1.2rem,2.1vw,2.25rem)]"
                   data-shutter-key="hero.headline"
                 >
                   {renderHeroStatement()}
@@ -2154,7 +2194,7 @@ export default function LandingPage({ content }: LandingPageProps) {
         <section
           id="spumanti"
           data-section="corallo"
-          className="relative bg-ink px-5 py-[4.5rem] text-paper md:px-8 md:py-28"
+          className="relative bg-ink px-5 py-[4.5rem] text-paper md:px-8 md:py-24 2xl:py-28"
         >
             <SectionReference
               marker={content.menu.sections.corallo}
@@ -2199,10 +2239,10 @@ export default function LandingPage({ content }: LandingPageProps) {
       <footer
         id="contatti"
         data-section="contatti"
-        className="relative bg-[#f1f1f1] px-5 py-16 text-black md:px-8 md:py-16"
+        className="relative bg-[#f1f1f1] px-5 py-10 text-black md:px-8 md:py-11 2xl:py-16"
       >
-        <div className="mx-auto flex min-h-[360px] max-w-[1560px] flex-col justify-between gap-16 font-menu uppercase tracking-[0.08em] md:min-h-[348px]">
-          <div className="grid gap-10 md:grid-cols-[1fr_1fr_1.05fr] md:items-start">
+        <div className="mx-auto flex min-h-[280px] max-w-[1560px] flex-col justify-between gap-10 font-menu uppercase tracking-[0.08em] md:min-h-[248px] 2xl:min-h-[348px] 2xl:gap-16">
+          <div className="grid gap-8 md:grid-cols-[1fr_1fr_1.05fr] md:items-start 2xl:gap-10">
             <div className="max-w-[270px] text-[0.72rem] font-medium leading-[1.75] md:text-[0.82rem]">
               <p className="font-bold">Dove siamo</p>
               <p>Via Paolo VI, 62 - 25046 Cazzago San Martino BS</p>
@@ -2214,10 +2254,10 @@ export default function LandingPage({ content }: LandingPageProps) {
               <p>T. +39 030 7750838</p>
             </div>
 
-            <div className="grid gap-8 text-[0.72rem] font-medium leading-[1.75] md:grid-cols-[1fr_auto] md:text-right md:text-[0.82rem]">
+            <div className="grid gap-6 text-[0.72rem] font-medium leading-[1.75] md:grid-cols-[1fr_auto] md:text-right md:text-[0.82rem] 2xl:gap-8">
               <div>
                 <p className="font-bold">Seguici</p>
-                <div className="mt-6 flex gap-7 md:justify-end">
+                <div className="mt-4 flex gap-7 md:justify-end 2xl:mt-6">
                   <a className="underline underline-offset-4 transition hover:text-wine" href="#">
                     Facebook
                   </a>
@@ -2228,7 +2268,7 @@ export default function LandingPage({ content }: LandingPageProps) {
               </div>
               <div>
                 <p className="font-bold">Lingua</p>
-                <p className="mt-6">
+                <p className="mt-4 2xl:mt-6">
                   <span className="font-extrabold">ITA</span>
                   <span className="px-5"> </span>
                   <span>ENG</span>
@@ -2237,8 +2277,8 @@ export default function LandingPage({ content }: LandingPageProps) {
             </div>
           </div>
 
-          <div className="grid gap-8 md:grid-cols-[1fr_auto_1fr] md:items-center">
-            <div className="space-y-5 md:self-end">
+          <div className="grid gap-6 md:grid-cols-[1fr_auto_1fr] md:items-center 2xl:gap-8">
+            <div className="space-y-4 md:self-end 2xl:space-y-5">
               <div className="h-px w-full bg-black/30" />
               <p className="text-[0.48rem] font-bold leading-none tracking-[0.16em] md:text-[0.54rem]">
                 ©MarchesiAntinori 2027
@@ -2248,10 +2288,10 @@ export default function LandingPage({ content }: LandingPageProps) {
             <img
               src="/figma/footer/livello-8.svg"
               alt="Marchese Antinori crest"
-              className="mx-auto aspect-[128.109/97.6713] w-[100px] object-contain"
+              className="mx-auto aspect-[128.109/97.6713] w-[76px] object-contain 2xl:w-[100px]"
             />
 
-            <div className="space-y-5 text-left md:self-end md:text-right">
+            <div className="space-y-4 text-left md:self-end md:text-right 2xl:space-y-5">
               <div className="h-px w-full bg-black/30" />
               <p className="text-[0.48rem] font-bold leading-none tracking-[0.16em] md:text-[0.54rem]">
                 Privacy&nbsp;&nbsp;.&nbsp;&nbsp; Terms&nbsp;&nbsp;.&nbsp;&nbsp; Cookies

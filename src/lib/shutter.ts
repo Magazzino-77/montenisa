@@ -302,7 +302,7 @@ export const fallbackLandingContent: LandingContent = {
               alt: "Sigillo di cera con stemma",
             },
             placement:
-              "right-[-3%] top-[7%] h-[min(24vw,300px)] w-[min(24vw,300px)] rotate-[8deg]",
+              "right-[1.5%] top-[9%] h-[clamp(150px,18vw,250px)] w-[clamp(150px,18vw,250px)] rotate-[8deg] 2xl:right-[1%] 2xl:top-[7%] 2xl:h-[min(24vw,300px)] 2xl:w-[min(24vw,300px)]",
           },
           {
             image: {
@@ -310,7 +310,7 @@ export const fallbackLandingContent: LandingContent = {
               alt: "Piuma d'oca",
             },
             placement:
-              "bottom-[4%] left-[-6%] h-[min(42vw,520px)] w-[min(30vw,380px)] -rotate-[18deg]",
+              "bottom-[7%] left-[5%] h-[clamp(300px,34vw,450px)] w-[clamp(210px,24vw,320px)] -rotate-[14deg] 2xl:left-[4%] 2xl:h-[min(42vw,520px)] 2xl:w-[min(30vw,380px)] 2xl:-rotate-[18deg]",
           },
           {
             image: {
@@ -318,7 +318,7 @@ export const fallbackLandingContent: LandingContent = {
               alt: "Moneta antica",
             },
             placement:
-              "right-[3%] bottom-[7%] h-[min(18vw,220px)] w-[min(18vw,220px)] rotate-[12deg]",
+              "right-[5%] bottom-[10%] h-[clamp(132px,14vw,190px)] w-[clamp(132px,14vw,190px)] rotate-[12deg] 2xl:right-[3%] 2xl:bottom-[7%] 2xl:h-[min(18vw,220px)] 2xl:w-[min(18vw,220px)]",
           },
         ],
       },
@@ -333,7 +333,7 @@ export const fallbackLandingContent: LandingContent = {
                 alt: "Foglia di vite",
               },
               placement:
-                "bottom-[5%] left-[2%] h-[min(30vw,380px)] w-[min(32vw,420px)] -rotate-[10deg]",
+                "bottom-[8%] left-[5%] h-[clamp(230px,26vw,320px)] w-[clamp(250px,28vw,340px)] -rotate-[8deg] 2xl:bottom-[5%] 2xl:left-[4%] 2xl:h-[min(30vw,380px)] 2xl:w-[min(32vw,420px)] 2xl:-rotate-[10deg]",
             },
             {
               image: {
@@ -341,7 +341,7 @@ export const fallbackLandingContent: LandingContent = {
                 alt: "Roccia stratificata",
               },
               placement:
-                "right-[5%] top-[12%] h-[min(24vw,310px)] w-[min(26vw,340px)] rotate-[-6deg]",
+                "right-[6%] top-[14%] h-[clamp(190px,20vw,280px)] w-[clamp(210px,22vw,300px)] rotate-[-6deg] 2xl:right-[5%] 2xl:top-[12%] 2xl:h-[min(24vw,310px)] 2xl:w-[min(26vw,340px)]",
             },
             {
               image: {
@@ -349,7 +349,7 @@ export const fallbackLandingContent: LandingContent = {
                 alt: "Cristallo trasparente",
               },
               placement:
-                "right-[7%] bottom-[8%] h-[min(18vw,230px)] w-[min(18vw,230px)] rotate-[10deg]",
+                "right-[8%] bottom-[10%] h-[clamp(140px,15vw,205px)] w-[clamp(140px,15vw,205px)] rotate-[10deg] 2xl:right-[7%] 2xl:bottom-[8%] 2xl:h-[min(18vw,230px)] 2xl:w-[min(18vw,230px)]",
             },
           ],
         },
@@ -364,7 +364,7 @@ export const fallbackLandingContent: LandingContent = {
                 alt: "Tappo da spumante",
               },
               placement:
-                "bottom-[5%] left-[4%] h-[min(30vw,390px)] w-[min(24vw,310px)] rotate-[-10deg]",
+                "bottom-[8%] left-[6%] h-[clamp(230px,26vw,320px)] w-[clamp(185px,20vw,260px)] rotate-[-8deg] 2xl:bottom-[5%] 2xl:left-[4%] 2xl:h-[min(30vw,390px)] 2xl:w-[min(24vw,310px)] 2xl:rotate-[-10deg]",
             },
             {
               image: {
@@ -372,7 +372,7 @@ export const fallbackLandingContent: LandingContent = {
                 alt: "Bollicine dorate",
               },
               placement:
-                "right-[6%] top-[8%] h-[min(26vw,340px)] w-[min(21vw,270px)] rotate-[4deg]",
+                "right-[7%] top-[10%] h-[clamp(190px,22vw,300px)] w-[clamp(150px,17vw,230px)] rotate-[4deg] 2xl:right-[6%] 2xl:top-[8%] 2xl:h-[min(26vw,340px)] 2xl:w-[min(21vw,270px)]",
             },
             {
               image: {
@@ -380,7 +380,7 @@ export const fallbackLandingContent: LandingContent = {
                 alt: "Scudo decorativo 1995",
               },
               placement:
-                "right-[3%] bottom-[8%] h-[min(24vw,310px)] w-[min(28vw,360px)] rotate-[6deg]",
+                "right-[5%] bottom-[10%] h-[clamp(190px,20vw,270px)] w-[clamp(220px,24vw,320px)] rotate-[6deg] 2xl:right-[3%] 2xl:bottom-[8%] 2xl:h-[min(24vw,310px)] 2xl:w-[min(28vw,360px)]",
             },
           ],
         },
