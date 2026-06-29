@@ -29,93 +29,109 @@ const renderHeroLine = (text: string, keyPrefix: string, className = "") => (
   <span className={`block ${className}`}>{renderHeroChars(text, keyPrefix)}</span>
 );
 
-const renderHeroStatement = () => {
-  const wrapRows = [
-    {
-      left: "Tra stanze di",
-      right: "luce e memoria,",
-      leftClass: "-mr-[0.35em]",
-      rightClass: "-ml-[0.35em]",
-    },
-    {
-      left: "ogni oggetto",
-      right: "conserva",
-      leftClass: "-mr-[1.1em]",
-      rightClass: "-ml-[1.1em]",
-    },
-    {
-      left: "una Traccia che",
-      right: "rivela una Storia.",
-      leftClass: "-mr-[0.65em]",
-      rightClass: "-ml-[0.65em]",
-    },
-    {
-      left: "Qui la terra",
-      right: "diventa materia,",
-      leftClass: "-mr-[1.15em]",
-      rightClass: "-ml-[1.15em]",
-    },
-    {
-      left: "i vigneti origine,",
-      right: "le cantine tempo,",
-      leftClass: "-mr-[0.55em]",
-      rightClass: "-ml-[0.55em]",
-    },
-    {
-      left: "il servizio rito.",
-      right: "Le cuvée sono Tesori,",
-      leftClass: "-mr-[0.1em]",
-      rightClass: "-ml-[0.1em]",
-    },
-  ];
+type HeroTextSegment = string | { text: string; highlight: true };
 
+const renderHeroTextSegments = (
+  segments: HeroTextSegment[],
+  keyPrefix: string,
+) =>
+  segments.map((segment, segmentIndex) => {
+    const text = typeof segment === "string" ? segment : segment.text;
+    const characters = renderHeroChars(text, `${keyPrefix}-${segmentIndex}`);
+
+    if (typeof segment === "string") {
+      return characters;
+    }
+
+    return (
+      <span
+        key={`${keyPrefix}-highlight-${segmentIndex}`}
+        className="font-snell italic"
+      >
+        {characters}
+      </span>
+    );
+  });
+
+const renderHeroMixedLine = (
+  segments: HeroTextSegment[],
+  keyPrefix: string,
+  className = "",
+) => (
+  <span className={`block ${className}`}>
+    {renderHeroTextSegments(segments, keyPrefix)}
+  </span>
+);
+
+const renderHeroStatement = () => {
   return (
     <>
-      {renderHeroLine("Tenuta Montenisa,", "hero-top-1", "font-medium")}
-      {renderHeroLine("nel cuore della Franciacorta,", "hero-top-2")}
+      {renderHeroMixedLine(
+        [
+          { text: "Tenuta Montenisa", highlight: true },
+          ", nel cuore della Franciacorta,",
+        ],
+        "hero-top-1",
+      )}
+      {renderHeroMixedLine(
+        [
+          "è uno ",
+          { text: "Scrigno", highlight: true },
+          " che custodisce ",
+          { text: "Meraviglie", highlight: true },
+          ".",
+        ],
+        "hero-top-2",
+      )}
       {renderHeroLine(
-        "è uno scrigno che custodisce Meraviglie.",
+        "Tra stanze di luce e memoria, ogni oggetto qui conservato ci svela una",
         "hero-top-3",
       )}
+      {renderHeroMixedLine(
+        [
+          { text: "Traccia", highlight: true },
+          " e rivela la sua ",
+          { text: "Storia", highlight: true },
+          ".",
+        ],
+        "hero-top-4",
+      )}
 
-      <span className="relative mx-auto my-0 grid w-full max-w-[29ch] grid-cols-[minmax(0,1fr)_clamp(78px,10vw,136px)_minmax(0,1fr)] items-center gap-x-0.5 md:my-1 md:gap-x-1.5">
-        <span className="relative z-10 col-start-2 row-span-6 row-start-1 block aspect-[1.12] w-[112%] -translate-x-[5%] self-center">
+      <span className="relative mx-auto my-4 block aspect-[1.12] w-[clamp(92px,13vw,170px)] md:my-5">
           <Image
             src="/images/hero-scrigno.png"
             alt=""
             fill
-            sizes="(min-width: 1024px) 150px, (min-width: 768px) 118px, 88px"
+            sizes="(min-width: 1024px) 170px, (min-width: 768px) 130px, 96px"
             className="object-contain drop-shadow-[0_10px_22px_rgba(0,0,0,0.45)]"
             aria-hidden="true"
           />
-        </span>
-
-        {wrapRows.flatMap(({ left, right, leftClass, rightClass }, rowIndex) => [
-          <span
-            key={`hero-wrap-left-${rowIndex}`}
-            className={`col-start-1 text-right leading-[1.03] ${leftClass}`}
-          >
-            {renderHeroChars(left, `hero-wrap-left-${rowIndex}`)}
-          </span>,
-          <span
-            key={`hero-wrap-right-${rowIndex}`}
-            className={`col-start-3 text-left leading-[1.03] ${rightClass}`}
-          >
-            {renderHeroChars(right, `hero-wrap-right-${rowIndex}`)}
-          </span>,
-        ])}
       </span>
 
-      {renderHeroLine(
-        "protetti dalla Tenuta e svelati una a una a chi sa guardare.",
+      {renderHeroMixedLine(
+        ["Le cuvée sono ", { text: "Tesori", highlight: true }, ", da svelare."],
         "hero-bottom-1",
       )}
-      {renderHeroLine(
-        "Perché ogni meraviglia attende solo",
+      {renderHeroMixedLine(
+        [
+          "Qui la terra diventa materia, i ",
+          { text: "Vigneti", highlight: true },
+          " origine, le ",
+          { text: "Cantine", highlight: true },
+        ],
         "hero-bottom-2",
-        "mt-1 font-medium",
       )}
-      {renderHeroLine("di essere scoperta.", "hero-bottom-3", "font-medium")}
+      {renderHeroMixedLine(
+        [
+          "Tempo, il servizio rito. Ogni ",
+          { text: "Meraviglia", highlight: true },
+        ],
+        "hero-bottom-3",
+      )}
+      {renderHeroLine(
+        "attende solo di essere scoperta.",
+        "hero-bottom-4",
+      )}
     </>
   );
 };
@@ -2022,7 +2038,7 @@ export default function LandingPage({ content }: LandingPageProps) {
                 <h1
                   data-hero-reveal
                   data-hero-text
-                  className="mx-auto max-w-[34ch] font-snell text-[clamp(1.2rem,2.1vw,2.25rem)] font-normal italic leading-[1.05] text-paper md:leading-[1]"
+                  className="mx-auto max-w-[58ch] font-menu text-[clamp(1.2rem,2.1vw,2.25rem)] font-normal leading-[1.05] text-paper md:leading-[1]"
                   data-shutter-key="hero.headline"
                 >
                   {renderHeroStatement()}
