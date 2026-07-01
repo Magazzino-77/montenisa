@@ -46,7 +46,7 @@ const renderHeroTextSegments = (
     return (
       <span
         key={`${keyPrefix}-highlight-${segmentIndex}`}
-        className="font-snell italic"
+        className="font-snell"
       >
         {characters}
       </span>
@@ -66,37 +66,6 @@ const renderHeroMixedLine = (
 const renderHeroStatement = () => {
   return (
     <>
-      {renderHeroMixedLine(
-        [
-          { text: "Tenuta Montenisa", highlight: true },
-          ", nel cuore della Franciacorta,",
-        ],
-        "hero-top-1",
-      )}
-      {renderHeroMixedLine(
-        [
-          "è uno ",
-          { text: "Scrigno", highlight: true },
-          " che custodisce ",
-          { text: "Meraviglie", highlight: true },
-          ".",
-        ],
-        "hero-top-2",
-      )}
-      {renderHeroLine(
-        "Tra stanze di luce e memoria, ogni oggetto qui conservato ci svela una",
-        "hero-top-3",
-      )}
-      {renderHeroMixedLine(
-        [
-          { text: "Traccia", highlight: true },
-          " e rivela la sua ",
-          { text: "Storia", highlight: true },
-          ".",
-        ],
-        "hero-top-4",
-      )}
-
       <span className="relative mx-auto my-4 block aspect-[1.12] w-[clamp(92px,13vw,170px)] md:my-5">
           <Image
             src="/images/hero-scrigno.png"
@@ -109,27 +78,33 @@ const renderHeroStatement = () => {
       </span>
 
       {renderHeroMixedLine(
-        ["Le cuvée sono ", { text: "Tesori", highlight: true }, ", da svelare."],
+        [
+          { text: "Tenuta Montenisa", highlight: true },
+          ", nel cuore della Franciacorta,",
+        ],
         "hero-bottom-1",
       )}
       {renderHeroMixedLine(
         [
-          "Qui la terra diventa materia, i ",
-          { text: "Vigneti", highlight: true },
-          " origine, le ",
-          { text: "Cantine", highlight: true },
+          "è uno ",
+          { text: "Scrigno", highlight: true },
+          " che custodisce ",
+          { text: "Meraviglie", highlight: true },
+          ".",
         ],
         "hero-bottom-2",
       )}
-      {renderHeroMixedLine(
-        [
-          "Tempo, il servizio rito. Ogni ",
-          { text: "Meraviglia", highlight: true },
-        ],
+      {renderHeroLine(
+        "Tra stanze di luce e memoria, ogni oggetto qui conservato ci svela una",
         "hero-bottom-3",
       )}
-      {renderHeroLine(
-        "attende solo di essere scoperta.",
+      {renderHeroMixedLine(
+        [
+          { text: "Traccia", highlight: true },
+          " e rivela la sua ",
+          { text: "Storia", highlight: true },
+          ".",
+        ],
         "hero-bottom-4",
       )}
     </>
@@ -286,7 +261,7 @@ function ProductGallerySlider({
     <>
       <h2
         ref={headlineRef}
-        className="font-snell text-[clamp(2.25rem,3.25vw,3.25rem)] font-medium italic leading-none 2xl:text-[clamp(2.7rem,4.65vw,4rem)]"
+        className="font-snell text-[clamp(2.25rem,3.55vw,2.625rem)] font-normal leading-none 2xl:text-[2.625rem]"
         data-shutter-key={`product.slides.${activeIndex}.headline`}
       >
         {activeSlide.headline}
@@ -297,7 +272,7 @@ function ProductGallerySlider({
         data-active-slide={activeIndex}
         data-product-slider
       >
-        <div className="relative mx-auto aspect-[0.75] w-full max-w-[310px] overflow-visible lg:max-w-[340px] 2xl:max-w-[420px]">
+        <div className="relative mx-auto aspect-[0.75] w-full max-w-[235px] overflow-visible lg:max-w-[260px] 2xl:max-w-[320px]">
           {safeSlides.map((slide, index) => (
             <figure
               key={`${slide.image.src}-${index}`}
@@ -314,7 +289,7 @@ function ProductGallerySlider({
                 src={slide.image.src}
                 alt={slide.image.alt}
                 fill
-                sizes="(min-width: 1536px) 420px, (min-width: 1024px) 340px, (min-width: 768px) 310px, 86vw"
+                sizes="(min-width: 1536px) 320px, (min-width: 1024px) 260px, (min-width: 768px) 235px, 72vw"
                 className="object-contain object-[50%_50%] mix-blend-lighten"
               />
             </figure>
@@ -595,7 +570,19 @@ function ArchiveChapterSection({
         marker={marker}
         shutterKey="menu.sections.archive.referenceId"
       />
-      <div className="relative mx-auto flex min-h-[100svh] max-w-[1560px] items-center px-5 py-[4.5rem] md:px-8 md:py-24 2xl:py-32">
+      <div
+        className="pointer-events-none absolute inset-0 z-0 overflow-hidden opacity-[0.18] mix-blend-multiply"
+        aria-hidden="true"
+      >
+        <Image
+          src="/images/archive-pattern.png"
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover"
+        />
+      </div>
+      <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-[1560px] items-center px-5 py-[4.5rem] md:px-8 md:py-24 2xl:py-32">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           {states.map((state, stateIndex) => (
             <div
@@ -638,7 +625,7 @@ function ArchiveChapterSection({
                 aria-hidden={stateIndex !== 0}
               >
                 <h2
-                  className="mx-auto max-w-[12ch] font-menu text-[clamp(2.75rem,6.6vw,6.5rem)] font-medium uppercase leading-[0.9] text-ink 2xl:text-[clamp(3rem,8vw,8rem)]"
+                  className="mx-auto max-w-none whitespace-nowrap font-menu text-[clamp(2.5rem,4.05vw,3rem)] font-medium uppercase leading-[0.9] text-ink 2xl:text-[3rem]"
                   data-shutter-key={`archive.states.${stateIndex}.headline`}
                 >
                   {state.headline}
@@ -737,7 +724,7 @@ function CellarChapterSection({
           trigger: stage,
           start: "top top",
           end: () =>
-            `+=${Math.max(cellarObjects.length * window.innerHeight * 0.44, 2800)}`,
+            `+=${Math.max(cellarObjects.length * window.innerHeight * 0.34, 2200)}`,
           pin: true,
           scrub: 0.85,
           anticipatePin: 1,
@@ -749,7 +736,12 @@ function CellarChapterSection({
         },
       });
 
+      const objectInterval = 0.58;
+      const objectTravelDuration = 1.36;
+
       cellarObjects.forEach((object, index) => {
+        const start = index * objectInterval;
+
         timeline
           .fromTo(
             object,
@@ -762,17 +754,17 @@ function CellarChapterSection({
               visibility: "visible",
               y: () => -(object.offsetTop + object.offsetHeight + 48),
               scale: 1,
-              duration: 1.42,
+              duration: objectTravelDuration,
               ease: "none",
             },
-            index,
+            start,
           )
           .set(
             object,
             {
               visibility: "hidden",
             },
-            index + 1.42,
+            start + objectTravelDuration,
           );
       });
 
@@ -795,9 +787,13 @@ function CellarChapterSection({
           );
       };
 
-      fadeCopy(0, 1, 3);
-      fadeCopy(1, 2, 6);
-      timeline.to({}, { duration: 0.1 }, cellarObjects.length + 0.4);
+      fadeCopy(0, 1, objectInterval * 3);
+      fadeCopy(1, 2, objectInterval * 6);
+      timeline.to(
+        {},
+        { duration: 0.1 },
+        cellarObjects.length * objectInterval + objectTravelDuration * 0.35,
+      );
     }, stage);
 
     return () => ctx.revert();
@@ -859,7 +855,7 @@ function CellarChapterSection({
                 aria-hidden={stateIndex !== 0}
               >
                 <h2
-                  className="mx-auto max-w-[14ch] font-menu text-[clamp(2.5rem,6.1vw,6rem)] font-medium uppercase leading-[0.9] text-ink 2xl:text-[clamp(2.7rem,7vw,7rem)]"
+                  className="mx-auto max-w-none whitespace-nowrap font-menu text-[clamp(2.5rem,4.05vw,3rem)] font-medium uppercase leading-[0.9] text-ink 2xl:text-[3rem]"
                   data-shutter-key={`cellar.states.${stateIndex}.headline`}
                 >
                   {state.headline}
@@ -1153,12 +1149,44 @@ function VineyardScrollSection({
 }
 
 const memoryImageLayouts = [
-  { y: "18vh", className: "h-[342px] w-[274px] rotate-[4deg]" },
-  { y: "58vh", className: "h-[381px] w-[305px] rotate-[-5deg]" },
-  { y: "20vh", className: "h-[336px] w-[260px] rotate-[2deg]" },
-  { y: "56vh", className: "h-[337px] w-[269px] rotate-[6deg]" },
-  { y: "17vh", className: "h-[370px] w-[296px] rotate-[-2deg]" },
-  { y: "55vh", className: "h-[259px] w-[345px] rotate-[-3deg]" },
+  "h-[270px] w-[216px]",
+  "h-[286px] w-[229px]",
+  "h-[266px] w-[206px]",
+  "h-[268px] w-[214px]",
+  "h-[292px] w-[234px]",
+  "h-[214px] w-[286px]",
+];
+
+const memoryWordLayouts = [
+  {
+    text: "Memoria",
+    className:
+      "left-[170px] top-[6vh] text-[9rem] opacity-[0.12] md:text-[14rem] lg:text-[16rem] 2xl:top-[19vh] 2xl:text-[22rem] 2xl:opacity-[0.2]",
+  },
+  {
+    text: "viva",
+    className:
+      "left-[1260px] top-[35vh] text-[8rem] opacity-[0.1] md:text-[13rem] lg:text-[15rem] 2xl:top-[66vh] 2xl:text-[20rem] 2xl:opacity-[0.16]",
+  },
+  {
+    text: "il sogno",
+    className:
+      "left-[2080px] top-[6vh] text-[8rem] opacity-[0.1] md:text-[13rem] lg:text-[15rem] 2xl:top-[20vh] 2xl:text-[19rem] 2xl:opacity-[0.16]",
+  },
+  {
+    text: "delle bollicine",
+    className:
+      "left-[3240px] top-[35vh] text-[8rem] opacity-[0.1] md:text-[13rem] lg:text-[15rem] 2xl:top-[63vh] 2xl:text-[19rem] 2xl:opacity-[0.15]",
+  },
+];
+
+const memoryPanelLayouts = [
+  { left: 410, top: "41vh", slot: "under Memoria" },
+  { left: 980, top: "66vh", slot: "between Memoria and viva" },
+  { left: 1460, top: "38vh", slot: "between Memoria and il sogno" },
+  { left: 2440, top: "64vh", slot: "between viva and il sogno" },
+  { left: 3180, top: "36vh", slot: "between il sogno and delle bollicine" },
+  { left: 3940, top: "62vh", slot: "after delle bollicine" },
 ];
 
 function MemoryHorizontalSection({
@@ -1179,29 +1207,10 @@ function MemoryHorizontalSection({
       return;
     }
 
-    const reduceMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-
     const ctx = gsap.context(() => {
       const track = stage.querySelector<HTMLElement>("[data-memory-track]");
-      const images = gsap.utils.toArray<HTMLElement>(
-        "[data-memory-image]",
-        stage,
-      );
 
       if (!track) {
-        return;
-      }
-
-      gsap.set(images, {
-        autoAlpha: 0,
-        y: () => window.innerHeight * 0.68,
-        scale: 0.96,
-      });
-
-      if (reduceMotion) {
-        gsap.set(images, { autoAlpha: 1, y: 0, scale: 1 });
         return;
       }
 
@@ -1229,37 +1238,6 @@ function MemoryHorizontalSection({
         },
         0,
       );
-
-      images.forEach((image, index) => {
-        const start = index * 0.82;
-
-        timeline.fromTo(
-          image,
-          {
-            autoAlpha: 0,
-            y: () => window.innerHeight * 0.72,
-            scale: 0.96,
-          },
-          {
-            autoAlpha: 1,
-            y: () => -window.innerHeight * 0.78,
-            scale: 1,
-            duration: 0.96,
-            ease: "none",
-          },
-          start,
-        );
-
-        timeline.to(
-          image,
-          {
-            autoAlpha: 0,
-            duration: 0.14,
-            ease: "none",
-          },
-          start + 0.82,
-        );
-      });
     }, stage);
 
     return () => ctx.revert();
@@ -1288,47 +1266,40 @@ function MemoryHorizontalSection({
       >
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 font-menu font-normal uppercase leading-[0.75] text-[#e0dad6]"
+          className="pointer-events-none absolute inset-0 font-menu font-normal uppercase leading-[0.75] text-white"
         >
-          <span
-            data-memory-word
-            className="absolute left-[170px] top-[6vh] text-[9rem] opacity-[0.12] md:text-[14rem] lg:text-[16rem] 2xl:top-[19vh] 2xl:text-[22rem] 2xl:opacity-[0.2]"
-          >
-            Memoria
-          </span>
-          <span
-            data-memory-word
-            className="absolute left-[1260px] top-[35vh] text-[8rem] opacity-[0.1] md:text-[13rem] lg:text-[15rem] 2xl:top-[66vh] 2xl:text-[20rem] 2xl:opacity-[0.16]"
-          >
-            viva
-          </span>
-          <span
-            data-memory-word
-            className="absolute left-[2080px] top-[6vh] text-[8rem] opacity-[0.1] md:text-[13rem] lg:text-[15rem] 2xl:top-[20vh] 2xl:text-[19rem] 2xl:opacity-[0.16]"
-          >
-            il sogno
-          </span>
-          <span
-            data-memory-word
-            className="absolute left-[3240px] top-[35vh] text-[8rem] opacity-[0.1] md:text-[13rem] lg:text-[15rem] 2xl:top-[63vh] 2xl:text-[19rem] 2xl:opacity-[0.15]"
-          >
-            delle bollicine
-          </span>
+          {memoryWordLayouts.map((word) => (
+            <span
+              key={word.text}
+              data-memory-word={word.text}
+              className={`absolute ${word.className}`}
+            >
+              {word.text}
+            </span>
+          ))}
         </div>
 
         {items.map((item, index) => {
-          const textLeft = 330 + index * 820;
-          const imageLeft = textLeft + (index % 2 === 0 ? 510 : 240);
-          const textTop = index % 2 === 0 ? "36vh" : "66vh";
+          const fallbackPanel = {
+            left: 410 + index * 720,
+            top: index % 2 === 0 ? "40vh" : "64vh",
+          };
+          const panelLayout =
+            memoryPanelLayouts[index % memoryPanelLayouts.length] ??
+            fallbackPanel;
           const imageLayout = memoryImageLayouts[index % memoryImageLayouts.length];
 
           return (
-            <div key={`${item.number}-${item.headline}`}>
+            <div
+              key={`${item.number}-${item.headline}`}
+              className="absolute z-20 flex items-center gap-12"
+              style={{ left: `${panelLayout.left}px`, top: panelLayout.top }}
+              data-memory-slot={panelLayout.slot}
+            >
               {item.image ? (
                 <figure
                   data-memory-image
-                  className={`pointer-events-none absolute z-0 overflow-hidden shadow-[0_38px_90px_rgba(0,0,0,0.34)] ${imageLayout.className}`}
-                  style={{ left: `${imageLeft}px`, top: imageLayout.y }}
+                  className={`pointer-events-none relative shrink-0 overflow-hidden shadow-[0_38px_90px_rgba(0,0,0,0.34)] ${imageLayout}`}
                   data-shutter-key={`memory.items.${index}.image`}
                   aria-hidden="true"
                 >
@@ -1344,8 +1315,7 @@ function MemoryHorizontalSection({
 
               <article
                 data-memory-panel
-                className="absolute z-20 max-w-[360px] text-paper"
-                style={{ left: `${textLeft}px`, top: textTop }}
+                className="max-w-[360px] text-paper"
               >
                 <p
                   className="font-menu text-[1.7rem] leading-none text-paper md:text-[2.15rem]"
@@ -1731,14 +1701,15 @@ export default function LandingPage({ content }: LandingPageProps) {
           });
         });
 
-        const heroCharacters =
-          gsap.utils.toArray<HTMLElement>("[data-hero-char]");
+        const heroCharacters = gsap.utils.toArray<HTMLElement>(
+          "[data-hero-text] [data-hero-char]",
+        );
         const heroVideo =
           document.querySelector<HTMLVideoElement>("[data-hero-video]");
 
         if (heroCharacters.length > 0) {
-          const heroCharacterStagger = 0.018;
-          const heroLetterGlowDuration = 0.5;
+          const heroCharacterStagger = 0.026;
+          const heroLetterGlowDuration = 0.72;
           const heroReadingDuration =
             heroLetterGlowDuration +
             Math.max(0, heroCharacters.length - 1) * heroCharacterStagger;
@@ -1761,8 +1732,12 @@ export default function LandingPage({ content }: LandingPageProps) {
             },
           });
 
-          heroTimeline.to(
+          heroTimeline.fromTo(
             heroCharacters,
+            {
+              color: "rgba(247, 244, 239, 0.24)",
+              textShadow: "0 0 0 rgba(247, 244, 239, 0)",
+            },
             {
               color: "rgba(247, 244, 239, 0.96)",
               textShadow: "0 0 18px rgba(247, 244, 239, 0.28)",
@@ -1854,6 +1829,10 @@ export default function LandingPage({ content }: LandingPageProps) {
           const tenutaVisual = tenutaStage.querySelector<HTMLElement>(
             "[data-tenuta-visual]",
           );
+          const tenutaText = gsap.utils.toArray<HTMLElement>(
+            "[data-tenuta-heading], [data-tenuta-copy]",
+            tenutaStage,
+          );
           const maskOpenings = {
             left: tenutaVisual?.querySelector<SVGPathElement>(
               '[data-tenuta-mask-opening="left"]',
@@ -1912,13 +1891,62 @@ export default function LandingPage({ content }: LandingPageProps) {
 
           setTenutaMaskProgress(0);
 
+          const getTenutaTopOffset = () =>
+            Math.max(
+              0,
+              document.querySelector<HTMLElement>("header")?.getBoundingClientRect()
+                .bottom ?? 0,
+            );
+          const getElementDocumentTop = (element: HTMLElement | null) => {
+            let top = 0;
+            let current: HTMLElement | null = element;
+
+            while (current) {
+              top += current.offsetTop;
+              current = current.offsetParent as HTMLElement | null;
+            }
+
+            return top;
+          };
+          const tenutaTimelineRef: {
+            current?: gsap.core.Timeline & {
+              scrollTrigger?: { start: number };
+            };
+          } = {};
+          const getTenutaTargetFrame = () => {
+            const visualWidth =
+              tenutaVisual?.offsetWidth ?? tenutaStage.offsetWidth;
+            const visualHeight =
+              tenutaVisual?.offsetHeight ?? tenutaStage.offsetHeight;
+            const triggerStart =
+              tenutaTimelineRef.current?.scrollTrigger?.start ??
+              window.scrollY;
+            const visualTopAtPin =
+              getElementDocumentTop(tenutaVisual ?? tenutaStage) -
+              triggerStart;
+            const targetTop = getTenutaTopOffset();
+            const targetHeight = Math.max(
+              1,
+              window.innerHeight - targetTop + 64,
+            );
+            const targetScale = Math.max(
+              window.innerWidth / visualWidth,
+              targetHeight / visualHeight,
+            );
+
+            return {
+              scale: targetScale,
+              x: 0,
+              y: targetTop - visualTopAtPin,
+            };
+          };
+
           const tenutaScrubVideo =
             tenutaStage.querySelector<HTMLVideoElement>(
               "[data-tenuta-scrub-video]",
             );
 
-          const tenutaTimeline = gsap
-            .timeline({
+          const tenutaTimeline = gsap.timeline({
               scrollTrigger: {
                 trigger: tenutaStage,
                 start: "center center",
@@ -1936,18 +1964,18 @@ export default function LandingPage({ content }: LandingPageProps) {
                 scrub: true,
                 onUpdate: (self) => setTenutaMaskProgress(self.progress),
               },
-            })
+            });
+          tenutaTimelineRef.current = tenutaTimeline as gsap.core.Timeline & {
+            scrollTrigger?: { start: number };
+          };
+          tenutaTimeline
             .fromTo(
               tenutaVisual ?? tenutaStage,
-              { scale: 1 },
+              { x: 0, y: 0, scale: 1 },
               {
-                scale: () =>
-                  Math.max(
-                    window.innerWidth /
-                      (tenutaVisual?.offsetWidth ?? tenutaStage.offsetWidth),
-                    window.innerHeight /
-                      (tenutaVisual?.offsetHeight ?? tenutaStage.offsetHeight),
-                  ),
+                x: () => getTenutaTargetFrame().x,
+                y: () => getTenutaTargetFrame().y,
+                scale: () => getTenutaTargetFrame().scale,
                 transformOrigin: "center top",
                 force3D: true,
                 ease: "none",
@@ -1964,6 +1992,16 @@ export default function LandingPage({ content }: LandingPageProps) {
                 scale: 1,
                 filter: "brightness(0.94) saturate(1.02)",
                 ease: "none",
+              },
+              0,
+            )
+            .to(
+              tenutaText,
+              {
+                y: (index) => (index === 0 ? -34 : 72),
+                autoAlpha: 0,
+                duration: 0.16,
+                ease: "power1.out",
               },
               0,
             )
@@ -2008,16 +2046,6 @@ export default function LandingPage({ content }: LandingPageProps) {
               );
             }
           }
-
-          tenutaTimeline.to(
-            "[data-tenuta-copy]",
-            {
-              y: 220,
-              autoAlpha: 0,
-              ease: "none",
-            },
-            0.08,
-          );
         }
       }
 
@@ -2098,15 +2126,14 @@ export default function LandingPage({ content }: LandingPageProps) {
             shutterKey="menu.sections.tenuta.referenceId"
           />
           <div className="mx-auto max-w-[1560px]">
-            <h2
-              data-reveal
-              className="mx-auto max-w-[18ch] text-center font-snell text-[clamp(2.25rem,3.78vw,4rem)] font-medium italic leading-[0.95] text-ink"
-              data-shutter-key="introduction.headline"
-            >
-              {content.introduction.headline}
-            </h2>
-
-            <div className="relative mx-auto mt-14 w-full md:w-[1120px]" data-tenuta-reveal>
+            <div className="relative mx-auto w-full md:w-[1120px]" data-tenuta-reveal>
+              <h2
+                data-tenuta-heading
+                className="mx-auto mb-4 max-w-none whitespace-nowrap text-center font-snell text-[clamp(2.25rem,3.55vw,2.625rem)] font-normal leading-[0.95] text-ink md:mb-5 2xl:text-[2.625rem]"
+                data-shutter-key="introduction.headline"
+              >
+                {content.introduction.headline}
+              </h2>
               <div
                 className="relative z-20 h-[58vw] min-h-[320px] w-full overflow-hidden outline-none md:h-[590px]"
                 data-tenuta-visual
@@ -2239,10 +2266,10 @@ export default function LandingPage({ content }: LandingPageProps) {
       <footer
         id="contatti"
         data-section="contatti"
-        className="relative bg-[#f1f1f1] px-5 py-10 text-black md:px-8 md:py-11 2xl:py-16"
+        className="relative bg-[#f1f1f1] px-5 py-7 text-black md:px-8 md:py-6 2xl:py-10"
       >
-        <div className="mx-auto flex min-h-[280px] max-w-[1560px] flex-col justify-between gap-10 font-menu uppercase tracking-[0.08em] md:min-h-[248px] 2xl:min-h-[348px] 2xl:gap-16">
-          <div className="grid gap-8 md:grid-cols-[1fr_1fr_1.05fr] md:items-start 2xl:gap-10">
+        <div className="mx-auto flex min-h-[220px] max-w-[1560px] flex-col justify-between gap-6 font-menu uppercase tracking-[0.08em] md:min-h-[180px] 2xl:min-h-[260px] 2xl:gap-10">
+          <div className="grid gap-6 md:grid-cols-[1fr_1fr_1.05fr] md:items-start 2xl:gap-8">
             <div className="max-w-[270px] text-[0.72rem] font-medium leading-[1.75] md:text-[0.82rem]">
               <p className="font-bold">Dove siamo</p>
               <p>Via Paolo VI, 62 - 25046 Cazzago San Martino BS</p>
@@ -2254,7 +2281,7 @@ export default function LandingPage({ content }: LandingPageProps) {
               <p>T. +39 030 7750838</p>
             </div>
 
-            <div className="grid gap-6 text-[0.72rem] font-medium leading-[1.75] md:grid-cols-[1fr_auto] md:text-right md:text-[0.82rem] 2xl:gap-8">
+            <div className="grid gap-5 text-[0.72rem] font-medium leading-[1.75] md:grid-cols-[1fr_auto] md:text-right md:text-[0.82rem] 2xl:gap-6">
               <div>
                 <p className="font-bold">Seguici</p>
                 <div className="mt-4 flex gap-7 md:justify-end 2xl:mt-6">
@@ -2288,7 +2315,7 @@ export default function LandingPage({ content }: LandingPageProps) {
             <img
               src="/figma/footer/livello-8.svg"
               alt="Marchese Antinori crest"
-              className="mx-auto aspect-[128.109/97.6713] w-[76px] object-contain 2xl:w-[100px]"
+              className="mx-auto aspect-[128.109/97.6713] w-[64px] object-contain 2xl:w-[96px]"
             />
 
             <div className="space-y-4 text-left md:self-end md:text-right 2xl:space-y-5">
