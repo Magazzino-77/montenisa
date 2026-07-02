@@ -1842,17 +1842,22 @@ export default function LandingPage({ content }: LandingPageProps) {
             y,
             radius,
             right,
+            bottom = 650,
           }: {
             x: number;
             y: number;
             radius: number;
             right: number;
+            bottom?: number;
           }) =>
-            `M${x} 650 L${x} ${y} A${radius} ${radius} 0 0 1 ${right} ${y} L${right} 650 Z`;
+            `M${x} ${bottom} L${x} ${y} A${radius} ${radius} 0 0 1 ${right} ${y} L${right} ${bottom} Z`;
           const interpolate = (from: number, to: number, progress: number) =>
             from + (to - from) * progress;
+          const tenutaMaskEase = gsap.parseEase("power2.inOut");
           const setTenutaMaskProgress = (progress: number) => {
+            const centerProgress = tenutaMaskEase(progress);
             const sideProgress = Math.min(progress * 1.35, 1);
+            const centerBottom = interpolate(650, 860, centerProgress);
             maskOpenings.left?.setAttribute(
               "d",
               archPath({
@@ -1860,15 +1865,17 @@ export default function LandingPage({ content }: LandingPageProps) {
                 y: interpolate(320, 180, sideProgress),
                 radius: interpolate(150, 300, sideProgress),
                 right: interpolate(382, -110, sideProgress),
+                bottom: interpolate(650, 820, sideProgress),
               }),
             );
             maskOpenings.center?.setAttribute(
               "d",
               archPath({
-                x: interpolate(450, -260, progress),
-                y: interpolate(300, -620, progress),
-                radius: interpolate(150, 860, progress),
-                right: interpolate(750, 1460, progress),
+                x: interpolate(450, -320, centerProgress),
+                y: interpolate(300, -560, centerProgress),
+                radius: interpolate(150, 920, centerProgress),
+                right: interpolate(750, 1520, centerProgress),
+                bottom: centerBottom,
               }),
             );
             maskOpenings.right?.setAttribute(
@@ -1878,6 +1885,7 @@ export default function LandingPage({ content }: LandingPageProps) {
                 y: interpolate(320, 180, sideProgress),
                 radius: interpolate(150, 300, sideProgress),
                 right: interpolate(1118, 1820, sideProgress),
+                bottom: interpolate(650, 820, sideProgress),
               }),
             );
           };
@@ -1942,7 +1950,7 @@ export default function LandingPage({ content }: LandingPageProps) {
           const tenutaTimeline = gsap.timeline({
               scrollTrigger: {
                 trigger: tenutaStage,
-                start: "center center",
+                start: () => `top top+=${getTenutaTopOffset() + 12}`,
                 end: "+=1800",
                 pin: true,
                 pinSpacing: true,
@@ -2112,7 +2120,7 @@ export default function LandingPage({ content }: LandingPageProps) {
         <section
           id="tenuta"
           data-section="tenuta"
-          className="relative bg-paper px-5 pb-0 pt-[4.5rem] md:px-8 md:pt-28"
+          className="relative bg-paper px-5 pb-0 pt-12 md:px-8 md:pt-16"
         >
           <SectionReference
             marker={content.menu.sections.tenuta}
@@ -2122,7 +2130,7 @@ export default function LandingPage({ content }: LandingPageProps) {
             <div className="relative mx-auto w-full md:w-[1120px]" data-tenuta-reveal>
               <h2
                 data-tenuta-heading
-                className="mx-auto mb-4 max-w-none whitespace-nowrap text-center font-snell text-[clamp(2.25rem,3.55vw,2.625rem)] font-normal uppercase leading-[0.95] text-ink md:mb-5 2xl:text-[2.625rem]"
+                className="relative z-30 mx-auto mb-4 max-w-none whitespace-nowrap text-center font-snell text-[clamp(2.25rem,3.55vw,2.625rem)] font-normal uppercase leading-[0.95] text-ink md:mb-5 2xl:text-[2.625rem]"
                 data-shutter-key="introduction.headline"
               >
                 {content.introduction.headline}
@@ -2133,7 +2141,7 @@ export default function LandingPage({ content }: LandingPageProps) {
                 data-shutter-key="introduction.videoPlaceholder"
               >
                 <div
-                  className="absolute inset-0 z-0"
+                  className="absolute inset-0 z-0 overflow-hidden"
                   data-tenuta-video
                   aria-hidden="true"
                 >
@@ -2154,14 +2162,27 @@ export default function LandingPage({ content }: LandingPageProps) {
                   <div className="absolute inset-0 bg-ink/16" />
                 </div>
                 <svg
-                  className="absolute -inset-[1px] z-10 h-[calc(100%+2px)] w-[calc(100%+2px)]"
+                  className="pointer-events-none absolute -inset-[1px] z-10 h-[calc(100%+2px)] w-[calc(100%+2px)]"
                   viewBox="0 0 1200 700"
                   preserveAspectRatio="none"
                   aria-hidden="true"
                 >
                   <defs>
-                    <mask id="tenuta-arch-openings">
-                      <rect width="1200" height="700" fill="white" />
+                    <mask
+                      id="tenuta-arch-openings"
+                      maskUnits="userSpaceOnUse"
+                      x="-1800"
+                      y="-1800"
+                      width="4800"
+                      height="3600"
+                    >
+                      <rect
+                        x="-1800"
+                        y="-1800"
+                        width="4800"
+                        height="3600"
+                        fill="white"
+                      />
                       <path
                         data-tenuta-mask-opening="left"
                         d="M82 650 L82 320 A150 150 0 0 1 382 320 L382 650 Z"
@@ -2181,10 +2202,10 @@ export default function LandingPage({ content }: LandingPageProps) {
                   </defs>
                   <rect
                     data-tenuta-mask-surface
-                    x="-8"
-                    y="-8"
-                    width="1216"
-                    height="716"
+                    x="-1800"
+                    y="-1800"
+                    width="4800"
+                    height="3600"
                     fill="var(--paper)"
                     mask="url(#tenuta-arch-openings)"
                   />
@@ -2193,7 +2214,7 @@ export default function LandingPage({ content }: LandingPageProps) {
 
               <div
                 data-tenuta-copy
-                className="relative z-0 mx-auto mt-8 max-w-[720px] text-center font-menu text-sm leading-7 text-ink/68 md:text-base"
+                className="relative z-30 mx-auto mt-8 max-w-[720px] text-center font-menu text-sm leading-7 text-ink/68 md:text-base"
               >
                 <p data-shutter-key="introduction.body">
                   {content.introduction.body}
