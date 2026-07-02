@@ -323,9 +323,9 @@ export const fallbackLandingContent: LandingContent = {
         ],
       },
       {
-        headline: "Petite France",
+        headline: "Una terra che diventa metodo",
         body:
-          "Alcuni racconti preferiscono un'origine più intima: una “piccola Francia” affacciata sulle colline bresciane, dove il linguaggio, le abitudini e la cultura lasciavano tracce leggibili ancora oggi. È una leggenda affettuosa, nutrita di memoria orale e di sguardi che riconoscono in questo paesaggio un volto familiare.",
+          "Nella Franciacorta, il suolo è fertile, minerale, ben drenato dai ciottoli lasciati da glaciazioni millenarie. Il clima è ventilato e temperato. Il paesaggio è vario e luminoso. Da questa combinazione di suolo, clima e bellezza nasce una vocazione rara: la capacità di trasformare l'uva in spumante attraverso un metodo preciso, paziente, naturale. Nel 1967, i vini della Franciacorta ottengono tra i primi in Italia la Denominazione di Origine Controllata. La meraviglia comincia a prendere forma.",
           objects: [
             {
               image: {
@@ -354,9 +354,9 @@ export const fallbackLandingContent: LandingContent = {
           ],
         },
       {
-        headline: "La traccia più antica",
+        headline: "1995. Una data che brilla.",
         body:
-          "Più probabilmente il nome nasce dalle Curtes Francae: comunità monastiche che qui coltivavano la terra, conservavano saperi e difendevano un equilibrio tra lavoro e contemplazione. È da quelle corti franchigiate che la Franciacorta trae il proprio carattere: un territorio fatto di disciplina, paesaggio e attesa.",
+          "Per la Franciacorta, il 1995 è un anno storico, in cui una zonazione vitivinicola più attenta riconosce con precisione la natura dei suoi vini. Ai Bianchi e ai Rossi viene destinata la denominazione Terre di Franciacorta. Al vino rifermentato naturalmente in bottiglia viene riservata la DOCG Franciacorta. Nasce così il primo e unico Brut italiano DOCG con obbligo di rifermentazione naturale in bottiglia. Da quel momento, la Franciacorta non è più soltanto un luogo. È un metodo, un'identità, una promessa. Dentro Tenuta Montenisa, questa promessa diventa collezione: cuvée custodite come tesori, nate dalla terra e svelate dal tempo.",
           objects: [
             {
               image: {

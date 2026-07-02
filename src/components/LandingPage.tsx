@@ -25,10 +25,6 @@ const renderHeroChars = (text: string, keyPrefix: string) =>
     </span>
   ));
 
-const renderHeroLine = (text: string, keyPrefix: string, className = "") => (
-  <span className={`block ${className}`}>{renderHeroChars(text, keyPrefix)}</span>
-);
-
 type HeroTextSegment = string | { text: string; highlight: true };
 
 const renderHeroTextSegments = (
@@ -94,18 +90,15 @@ const renderHeroStatement = () => {
         ],
         "hero-bottom-2",
       )}
-      {renderHeroLine(
-        "Tra stanze di luce e memoria, ogni oggetto qui conservato ci svela una",
-        "hero-bottom-3",
-      )}
       {renderHeroMixedLine(
         [
+          "Tra stanze di luce e memoria, ogni oggetto qui conservato ci svela una ",
           { text: "Traccia", highlight: true },
           " e rivela la sua ",
           { text: "Storia", highlight: true },
           ".",
         ],
-        "hero-bottom-4",
+        "hero-bottom-3",
       )}
     </>
   );
@@ -115,16 +108,11 @@ type LandingPageProps = {
   content: LandingContent;
 };
 
-function CtaDivider({ className = "" }: { className?: string }) {
+function CtaLabel({ children }: { children: React.ReactNode }) {
   return (
-    <Image
-      src="/images/cta-divider.svg"
-      alt=""
-      width={218}
-      height={17}
-      className={`h-auto w-[218px] object-contain ${className}`}
-      aria-hidden="true"
-    />
+    <span className="border-y border-current px-1.5 py-[18px] leading-none">
+      {children}
+    </span>
   );
 }
 
@@ -561,6 +549,7 @@ function ArchiveChapterSection({
 
   return (
     <section
+      id="archivio"
       ref={stageRef}
       data-section="archive"
       data-archive-stage
@@ -625,7 +614,7 @@ function ArchiveChapterSection({
                 aria-hidden={stateIndex !== 0}
               >
                 <h2
-                  className="mx-auto max-w-none whitespace-nowrap font-menu text-[clamp(2.5rem,4.05vw,3rem)] font-medium uppercase leading-[0.9] text-ink 2xl:text-[3rem]"
+                  className="mx-auto max-w-none whitespace-nowrap font-menu text-[clamp(2.25rem,3.28vw,2.625rem)] font-medium uppercase leading-[0.9] text-ink"
                   data-shutter-key={`archive.states.${stateIndex}.headline`}
                 >
                   {state.headline}
@@ -642,11 +631,10 @@ function ArchiveChapterSection({
 
           <a
             href="#tenuta"
-            className="relative z-10 mt-8 inline-flex flex-col items-center gap-3 font-menu text-[0.68rem] uppercase tracking-[0.16em] text-ink/58 transition hover:text-wine 2xl:mt-12 2xl:text-[0.72rem] 2xl:tracking-[0.18em]"
+            className="relative z-10 mt-8 inline-flex items-center font-menu text-[0.68rem] uppercase tracking-[0.16em] text-ink/58 transition hover:text-wine 2xl:mt-12 2xl:text-[0.72rem] 2xl:tracking-[0.18em]"
             data-shutter-key="archive.cta"
           >
-            <span>{archive.cta}</span>
-            <CtaDivider />
+            <CtaLabel>{archive.cta}</CtaLabel>
           </a>
         </div>
       </div>
@@ -872,11 +860,10 @@ function CellarChapterSection({
 
           <a
             href="#spumanti"
-            className="relative z-10 mt-8 inline-flex flex-col items-center gap-3 font-menu text-[0.68rem] uppercase tracking-[0.16em] text-ink transition hover:text-wine 2xl:mt-10 2xl:text-[0.72rem] 2xl:tracking-[0.18em]"
+            className="relative z-10 mt-8 inline-flex items-center font-menu text-[0.68rem] uppercase tracking-[0.16em] text-ink transition hover:text-wine 2xl:mt-10 2xl:text-[0.72rem] 2xl:tracking-[0.18em]"
             data-shutter-key="cellar.cta"
           >
-            <span>{cellar.cta}</span>
-            <CtaDivider />
+            <CtaLabel>{cellar.cta}</CtaLabel>
           </a>
         </div>
       </div>
@@ -925,7 +912,7 @@ function VineyardCopy({
       className="mx-auto flex w-full max-w-[680px] flex-col items-center text-center"
     >
       <h2
-        className="max-w-[12ch] font-menu text-[clamp(2.35rem,8vw,4.1rem)] font-normal uppercase leading-[1.08] text-paper lg:text-[clamp(2.8rem,3.75vw,3.75rem)] 2xl:text-[clamp(3.2rem,4.5vw,4.1rem)]"
+        className="max-w-[12ch] font-menu text-[clamp(2.35rem,8vw,2.625rem)] font-normal uppercase leading-[1.08] text-paper lg:text-[2.625rem]"
         data-shutter-key={`vineyard.states.${index}.headline`}
       >
         {state.headline}
@@ -948,6 +935,12 @@ function VineyardCopy({
       >
         {state.body}
       </p>
+      <a
+        href="#tenuta"
+        className="mt-7 inline-flex items-center font-menu text-[0.72rem] uppercase tracking-[0.18em] text-paper/72 transition hover:text-paper 2xl:mt-8"
+      >
+        <CtaLabel>Esplora la tenuta</CtaLabel>
+      </a>
     </article>
   );
 }
@@ -2129,7 +2122,7 @@ export default function LandingPage({ content }: LandingPageProps) {
             <div className="relative mx-auto w-full md:w-[1120px]" data-tenuta-reveal>
               <h2
                 data-tenuta-heading
-                className="mx-auto mb-4 max-w-none whitespace-nowrap text-center font-snell text-[clamp(2.25rem,3.55vw,2.625rem)] font-normal leading-[0.95] text-ink md:mb-5 2xl:text-[2.625rem]"
+                className="mx-auto mb-4 max-w-none whitespace-nowrap text-center font-snell text-[clamp(2.25rem,3.55vw,2.625rem)] font-normal uppercase leading-[0.95] text-ink md:mb-5 2xl:text-[2.625rem]"
                 data-shutter-key="introduction.headline"
               >
                 {content.introduction.headline}
@@ -2207,12 +2200,11 @@ export default function LandingPage({ content }: LandingPageProps) {
                 </p>
                 <a
                   href="#spumanti"
-                  className="mt-8 inline-flex flex-col items-center gap-3 font-menu text-[0.72rem] uppercase tracking-[0.18em] text-ink transition hover:text-wine"
+                  className="mt-8 inline-flex items-center font-menu text-[0.72rem] uppercase tracking-[0.18em] text-ink transition hover:text-wine"
                   data-shutter-key="introduction.cta"
                 >
-                <span>{content.introduction.cta}</span>
-                <CtaDivider />
-              </a>
+                  <CtaLabel>{content.introduction.cta}</CtaLabel>
+                </a>
             </div>
           </div>
           </div>
@@ -2235,9 +2227,15 @@ export default function LandingPage({ content }: LandingPageProps) {
                   data-reveal
                   className="mx-auto max-w-[620px] font-menu text-sm leading-7 text-paper/70 md:text-base"
                   data-shutter-key="product.body"
-                >
+              >
                 {content.product.body}
               </p>
+              <a
+                href="#archivio"
+                className="mx-auto inline-flex items-center font-menu text-[0.72rem] uppercase tracking-[0.18em] text-paper/72 transition hover:text-paper"
+              >
+                <CtaLabel>Scopri di più</CtaLabel>
+              </a>
             </div>
           </div>
         </section>
@@ -2295,9 +2293,8 @@ export default function LandingPage({ content }: LandingPageProps) {
               </div>
               <div>
                 <p className="font-bold">Lingua</p>
-                <p className="mt-4 2xl:mt-6">
+                <p className="mt-4 inline-flex gap-3 2xl:mt-6">
                   <span className="font-extrabold">ITA</span>
-                  <span className="px-5"> </span>
                   <span>ENG</span>
                 </p>
               </div>
