@@ -122,6 +122,7 @@ function ProductGallerySlider({
   slides: ProductSlide[];
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const sliderRootRef = useRef<HTMLDivElement | null>(null);
   const frameRefs = useRef<Array<HTMLElement | null>>([]);
   const thumbRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const headlineRef = useRef<HTMLHeadingElement | null>(null);
@@ -129,90 +130,95 @@ function ProductGallerySlider({
   const activeSlide = safeSlides[activeIndex];
 
   useEffect(() => {
+    const root = sliderRootRef.current;
     const activeFrame = frameRefs.current[activeIndex];
 
-    if (!activeFrame) {
+    if (!root || !activeFrame) {
       return;
     }
 
-    const frames = frameRefs.current.filter(
-      (frame): frame is HTMLElement => Boolean(frame),
-    );
-    const thumbs = thumbRefs.current.filter(
-      (thumb): thumb is HTMLButtonElement => Boolean(thumb),
-    );
-    const headline = headlineRef.current;
-    const animatable = [...frames, ...thumbs, headline].filter(Boolean);
-
-    // Cancel any in-flight tweens so rapid prev/next clicks can't strand a
-    // frame in a half-revealed state.
-    gsap.killTweensOf(animatable);
-
-    const reduceMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-
-    if (reduceMotion) {
-      gsap.set(frames, {
-        autoAlpha: 0,
-        scale: 1,
-        clipPath: "inset(0% 0% 0% 0%)",
-      });
-      gsap.set(activeFrame, { autoAlpha: 1 });
-      gsap.set(thumbs, { autoAlpha: 1, y: 0 });
-      if (headline) {
-        gsap.set(headline, { autoAlpha: 1, x: 0 });
-      }
-      return;
-    }
-
-    // Crossfade the outgoing frame instead of hard-cutting it.
-    gsap.to(
-      frames.filter((frame) => frame !== activeFrame),
-      {
-        autoAlpha: 0,
-        scale: 1.025,
-        duration: 0.5,
-        ease: "power2.out",
-      },
-    );
-    gsap.fromTo(
-      activeFrame,
-      {
-        autoAlpha: 0,
-        scale: 1.035,
-        clipPath: "inset(0% 0% 0% 100%)",
-      },
-      {
-        autoAlpha: 1,
-        scale: 1,
-        clipPath: "inset(0% 0% 0% 0%)",
-        duration: 0.95,
-        ease: "power3.out",
-      },
-    );
-    gsap.fromTo(
-      thumbs,
-      {
-        y: 12,
-        autoAlpha: 0.42,
-      },
-      {
-        y: 0,
-        autoAlpha: 1,
-        duration: 0.55,
-        ease: "power2.out",
-        stagger: 0.055,
-      },
-    );
-
-    if (headline) {
-      gsap.fromTo(
-        headline,
-        { autoAlpha: 0, x: -92 },
-        { autoAlpha: 1, x: 0, duration: 0.72, ease: "power3.out" },
+    const ctx = gsap.context(() => {
+      const frames = frameRefs.current.filter(
+        (frame): frame is HTMLElement => Boolean(frame),
       );
-    }
+      const thumbs = thumbRefs.current.filter(
+        (thumb): thumb is HTMLButtonElement => Boolean(thumb),
+      );
+      const headline = headlineRef.current;
+      const animatable = [...frames, ...thumbs, headline].filter(Boolean);
+
+      // Cancel any in-flight tweens so rapid prev/next clicks can't strand a
+      // frame in a half-revealed state.
+      gsap.killTweensOf(animatable);
+
+      const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+
+      if (reduceMotion) {
+        gsap.set(frames, {
+          autoAlpha: 0,
+          scale: 1,
+          clipPath: "inset(0% 0% 0% 0%)",
+        });
+        gsap.set(activeFrame, { autoAlpha: 1 });
+        gsap.set(thumbs, { autoAlpha: 1, y: 0 });
+        if (headline) {
+          gsap.set(headline, { autoAlpha: 1, x: 0 });
+        }
+        return;
+      }
+
+      // Crossfade the outgoing frame instead of hard-cutting it.
+      gsap.to(
+        frames.filter((frame) => frame !== activeFrame),
+        {
+          autoAlpha: 0,
+          scale: 1.025,
+          duration: 0.5,
+          ease: "power2.out",
+        },
+      );
+      gsap.fromTo(
+        activeFrame,
+        {
+          autoAlpha: 0,
+          scale: 1.035,
+          clipPath: "inset(0% 0% 0% 100%)",
+        },
+        {
+          autoAlpha: 1,
+          scale: 1,
+          clipPath: "inset(0% 0% 0% 0%)",
+          duration: 0.95,
+          ease: "power3.out",
+        },
+      );
+      gsap.fromTo(
+        thumbs,
+        {
+          y: 12,
+          autoAlpha: 0.42,
+        },
+        {
+          y: 0,
+          autoAlpha: 1,
+          duration: 0.55,
+          ease: "power2.out",
+          stagger: 0.055,
+        },
+      );
+
+      if (headline) {
+        gsap.fromTo(
+          headline,
+          { autoAlpha: 0, x: -92 },
+          { autoAlpha: 1, x: 0, duration: 0.72, ease: "power3.out" },
+        );
+      }
+    }, root);
+
+    return () => ctx.revert();
   }, [activeIndex]);
 
   if (safeSlides.length === 0 || !activeSlide) {
@@ -246,7 +252,7 @@ function ProductGallerySlider({
         }));
 
   return (
-    <>
+    <div ref={sliderRootRef} className="contents">
       <h2
         ref={headlineRef}
         className="font-snell text-[clamp(2.25rem,3.55vw,2.625rem)] font-normal leading-none 2xl:text-[2.625rem]"
@@ -395,7 +401,7 @@ function ProductGallerySlider({
           })}
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
@@ -1142,44 +1148,74 @@ function VineyardScrollSection({
 }
 
 const memoryImageLayouts = [
-  "h-[270px] w-[216px]",
-  "h-[286px] w-[229px]",
-  "h-[266px] w-[206px]",
-  "h-[268px] w-[214px]",
-  "h-[292px] w-[234px]",
-  "h-[214px] w-[286px]",
+  "h-[min(23vh,184px)] w-[min(18vh,146px)]",
+  "h-[min(28vh,224px)] w-[min(17vh,136px)]",
+  "h-[min(25vh,200px)] w-[min(17vh,136px)]",
+  "h-[min(23vh,184px)] w-[min(18vh,144px)]",
+  "h-[min(27vh,216px)] w-[min(18vh,144px)]",
+  "h-[min(22vh,176px)] w-[min(17vh,136px)]",
 ];
 
 const memoryWordLayouts = [
   {
     text: "Memoria",
     className:
-      "left-[170px] top-[6vh] text-[9rem] opacity-[0.12] md:text-[14rem] lg:text-[16rem] 2xl:top-[19vh] 2xl:text-[22rem] 2xl:opacity-[0.2]",
+      "left-[120px] top-[38vh] text-[7.8rem] opacity-[0.9] md:text-[9.2rem] lg:text-[10.4rem] 2xl:top-[37vh] 2xl:text-[12.8rem]",
   },
   {
     text: "viva",
     className:
-      "left-[1260px] top-[35vh] text-[8rem] opacity-[0.1] md:text-[13rem] lg:text-[15rem] 2xl:top-[66vh] 2xl:text-[20rem] 2xl:opacity-[0.16]",
+      "left-[900px] top-[56vh] text-[7.4rem] opacity-[0.9] md:text-[8.8rem] lg:text-[10rem] 2xl:top-[57vh] 2xl:text-[12rem]",
   },
   {
     text: "il sogno",
     className:
-      "left-[2080px] top-[6vh] text-[8rem] opacity-[0.1] md:text-[13rem] lg:text-[15rem] 2xl:top-[20vh] 2xl:text-[19rem] 2xl:opacity-[0.16]",
+      "left-[1510px] top-[38vh] text-[7.4rem] opacity-[0.9] md:text-[8.8rem] lg:text-[10rem] 2xl:top-[37vh] 2xl:text-[12rem]",
   },
   {
     text: "delle bollicine",
     className:
-      "left-[3240px] top-[35vh] text-[8rem] opacity-[0.1] md:text-[13rem] lg:text-[15rem] 2xl:top-[63vh] 2xl:text-[19rem] 2xl:opacity-[0.15]",
+      "left-[2120px] top-[56vh] text-[7.2rem] opacity-[0.9] md:text-[8.5rem] lg:text-[9.6rem] 2xl:top-[57vh] 2xl:text-[11.5rem]",
   },
 ];
 
 const memoryPanelLayouts = [
-  { left: 410, top: "41vh", slot: "under Memoria" },
-  { left: 980, top: "66vh", slot: "between Memoria and viva" },
-  { left: 1460, top: "38vh", slot: "between Memoria and il sogno" },
-  { left: 2440, top: "64vh", slot: "between viva and il sogno" },
-  { left: 3180, top: "36vh", slot: "between il sogno and delle bollicine" },
-  { left: 3940, top: "62vh", slot: "after delle bollicine" },
+  {
+    left: 290,
+    top: "24vh",
+    slot: "above Memoria",
+    direction: "text-left-image-right",
+  },
+  {
+    left: 285,
+    top: "67vh",
+    slot: "below Memoria",
+    direction: "image-left-text-right",
+  },
+  {
+    left: 875,
+    top: "24vh",
+    slot: "above viva",
+    direction: "text-left-image-right",
+  },
+  {
+    left: 1480,
+    top: "63vh",
+    slot: "between viva and sogno",
+    direction: "text-left-image-right",
+  },
+  {
+    left: 2080,
+    top: "22vh",
+    slot: "above sogno",
+    direction: "image-right-text-left",
+  },
+  {
+    left: 2750,
+    top: "24vh",
+    slot: "above bollicine",
+    direction: "text-left-image-right",
+  },
 ];
 
 function MemoryHorizontalSection({
@@ -1191,7 +1227,7 @@ function MemoryHorizontalSection({
 }) {
   const stageRef = useRef<HTMLElement>(null);
   const items = memory.items;
-  const trackWidth = Math.max(5600, items.length * 900 + 1450);
+  const trackWidth = Math.max(4300, items.length * 520 + 1000);
 
   useEffect(() => {
     const stage = stageRef.current;
@@ -1202,8 +1238,9 @@ function MemoryHorizontalSection({
 
     const ctx = gsap.context(() => {
       const track = stage.querySelector<HTMLElement>("[data-memory-track]");
+      const words = stage.querySelector<HTMLElement>("[data-memory-words]");
 
-      if (!track) {
+      if (!track || !words) {
         return;
       }
 
@@ -1226,6 +1263,16 @@ function MemoryHorizontalSection({
         track,
         {
           x: () => -getDistance(),
+          duration: items.length,
+          ease: "none",
+        },
+        0,
+      );
+      timeline.to(
+        words,
+        {
+          x: () => getDistance() * 0.18,
+          force3D: true,
           duration: items.length,
           ease: "none",
         },
@@ -1258,8 +1305,9 @@ function MemoryHorizontalSection({
         style={{ width: `${trackWidth}px` }}
       >
         <div
+          data-memory-words
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 font-menu font-normal uppercase leading-[0.75] text-white"
+          className="pointer-events-none absolute inset-0 font-menu font-normal uppercase leading-[0.75] text-white will-change-transform"
         >
           {memoryWordLayouts.map((word) => (
             <span
@@ -1276,59 +1324,69 @@ function MemoryHorizontalSection({
           const fallbackPanel = {
             left: 410 + index * 720,
             top: index % 2 === 0 ? "40vh" : "64vh",
+            direction: "image-left-text-right",
           };
           const panelLayout =
             memoryPanelLayouts[index % memoryPanelLayouts.length] ??
             fallbackPanel;
           const imageLayout = memoryImageLayouts[index % memoryImageLayouts.length];
+          const imageFirst =
+            panelLayout.direction === "image-left-text-right" ||
+            panelLayout.direction === "image-right-text-left";
+          const reverseOrder =
+            panelLayout.direction === "text-left-image-right" ||
+            panelLayout.direction === "image-right-text-left";
+          const memoryImage = item.image ? (
+            <figure
+              data-memory-image
+              className={`pointer-events-none relative shrink-0 overflow-hidden shadow-[0_28px_70px_rgba(0,0,0,0.38)] ${imageLayout}`}
+              data-shutter-key={`memory.items.${index}.image`}
+              aria-hidden="true"
+            >
+              <Image
+                src={item.image.src}
+                alt={item.image.alt}
+                fill
+                sizes="(min-width: 768px) 240px, 54vw"
+                className="object-cover"
+              />
+            </figure>
+          ) : null;
+          const memoryText = (
+            <article
+              data-memory-panel
+              className="max-w-[260px] text-paper"
+            >
+              <p
+                className="font-menu text-[1.1rem] leading-none text-paper md:text-[1.35rem]"
+                data-shutter-key={`memory.items.${index}.number`}
+              >
+                ({item.number})
+              </p>
+              <h3
+                className="mt-2 font-menu text-[0.72rem] uppercase leading-[1.08] text-paper md:text-[0.82rem]"
+                data-shutter-key={`memory.items.${index}.headline`}
+              >
+                {item.headline}
+              </h3>
+              <p
+                className="mt-2 max-w-[245px] font-menu text-[0.68rem] leading-[1.25] text-paper/84 md:text-[0.76rem]"
+                data-shutter-key={`memory.items.${index}.body`}
+              >
+                {item.body}
+              </p>
+            </article>
+          );
 
           return (
             <div
               key={`${item.number}-${item.headline}`}
-              className="absolute z-20 flex items-center gap-12"
+              className={`absolute z-20 flex items-start gap-6 ${reverseOrder ? "flex-row-reverse" : ""}`}
               style={{ left: `${panelLayout.left}px`, top: panelLayout.top }}
               data-memory-slot={panelLayout.slot}
             >
-              {item.image ? (
-                <figure
-                  data-memory-image
-                  className={`pointer-events-none relative shrink-0 overflow-hidden shadow-[0_38px_90px_rgba(0,0,0,0.34)] ${imageLayout}`}
-                  data-shutter-key={`memory.items.${index}.image`}
-                  aria-hidden="true"
-                >
-                  <Image
-                    src={item.image.src}
-                    alt={item.image.alt}
-                    fill
-                    sizes="(min-width: 768px) 320px, 60vw"
-                    className="object-cover"
-                  />
-                </figure>
-              ) : null}
-
-              <article
-                data-memory-panel
-                className="max-w-[360px] text-paper"
-              >
-                <p
-                  className="font-menu text-[1.7rem] leading-none text-paper md:text-[2.15rem]"
-                  data-shutter-key={`memory.items.${index}.number`}
-                >
-                  ({item.number})
-                </p>
-                <h3
-                  className="mt-5 font-menu text-lg uppercase leading-[1.08] text-paper md:text-[1.35rem]"
-                  data-shutter-key={`memory.items.${index}.headline`}
-                >
-                  {item.headline}
-                </h3>
-                <p
-                  className="mt-4 max-w-[330px] font-menu text-base leading-[1.38] text-paper/82 md:text-[1.08rem]"
-                  data-shutter-key={`memory.items.${index}.body`}
-                >
-                  {item.body}
-                </p>
-              </article>
+              {imageFirst ? memoryImage : memoryText}
+              {imageFirst ? memoryText : memoryImage}
             </div>
           );
         })}
@@ -1987,11 +2045,20 @@ export default function LandingPage({ content }: LandingPageProps) {
               "[data-tenuta-video]",
               {
                 scale: 1.08,
-                filter: "brightness(0.78) saturate(0.82)",
               },
               {
                 scale: 1,
-                filter: "brightness(0.94) saturate(1.02)",
+                ease: "none",
+              },
+              0,
+            )
+            .fromTo(
+              "[data-tenuta-video-shade]",
+              {
+                autoAlpha: 0.22,
+              },
+              {
+                autoAlpha: 0.08,
                 ease: "none",
               },
               0,
@@ -2127,10 +2194,13 @@ export default function LandingPage({ content }: LandingPageProps) {
             shutterKey="menu.sections.tenuta.referenceId"
           />
           <div className="mx-auto max-w-[1560px]">
-            <div className="relative mx-auto w-full md:w-[1120px]" data-tenuta-reveal>
+            <div
+              className="relative mx-auto w-full max-w-[1120px]"
+              data-tenuta-reveal
+            >
               <h2
                 data-tenuta-heading
-                className="relative z-30 mx-auto mb-4 max-w-none whitespace-nowrap text-center font-snell text-[clamp(2.25rem,3.55vw,2.625rem)] font-normal uppercase leading-[0.95] text-ink md:mb-5 2xl:text-[2.625rem]"
+                className="relative z-30 mx-auto mb-4 max-w-full text-center font-snell text-[clamp(1.8rem,3.55vw,2.625rem)] font-normal uppercase leading-[0.95] text-ink md:mb-5 2xl:text-[2.625rem]"
                 data-shutter-key="introduction.headline"
               >
                 {content.introduction.headline}
@@ -2159,7 +2229,10 @@ export default function LandingPage({ content }: LandingPageProps) {
                       type="video/mp4"
                     />
                   </video>
-                  <div className="absolute inset-0 bg-ink/16" />
+                  <div
+                    className="absolute inset-0 bg-ink"
+                    data-tenuta-video-shade
+                  />
                 </div>
                 <svg
                   className="pointer-events-none absolute -inset-[1px] z-10 h-[calc(100%+2px)] w-[calc(100%+2px)]"
@@ -2288,22 +2361,33 @@ export default function LandingPage({ content }: LandingPageProps) {
         className="relative bg-[#f1f1f1] px-5 py-7 text-black md:px-8 md:py-6 2xl:py-10"
       >
         <div className="mx-auto flex min-h-[220px] max-w-[1560px] flex-col justify-between gap-6 font-menu uppercase tracking-[0.08em] md:min-h-[180px] 2xl:min-h-[260px] 2xl:gap-10">
-          <div className="grid gap-6 md:grid-cols-[1fr_1fr_1.05fr] md:items-start 2xl:gap-8">
-            <div className="max-w-[270px] text-[0.72rem] font-medium leading-[1.75] md:text-[0.82rem]">
-              <p className="font-bold">Dove siamo</p>
-              <p>Via Paolo VI, 62 - 25046 Cazzago San Martino BS</p>
+          <div className="grid gap-6 md:grid-cols-[1fr_auto_1fr] md:items-start 2xl:gap-8">
+            <div className="grid gap-6 md:grid-cols-2 md:items-start">
+              <div className="max-w-[270px] text-[0.64rem] font-medium leading-[1.7] md:text-[0.72rem]">
+                <p className="font-bold">Dove siamo</p>
+                <p>Via Paolo VI, 62 - 25046 Cazzago San Martino BS</p>
+              </div>
+
+              <div className="max-w-[360px] text-[0.64rem] font-medium leading-[1.7] md:text-[0.72rem]">
+                <p className="font-bold">Wine Shop/Visite</p>
+                <p>+39 345 0443240</p>
+                <p>T. +39 030 7750838</p>
+              </div>
             </div>
 
-            <div className="max-w-[360px] text-[0.72rem] font-medium leading-[1.75] md:text-[0.82rem]">
-              <p className="font-bold">Wine Shop/Visite</p>
-              <p>+39 345 0443240</p>
-              <p>T. +39 030 7750838</p>
+            <div className="text-[0.64rem] font-medium leading-[1.7] md:justify-self-center md:text-center md:text-[0.72rem]">
+              <a
+                className="underline underline-offset-4 transition hover:text-wine"
+                href="#"
+              >
+                Guida alla degustazione
+              </a>
             </div>
 
-            <div className="grid gap-5 text-[0.72rem] font-medium leading-[1.75] md:grid-cols-[1fr_auto] md:text-right md:text-[0.82rem] 2xl:gap-6">
+            <div className="grid gap-5 text-[0.64rem] font-medium leading-[1.7] md:grid-cols-[auto_auto] md:justify-self-end md:text-right md:text-[0.72rem] 2xl:gap-6">
               <div>
                 <p className="font-bold">Seguici</p>
-                <div className="mt-4 flex gap-7 md:justify-end 2xl:mt-6">
+                <div className="mt-3 grid gap-1.5 md:justify-items-end 2xl:mt-5">
                   <a className="underline underline-offset-4 transition hover:text-wine" href="#">
                     Facebook
                   </a>
@@ -2314,9 +2398,10 @@ export default function LandingPage({ content }: LandingPageProps) {
               </div>
               <div>
                 <p className="font-bold">Lingua</p>
-                <p className="mt-4 inline-flex gap-3 2xl:mt-6">
+                <p className="mt-3 grid gap-1.5 2xl:mt-5">
                   <span className="font-extrabold">ITA</span>
                   <span>ENG</span>
+                  <span>DE</span>
                 </p>
               </div>
             </div>
