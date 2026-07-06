@@ -1227,7 +1227,7 @@ function MemoryHorizontalSection({
 }) {
   const stageRef = useRef<HTMLElement>(null);
   const items = memory.items;
-  const trackWidth = Math.max(4300, items.length * 520 + 1000);
+  const trackWidth = Math.max(5000, items.length * 620 + 1200);
 
   useEffect(() => {
     const stage = stageRef.current;
@@ -1236,6 +1236,7 @@ function MemoryHorizontalSection({
       return;
     }
 
+    let cleanupMemoryScroll = () => {};
     const ctx = gsap.context(() => {
       const track = stage.querySelector<HTMLElement>("[data-memory-track]");
       const words = stage.querySelector<HTMLElement>("[data-memory-words]");
@@ -1244,13 +1245,26 @@ function MemoryHorizontalSection({
         return;
       }
 
-      const getDistance = () =>
-        Math.max(0, track.scrollWidth - window.innerWidth);
+      const getTrackWidth = () => {
+        const panels = gsap.utils.toArray<HTMLElement>("[data-memory-slot]");
+        const contentRight = panels.reduce(
+          (maxRight, panel) =>
+            Math.max(maxRight, panel.offsetLeft + panel.offsetWidth),
+          0,
+        );
+
+        return Math.max(
+          track.scrollWidth,
+          contentRight + Math.min(window.innerWidth * 0.55, 720),
+          window.innerWidth,
+        );
+      };
+      const getDistance = () => Math.max(0, getTrackWidth() - window.innerWidth);
       const timeline = gsap.timeline({
         scrollTrigger: {
           trigger: stage,
           start: "top top",
-          end: () => `+=${Math.max(getDistance(), 4200)}`,
+          end: () => `+=${Math.max(getDistance(), 4600)}`,
           pin: true,
           scrub: 0.9,
           anticipatePin: 1,
@@ -1278,9 +1292,32 @@ function MemoryHorizontalSection({
         },
         0,
       );
+
+      const refreshMemoryScroll = () => ScrollTrigger.refresh();
+      const images = gsap.utils.toArray<HTMLImageElement>("img", track);
+      const pendingImages = images.filter((image) => !image.complete);
+
+      pendingImages.forEach((image) => {
+        image.addEventListener("load", refreshMemoryScroll, { once: true });
+        image.addEventListener("error", refreshMemoryScroll, { once: true });
+      });
+
+      window.addEventListener("load", refreshMemoryScroll, { once: true });
+      document.fonts?.ready.then(refreshMemoryScroll);
+
+      cleanupMemoryScroll = () => {
+        pendingImages.forEach((image) => {
+          image.removeEventListener("load", refreshMemoryScroll);
+          image.removeEventListener("error", refreshMemoryScroll);
+        });
+        window.removeEventListener("load", refreshMemoryScroll);
+      };
     }, stage);
 
-    return () => ctx.revert();
+    return () => {
+      cleanupMemoryScroll();
+      ctx.revert();
+    };
   }, [items]);
 
   if (items.length === 0) {
