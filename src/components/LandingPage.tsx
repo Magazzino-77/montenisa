@@ -255,18 +255,18 @@ function ProductGallerySlider({
     <div ref={sliderRootRef} className="contents">
       <h2
         ref={headlineRef}
-        className="font-snell text-[clamp(2.25rem,3.55vw,2.625rem)] font-normal leading-none 2xl:text-[2.625rem]"
+        className="font-menu text-[clamp(2rem,3.25vw,2.5rem)] font-normal uppercase leading-none text-paper 2xl:text-[2.5rem]"
         data-shutter-key={`product.slides.${activeIndex}.headline`}
       >
         {activeSlide.headline}
       </h2>
 
       <div
-        className="mx-auto w-full max-w-[1180px]"
+        className="mx-auto w-full max-w-[1280px]"
         data-active-slide={activeIndex}
         data-product-slider
       >
-        <div className="relative mx-auto aspect-[0.75] w-full max-w-[235px] overflow-visible lg:max-w-[260px] 2xl:max-w-[320px]">
+        <div className="relative mx-auto mt-3 aspect-[0.58] w-full max-w-[136px] overflow-visible md:max-w-[160px] lg:max-w-[170px] 2xl:max-w-[210px]">
           {safeSlides.map((slide, index) => (
             <figure
               key={`${slide.image.src}-${index}`}
@@ -283,7 +283,7 @@ function ProductGallerySlider({
                 src={slide.image.src}
                 alt={slide.image.alt}
                 fill
-                sizes="(min-width: 1536px) 320px, (min-width: 1024px) 260px, (min-width: 768px) 235px, 72vw"
+                sizes="(min-width: 1536px) 210px, (min-width: 1024px) 170px, (min-width: 768px) 160px, 42vw"
                 className="object-contain object-[50%_50%] mix-blend-lighten"
               />
             </figure>
@@ -337,7 +337,17 @@ function ProductGallerySlider({
           </button>
         </div>
 
-        <div className="mx-auto mt-6 flex max-w-[980px] items-end justify-center gap-3 md:gap-5 2xl:mt-8 2xl:gap-8">
+        {activeSlide.body ? (
+          <p
+            data-reveal
+            className="mx-auto mt-5 max-w-[720px] font-menu text-[0.76rem] leading-6 text-paper/82 md:mt-6 md:text-sm md:leading-7"
+            data-shutter-key={`product.slides.${activeIndex}.body`}
+          >
+            {activeSlide.body}
+          </p>
+        ) : null}
+
+        <div className="mx-auto mt-7 flex w-screen max-w-none items-center justify-center gap-8 overflow-hidden md:mt-8 md:gap-14 2xl:mt-10">
           {visibleThumbs.map(({ slide, index, offset }) => {
             const isActive = activeIndex === index;
             const sideOverlay =
@@ -364,8 +374,8 @@ function ProductGallerySlider({
                 }}
                 className={`group relative shrink-0 overflow-hidden transition duration-500 ${
                   isActive
-                    ? "h-[184px] w-[128px] md:h-[190px] md:w-[132px] lg:h-[212px] lg:w-[147px] 2xl:h-[286px] 2xl:w-[198px]"
-                    : "h-[160px] w-[112px] md:h-[166px] md:w-[115px] lg:h-[186px] lg:w-[129px] 2xl:h-[246px] 2xl:w-[170px]"
+                    ? "aspect-[2157/1458] w-[min(70vw,520px)] md:w-[min(42vw,640px)]"
+                    : "aspect-[2157/1458] w-[min(46vw,320px)] md:w-[min(28vw,430px)]"
                 } ${
                   isActive
                     ? "opacity-100"
@@ -378,7 +388,7 @@ function ProductGallerySlider({
                   src={slide.thumbnail.src}
                   alt={slide.thumbnail.alt}
                   fill
-                  sizes="(min-width: 768px) 172px, 34vw"
+                  sizes="(min-width: 1536px) 640px, (min-width: 768px) 42vw, 70vw"
                   className={`object-cover transition duration-700 ${
                     isActive ? "scale-105" : "scale-100 group-hover:scale-105"
                   }`}
@@ -400,6 +410,13 @@ function ProductGallerySlider({
             );
           })}
         </div>
+
+        <a
+          href="#archivio"
+          className="mx-auto mt-9 inline-flex items-center font-menu text-[0.72rem] uppercase tracking-[0.18em] text-paper/82 transition hover:text-paper md:mt-10"
+        >
+          <CtaLabel>Scopri di più</CtaLabel>
+        </a>
       </div>
     </div>
   );
@@ -2037,11 +2054,6 @@ export default function LandingPage({ content }: LandingPageProps) {
             };
           };
 
-          const tenutaScrubVideo =
-            tenutaStage.querySelector<HTMLVideoElement>(
-              "[data-tenuta-scrub-video]",
-            );
-
           const tenutaTimeline = gsap.timeline({
               scrollTrigger: {
                 trigger: tenutaStage,
@@ -2119,38 +2131,6 @@ export default function LandingPage({ content }: LandingPageProps) {
               0,
             );
 
-          if (tenutaScrubVideo) {
-            const scrubTenutaVideo = () => {
-              const duration = tenutaScrubVideo.duration;
-
-              if (!Number.isFinite(duration) || duration <= 0) {
-                return;
-              }
-
-              tenutaTimeline.to(
-                tenutaScrubVideo,
-                {
-                  currentTime: Math.max(0, duration - 0.04),
-                  ease: "none",
-                },
-                0,
-              );
-              ScrollTrigger.refresh();
-            };
-
-            tenutaScrubVideo.pause();
-            tenutaScrubVideo.currentTime = 0;
-
-            if (tenutaScrubVideo.readyState >= 1) {
-              scrubTenutaVideo();
-            } else {
-              tenutaScrubVideo.addEventListener(
-                "loadedmetadata",
-                scrubTenutaVideo,
-                { once: true },
-              );
-            }
-          }
         }
       }
 
@@ -2252,20 +2232,14 @@ export default function LandingPage({ content }: LandingPageProps) {
                   data-tenuta-video
                   aria-hidden="true"
                 >
-                  <video
-                    data-tenuta-scrub-video
-                    className="h-full w-full scale-105 object-cover object-[50%_52%]"
-                    muted
-                    playsInline
-                    preload="auto"
-                    poster={content.introduction.image!.src}
-                    aria-label={content.introduction.image!.alt}
-                  >
-                    <source
-                      src="/videos/tenuta-entrance-scroll.mp4"
-                      type="video/mp4"
-                    />
-                  </video>
+                  <Image
+                    src="/images/tenuta-arches-static.png"
+                    alt={content.introduction.image!.alt}
+                    fill
+                    priority
+                    sizes="100vw"
+                    className="scale-105 object-cover object-[50%_52%]"
+                  />
                   <div
                     className="absolute inset-0 bg-ink"
                     data-tenuta-video-shade
@@ -2354,19 +2328,6 @@ export default function LandingPage({ content }: LandingPageProps) {
           <div className="mx-auto max-w-[1560px]">
             <div className="mx-auto grid max-w-[1180px] gap-10 text-center">
               <ProductGallerySlider slides={content.product.slides} />
-              <p
-                  data-reveal
-                  className="mx-auto max-w-[620px] font-menu text-sm leading-7 text-paper/70 md:text-base"
-                  data-shutter-key="product.body"
-              >
-                {content.product.body}
-              </p>
-              <a
-                href="#archivio"
-                className="mx-auto inline-flex items-center font-menu text-[0.72rem] uppercase tracking-[0.18em] text-paper/72 transition hover:text-paper"
-              >
-                <CtaLabel>Scopri di più</CtaLabel>
-              </a>
             </div>
           </div>
         </section>

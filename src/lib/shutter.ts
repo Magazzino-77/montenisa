@@ -10,6 +10,7 @@ export type LandingImage = {
 
 export type ProductSlide = {
   headline: string;
+  body?: string;
   image: LandingImage;
   thumbnail: LandingImage;
 };
@@ -254,36 +255,81 @@ export const fallbackLandingContent: LandingContent = {
     },
     slides: [
       {
-        headline: "Il Corallo Rosa",
+        headline: "Rosé",
+        body:
+          "Il corallo rosato è un elemento naturale prezioso e raro, da sempre associato al fascino femminile. Le sue sfumature delicate richiamano il colore del Rosé, mentre la sua bellezza naturale riflette la freschezza e la vivacità di questa cuvée.",
         image: {
           src: "/images/corallo-3d.png",
           alt: "Pink coral sculpture",
         },
         thumbnail: {
-          src: "/images/montenisa-corallo-rosa.png",
+          src: "/images/spumanti/vino-corallo.png",
           alt: "Rosé Franciacorta bottle thumbnail",
         },
       },
       {
-        headline: "La Conchiglia",
+        headline: "Blanc de Blancs",
+        body:
+          "La conchiglia custodisce l'eco del mare e della mineralità. La sua forma luminosa racconta una cuvée tesa, elegante e precisa, capace di trasformare freschezza e sapidità in equilibrio.",
         image: {
           src: "/images/conchiglia-3d.png",
           alt: "Ivory shell sculpture",
         },
         thumbnail: {
-          src: "/images/montenisa-conchiglia.png",
+          src: "/images/spumanti/vino-conchiglia.png",
           alt: "Blanc de Blancs bottle thumbnail",
         },
       },
       {
-        headline: "La Chiave Antica",
+        headline: "Cuvée Royale",
+        body:
+          "La chiave antica apre una stanza di memoria e precisione. Il suo metallo prezioso richiama una cuvée costruita sul tempo, sulla cura e su una promessa di eleganza classica.",
         image: {
           src: "/images/chiave-3d.png",
           alt: "Ornate golden key sculpture",
         },
         thumbnail: {
-          src: "/images/montenisa-chiave-antica.png",
+          src: "/images/spumanti/vino-chiave.png",
           alt: "Cuvée Royale bottle thumbnail",
+        },
+      },
+      {
+        headline: "La Lettera",
+        body:
+          "La lettera conserva un messaggio, una dedica, una traccia intima. Diventa simbolo di un vino che parla attraverso sfumature sottili, memoria e misura.",
+        image: {
+          src: "/images/spumanti/lettera.png",
+          alt: "Lettera antica",
+        },
+        thumbnail: {
+          src: "/images/spumanti/vino-lettera.png",
+          alt: "Franciacorta bottle with letter still life",
+        },
+      },
+      {
+        headline: "L'Occhiale",
+        body:
+          "L'occhiale invita a guardare più da vicino: dettagli, riflessi, profondità. È il gesto dell'osservazione che accompagna una cuvée nitida e contemplativa.",
+        image: {
+          src: "/images/spumanti/occhiale.png",
+          alt: "Occhiale antico",
+        },
+        thumbnail: {
+          src: "/images/spumanti/vino-occhiale.png",
+          alt: "Franciacorta bottle with antique glasses still life",
+        },
+      },
+      {
+        headline: "L'Ombrello",
+        body:
+          "L'ombrello protegge e rivela, come un piccolo teatro portatile. La sua presenza scenografica racconta una cuvée dal carattere gentile, elegante e sorprendente.",
+        image: {
+          src: "/images/spumanti/ombrello.png",
+          alt: "Ombrello chiaro",
+        },
+        thumbnail: {
+          src: "/images/spumanti/vino-ombrello.png",
+          alt: "Franciacorta bottle with umbrella still life",
         },
       },
     ],
@@ -803,6 +849,7 @@ const normalizeProductSlide = (
 
   return withoutUndefined({
     headline: pickString(value, ["headline", "title", "heading", "label"]),
+    body: pickString(value, ["body", "description", "copy", "text"]),
     image,
     thumbnail: thumbnail ?? image,
   }) as DeepPartial<ProductSlide>;
@@ -1174,6 +1221,17 @@ const mergeByIndex = <T extends Record<string, unknown>>(
   })) as T[];
 };
 
+const mergeProductSlides = (
+  fallback: ProductSlide[],
+  content: unknown,
+): ProductSlide[] => {
+  const merged = mergeByIndex(fallback, content) as ProductSlide[];
+
+  return merged.length < fallback.length
+    ? [...merged, ...fallback.slice(merged.length)]
+    : merged;
+};
+
 const mergeSectionMarkers = (
   content: DeepPartial<LandingContent["menu"]["sections"]> | undefined,
 ): LandingContent["menu"]["sections"] => {
@@ -1254,10 +1312,10 @@ const mergeContent = (
   ),
   product: {
     ...mergeChapter(fallbackLandingContent.product, content.product),
-    slides: mergeByIndex(
+    slides: mergeProductSlides(
       fallbackLandingContent.product.slides,
       content.product?.slides,
-    ) as ProductSlide[],
+    ),
   },
   archive: {
     ...fallbackLandingContent.archive,
