@@ -2100,8 +2100,11 @@ export default function LandingPage({ content }: LandingPageProps) {
             "[data-tenuta-visual]",
           );
           const tenutaText = gsap.utils.toArray<HTMLElement>(
-            "[data-tenuta-heading], [data-tenuta-copy]",
+            "[data-tenuta-heading]",
             tenutaStage,
+          );
+          const tenutaCopy = tenutaStage.querySelector<HTMLElement>(
+            "[data-tenuta-copy]",
           );
           const maskOpenings = {
             left: tenutaVisual?.querySelector<SVGPathElement>(
@@ -2205,7 +2208,7 @@ export default function LandingPage({ content }: LandingPageProps) {
             const targetTop = getTenutaTopOffset();
             const targetHeight = Math.max(
               1,
-              window.innerHeight - targetTop + 64,
+              window.innerHeight - targetTop + 96,
             );
             const targetScale = Math.max(
               window.innerWidth / visualWidth,
@@ -2280,8 +2283,22 @@ export default function LandingPage({ content }: LandingPageProps) {
             .to(
               tenutaText,
               {
-                y: (index) => (index === 0 ? -34 : 72),
+                y: -34,
                 autoAlpha: 0,
+                duration: 0.16,
+                ease: "power1.out",
+              },
+              0,
+            )
+            .to(
+              tenutaCopy,
+              {
+                y: 72,
+                autoAlpha: 0,
+                marginTop: 0,
+                height: 0,
+                minHeight: 0,
+                overflow: "hidden",
                 duration: 0.16,
                 ease: "power1.out",
               },
@@ -2369,7 +2386,7 @@ export default function LandingPage({ content }: LandingPageProps) {
         <section
           id="tenuta"
           data-section="tenuta"
-          className="relative bg-paper px-5 pb-0 pt-12 md:px-8 md:pt-16"
+          className="relative overflow-hidden bg-paper px-5 pb-0 pt-12 md:px-8 md:pt-16"
         >
           <SectionReference
             marker={content.menu.sections.tenuta}
@@ -2388,7 +2405,7 @@ export default function LandingPage({ content }: LandingPageProps) {
                 {content.introduction.headline}
               </h2>
               <div
-                className="relative z-20 h-[58vw] min-h-[320px] w-full overflow-hidden outline-none md:h-[590px]"
+                className="relative z-20 mb-[-1px] h-[58vw] min-h-[320px] w-full overflow-hidden outline-none md:h-[590px]"
                 data-tenuta-visual
                 data-content-key="introduction.videoPlaceholder"
               >
@@ -2483,7 +2500,7 @@ export default function LandingPage({ content }: LandingPageProps) {
         <section
           id="spumanti"
           data-section="corallo"
-          className="relative bg-ink px-5 py-[4.5rem] text-paper md:px-8 md:py-24 2xl:py-28"
+          className="relative z-10 -mt-px bg-ink px-5 py-[4.5rem] text-paper md:px-8 md:py-24 2xl:py-28"
         >
             <SectionReference
               marker={content.menu.sections.corallo}
