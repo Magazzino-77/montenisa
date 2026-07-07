@@ -1170,6 +1170,21 @@ function VineyardScrollSection({
       return;
     }
 
+    const desktopInner = stage.querySelector<HTMLElement>(
+      "[data-vineyard-desktop-inner]",
+    );
+    const syncVineyardHeaderInset = () => {
+      const headerHeight =
+        document.querySelector<HTMLElement>("header")?.offsetHeight ?? 72;
+
+      if (desktopInner) {
+        desktopInner.style.paddingTop = `${headerHeight}px`;
+      }
+    };
+
+    syncVineyardHeaderInset();
+    window.addEventListener("resize", syncVineyardHeaderInset);
+
     const ctx = gsap.context(() => {
       const copyLayers = states
         .map((_, index) =>
@@ -1207,10 +1222,17 @@ function VineyardScrollSection({
         return;
       }
 
+      const getVineyardPinStart = () => {
+        const headerHeight =
+          document.querySelector<HTMLElement>("header")?.offsetHeight ?? 72;
+        // Start the pin just before the section would tuck under the header.
+        return `top top+=${Math.max(8, headerHeight - 24)}`;
+      };
+
       const timeline = gsap.timeline({
         scrollTrigger: {
           trigger: stage,
-          start: "top top",
+          start: getVineyardPinStart,
           end: () => `+=${Math.max(states.length * window.innerHeight * 0.95, 2600)}`,
           pin: true,
           scrub: 0.9,
@@ -1268,7 +1290,10 @@ function VineyardScrollSection({
       timeline.to({}, { duration: 0.6 });
     }, stage);
 
-    return () => ctx.revert();
+    return () => {
+      window.removeEventListener("resize", syncVineyardHeaderInset);
+      ctx.revert();
+    };
   }, [states]);
 
   if (states.length === 0) {
@@ -1301,7 +1326,10 @@ function VineyardScrollSection({
         data-vineyard-desktop
         className="relative hidden h-[100svh] min-h-[640px] overflow-hidden md:block lg:min-h-[700px] 2xl:min-h-[760px]"
       >
-        <div className="mx-auto grid h-full max-w-[1560px] grid-cols-2 gap-0">
+        <div
+          data-vineyard-desktop-inner
+          className="box-border mx-auto grid h-full max-w-[1560px] grid-cols-2 gap-0"
+        >
           {(["left", "right"] as const).map((side) => (
             <div
               key={`vineyard-column-${side}`}
