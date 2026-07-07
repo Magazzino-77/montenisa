@@ -1031,7 +1031,7 @@ function CellarChapterSection({
         </div>
 
         <div className="relative z-10 mx-auto w-full max-w-[1180px] text-center">
-          <div className="relative min-h-[clamp(15rem,34vw,23rem)] 2xl:min-h-[clamp(16rem,40vw,26rem)]">
+          <div className="relative min-h-[clamp(10rem,24vw,16rem)] 2xl:min-h-[clamp(11rem,24vw,22rem)]">
             {states.map((state, stateIndex) => (
               <div
                 key={`cellar-copy-${stateIndex}`}
