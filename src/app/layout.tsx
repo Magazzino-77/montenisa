@@ -36,12 +36,12 @@ const menu = Playfair_Display({
 export const metadata: Metadata = {
   title: "Tenuta Montenisa | Franciacorta",
   description:
-    "A one-page Tenuta Montenisa homepage foundation inspired by the Figma prototype and ready for Shutter-managed content.",
+    "A one-page Tenuta Montenisa homepage foundation inspired by the Figma prototype.",
   metadataBase: new URL("https://montenisa.vercel.app"),
   openGraph: {
     title: "Tenuta Montenisa | Franciacorta",
     description:
-      "A refined, chapter-led homepage foundation for Tenuta Montenisa, ready for Shutter-managed content.",
+      "A refined, chapter-led homepage foundation for Tenuta Montenisa.",
     images: ["/images/montenisa-estate-hero.png"],
   },
 };

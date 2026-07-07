@@ -647,7 +647,7 @@ export const fallbackLandingContent: LandingContent = {
     title: "Tenuta Montenisa",
     email: "studio@montenisa.it",
     location: "Calino, Franciacorta",
-    legal: "Prototype foundation by M77. Content ready for Shutter.",
+    legal: "Prototype foundation by M77.",
   },
 };
 
@@ -1361,31 +1361,5 @@ export const resolveLandingPageContent = (payload: ContentPayload) =>
   );
 
 export async function getLandingPageContent(): Promise<LandingContent> {
-  const endpoint =
-    process.env.SHUTTER_CONTENT_ENDPOINT ?? process.env.SHUTTER_LANDING_ENDPOINT;
-
-  if (!endpoint) {
-    return fallbackLandingContent;
-  }
-
-  try {
-    const response = await fetch(endpoint, {
-      headers: {
-        Accept: "application/json",
-      },
-      next: {
-        revalidate: 120,
-      },
-    });
-
-    if (!response.ok) {
-      return fallbackLandingContent;
-    }
-
-    const payload = (await response.json()) as ContentPayload;
-
-    return resolveLandingPageContent(payload);
-  } catch {
-    return fallbackLandingContent;
-  }
+  return fallbackLandingContent;
 }

@@ -132,8 +132,8 @@ a {
 }
 
 .product-thumb-stage {
-  --active-thumb-width: min(66vw, 490px);
-  --side-thumb-width: min(46vw, 320px);
+  --active-thumb-width: min(58vw, 430px);
+  --side-thumb-width: min(38vw, 270px);
   --thumb-ratio: 0.67594;
   height: calc(var(--active-thumb-width) * var(--thumb-ratio));
 }
@@ -177,8 +177,8 @@ a {
 
 @media (min-width: 768px) {
   .product-thumb-stage {
-    --active-thumb-width: min(43vw, 600px);
-    --side-thumb-width: min(26vw, 390px);
+    --active-thumb-width: min(36vw, 500px);
+    --side-thumb-width: min(22vw, 330px);
   }
 
   .product-thumb--prev {
@@ -192,8 +192,8 @@ a {
 
 @media (min-width: 1024px) {
   .product-thumb-stage {
-    --active-thumb-width: min(41vw, 600px);
-    --side-thumb-width: min(24vw, 430px);
+    --active-thumb-width: min(35vw, 520px);
+    --side-thumb-width: min(20vw, 350px);
   }
 }
 

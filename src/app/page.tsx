@@ -1,5 +1,5 @@
 import LandingPage from "@/components/LandingPage";
-import { getLandingPageContent } from "@/lib/shutter";
+import { getLandingPageContent } from "@/lib/landing-content";
 
 export default async function Home() {
   const content = await getLandingPageContent();

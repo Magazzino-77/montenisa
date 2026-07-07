@@ -11,7 +11,7 @@ import type {
   LandingSectionKey,
   LandingSectionMarker,
   ProductSlide,
-} from "@/lib/shutter";
+} from "@/lib/landing-content";
 
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
@@ -313,7 +313,7 @@ function ProductGallerySlider({
       <h2
         ref={headlineRef}
         className="w-full text-center font-menu text-[clamp(2rem,3.25vw,2.5rem)] font-normal uppercase leading-none text-paper 2xl:text-[2.5rem]"
-        data-shutter-key={`product.slides.${activeIndex}.headline`}
+        data-content-key={`product.slides.${activeIndex}.headline`}
       >
         {activeSlide.headline}
       </h2>
@@ -333,7 +333,7 @@ function ProductGallerySlider({
               className={`pointer-events-none absolute inset-0 ${
                 index === activeIndex ? "" : "opacity-0"
               }`}
-              data-shutter-key={`product.slides.${index}.image`}
+              data-content-key={`product.slides.${index}.image`}
               aria-hidden={activeIndex !== index}
             >
               <Image
@@ -398,7 +398,7 @@ function ProductGallerySlider({
           <p
             data-reveal
             className="mx-auto mt-5 flex min-h-[66px] w-full max-w-[920px] items-center justify-center text-center font-menu text-[16px] leading-[22px] text-paper/82 md:mt-6"
-            data-shutter-key={`product.slides.${activeIndex}.body`}
+            data-content-key={`product.slides.${activeIndex}.body`}
           >
             <ThreeLineProductCopy>{activeSlide.body}</ThreeLineProductCopy>
           </p>
@@ -645,7 +645,7 @@ function ArchiveChapterSection({
     >
       <SectionReference
         marker={marker}
-        shutterKey="menu.sections.archive.referenceId"
+        contentKey="menu.sections.archive.referenceId"
       />
       <div
         className="pointer-events-none absolute inset-0 z-0 overflow-hidden opacity-[0.18] mix-blend-multiply"
@@ -673,7 +673,7 @@ function ArchiveChapterSection({
                   key={`${object.image.src}-${objectIndex}`}
                   data-archive-object
                   className={`absolute ${object.placement ?? ""}`}
-                  data-shutter-key={`archive.states.${stateIndex}.objects.${objectIndex}.image`}
+                  data-content-key={`archive.states.${stateIndex}.objects.${objectIndex}.image`}
                 >
                   <div data-archive-float className="absolute inset-0">
                     <img
@@ -703,13 +703,13 @@ function ArchiveChapterSection({
               >
                 <h2
                   className="mx-auto max-w-none whitespace-nowrap font-menu text-[clamp(2.25rem,3.28vw,2.625rem)] font-medium uppercase leading-[0.9] text-ink"
-                  data-shutter-key={`archive.states.${stateIndex}.headline`}
+                  data-content-key={`archive.states.${stateIndex}.headline`}
                 >
                   {state.headline}
                 </h2>
                 <p
                   className="mx-auto mt-6 max-w-[640px] font-menu text-sm uppercase leading-6 tracking-[0.05em] text-ink/72 md:text-[0.9rem] md:leading-7 2xl:mt-8 2xl:max-w-[680px] 2xl:text-[0.95rem]"
-                  data-shutter-key={`archive.states.${stateIndex}.body`}
+                  data-content-key={`archive.states.${stateIndex}.body`}
                 >
                   {state.body}
                 </p>
@@ -720,7 +720,7 @@ function ArchiveChapterSection({
           <a
             href="#tenuta"
             className="relative z-10 mt-8 inline-flex items-center font-menu text-[0.68rem] uppercase tracking-[0.16em] text-ink/58 transition hover:text-wine 2xl:mt-12 2xl:text-[0.72rem] 2xl:tracking-[0.18em]"
-            data-shutter-key="archive.cta"
+            data-content-key="archive.cta"
           >
             <CtaLabel>{archive.cta}</CtaLabel>
           </a>
@@ -888,7 +888,7 @@ function CellarChapterSection({
     >
       <SectionReference
         marker={marker}
-        shutterKey="menu.sections.cantina.referenceId"
+        contentKey="menu.sections.cantina.referenceId"
       />
       <div className="relative mx-auto flex min-h-[100svh] max-w-[1560px] items-center px-5 py-[4.5rem] md:px-8 md:py-24 2xl:py-32">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -904,7 +904,7 @@ function CellarChapterSection({
                   key={`${object.image.src}-${objectIndex}`}
                   data-cellar-object
                   className={`absolute ${object.placement ?? ""}`}
-                  data-shutter-key={`cellar.states.${stateIndex}.objects.${objectIndex}.image`}
+                  data-content-key={`cellar.states.${stateIndex}.objects.${objectIndex}.image`}
                 >
                   <Image
                     src={object.image.src}
@@ -932,13 +932,13 @@ function CellarChapterSection({
               >
                 <h2
                   className="mx-auto max-w-none whitespace-nowrap font-menu text-[clamp(2.5rem,4.05vw,3rem)] font-medium uppercase leading-[0.9] text-ink 2xl:text-[3rem]"
-                  data-shutter-key={`cellar.states.${stateIndex}.headline`}
+                  data-content-key={`cellar.states.${stateIndex}.headline`}
                 >
                   {state.headline}
                 </h2>
                 <p
                   className="mx-auto mt-6 max-w-[590px] font-menu text-sm uppercase leading-6 tracking-[0.04em] text-ink/74 md:text-[0.9rem] md:leading-7 2xl:mt-7 2xl:max-w-[620px] 2xl:text-[0.95rem]"
-                  data-shutter-key={`cellar.states.${stateIndex}.body`}
+                  data-content-key={`cellar.states.${stateIndex}.body`}
                 >
                   {state.body}
                 </p>
@@ -949,7 +949,7 @@ function CellarChapterSection({
           <a
             href="#spumanti"
             className="relative z-10 mt-8 inline-flex items-center font-menu text-[0.68rem] uppercase tracking-[0.16em] text-ink transition hover:text-wine 2xl:mt-10 2xl:text-[0.72rem] 2xl:tracking-[0.18em]"
-            data-shutter-key="cellar.cta"
+            data-content-key="cellar.cta"
           >
             <CtaLabel>{cellar.cta}</CtaLabel>
           </a>
@@ -973,7 +973,7 @@ function VineyardVisual({
     >
       <figure
         className="absolute left-1/2 top-1/2 h-full w-[70%] max-w-[680px] -translate-x-1/2 -translate-y-1/2 overflow-hidden md:w-[76%] lg:inset-0 lg:w-full lg:max-w-none lg:translate-x-0 lg:translate-y-0"
-        data-shutter-key={`vineyard.states.${index}.primaryImage`}
+        data-content-key={`vineyard.states.${index}.primaryImage`}
       >
         <Image
           src={state.primaryImage.src}
@@ -1001,13 +1001,13 @@ function VineyardCopy({
     >
       <h2
         className="max-w-[12ch] font-menu text-[clamp(2.35rem,8vw,2.625rem)] font-normal uppercase leading-[1.08] text-paper lg:text-[2.625rem]"
-        data-shutter-key={`vineyard.states.${index}.headline`}
+        data-content-key={`vineyard.states.${index}.headline`}
       >
         {state.headline}
       </h2>
       <figure
         className="relative mt-10 h-[180px] w-[150px] overflow-hidden shadow-[0_24px_70px_rgba(0,0,0,0.32)] md:mt-12 md:h-[260px] md:w-[217px]"
-        data-shutter-key={`vineyard.states.${index}.secondaryImage`}
+        data-content-key={`vineyard.states.${index}.secondaryImage`}
       >
         <Image
           src={state.secondaryImage.src}
@@ -1019,7 +1019,7 @@ function VineyardCopy({
       </figure>
       <p
         className="mt-9 max-w-[620px] font-menu text-[0.92rem] leading-[1.58] text-paper/82 md:mt-10 md:text-[1rem] md:leading-[1.75] 2xl:mt-11 2xl:max-w-[651px] 2xl:text-[1.08rem] 2xl:leading-[1.85]"
-        data-shutter-key={`vineyard.states.${index}.body`}
+        data-content-key={`vineyard.states.${index}.body`}
       >
         {state.body}
       </p>
@@ -1173,7 +1173,7 @@ function VineyardScrollSection({
     >
       <SectionReference
         marker={marker}
-        shutterKey="menu.sections.vigna.referenceId"
+        contentKey="menu.sections.vigna.referenceId"
         tone="dark"
       />
 
@@ -1429,7 +1429,7 @@ function MemoryHorizontalSection({
     >
       <SectionReference
         marker={marker}
-        shutterKey="menu.sections.memoria.referenceId"
+        contentKey="menu.sections.memoria.referenceId"
         tone="dark"
       />
 
@@ -1474,7 +1474,7 @@ function MemoryHorizontalSection({
             <figure
               data-memory-image
               className={`pointer-events-none relative shrink-0 overflow-hidden shadow-[0_28px_70px_rgba(0,0,0,0.38)] ${imageLayout}`}
-              data-shutter-key={`memory.items.${index}.image`}
+              data-content-key={`memory.items.${index}.image`}
               aria-hidden="true"
             >
               <Image
@@ -1493,19 +1493,19 @@ function MemoryHorizontalSection({
             >
               <p
                 className="font-menu text-[1.1rem] leading-none text-paper md:text-[1.35rem]"
-                data-shutter-key={`memory.items.${index}.number`}
+                data-content-key={`memory.items.${index}.number`}
               >
                 ({item.number})
               </p>
               <h3
                 className="mt-2 font-menu text-[0.72rem] uppercase leading-[1.08] text-paper md:text-[0.82rem]"
-                data-shutter-key={`memory.items.${index}.headline`}
+                data-content-key={`memory.items.${index}.headline`}
               >
                 {item.headline}
               </h3>
               <p
                 className="mt-2 max-w-[245px] font-menu text-[0.68rem] leading-[1.25] text-paper/84 md:text-[0.76rem]"
-                data-shutter-key={`memory.items.${index}.body`}
+                data-content-key={`memory.items.${index}.body`}
               >
                 {item.body}
               </p>
@@ -1531,10 +1531,10 @@ function MemoryHorizontalSection({
 
 function SectionReference({
   marker,
-  shutterKey,
+  contentKey,
 }: {
   marker: LandingSectionMarker;
-  shutterKey?: string;
+  contentKey?: string;
   tone?: "light" | "dark";
 }) {
   const id = marker.referenceId;
@@ -1543,7 +1543,7 @@ function SectionReference({
     <span
       id={id}
       className="pointer-events-none absolute left-0 top-0 h-px w-px scroll-mt-36 overflow-hidden opacity-0"
-      data-shutter-key={shutterKey}
+      data-content-key={contentKey}
       aria-hidden="true"
     />
   );
@@ -1628,7 +1628,7 @@ function SiteMenu({
                 <a
                   key={item.href}
                   className="whitespace-nowrap transition-opacity hover:opacity-65"
-                  data-shutter-key={`navigation.${index}.label`}
+                  data-content-key={`navigation.${index}.label`}
                   href={item.href}
                 >
                   {item.label}
@@ -1687,7 +1687,7 @@ function SiteMenu({
                 <a
                   key={item.href}
                   className="border border-current/12 px-3 py-2.5 text-center transition hover:bg-current/8"
-                  data-shutter-key={`navigation.${index}.label`}
+                  data-content-key={`navigation.${index}.label`}
                   href={item.href}
                   onClick={() => setIsMenuOpen(false)}
                 >
@@ -1717,7 +1717,7 @@ function SiteMenu({
               />
               <p
                 className="font-menu text-[0.68rem] font-bold uppercase leading-none tracking-[0.14em] md:text-[0.72rem] 2xl:text-sm 2xl:tracking-[0.16em]"
-                data-shutter-key={`menu.sections.${menuState.activeSection}.menuLabel`}
+                data-content-key={`menu.sections.${menuState.activeSection}.menuLabel`}
               >
                 {menuState.sectionLabel}
               </p>
@@ -2244,7 +2244,7 @@ export default function LandingPage({ content }: LandingPageProps) {
         >
           <SectionReference
             marker={content.menu.sections.hero}
-            shutterKey="menu.sections.hero.referenceId"
+            contentKey="menu.sections.hero.referenceId"
             tone="dark"
           />
           <div className="absolute inset-0 opacity-[0.68]">
@@ -2272,7 +2272,7 @@ export default function LandingPage({ content }: LandingPageProps) {
                   data-hero-reveal
                   data-hero-text
                   className="mx-auto max-w-[46ch] font-menu text-[clamp(1.1rem,1.82vw,2rem)] font-normal leading-[1.05] text-paper md:leading-[1] 2xl:max-w-[58ch] 2xl:text-[clamp(1.2rem,2.1vw,2.25rem)]"
-                  data-shutter-key="hero.headline"
+                  data-content-key="hero.headline"
                 >
                   {renderHeroStatement()}
                 </h1>
@@ -2288,7 +2288,7 @@ export default function LandingPage({ content }: LandingPageProps) {
         >
           <SectionReference
             marker={content.menu.sections.tenuta}
-            shutterKey="menu.sections.tenuta.referenceId"
+            contentKey="menu.sections.tenuta.referenceId"
           />
           <div className="mx-auto max-w-[1560px]">
             <div
@@ -2298,14 +2298,14 @@ export default function LandingPage({ content }: LandingPageProps) {
               <h2
                 data-tenuta-heading
                 className="relative z-30 mx-auto mb-4 max-w-full text-center font-snell text-[clamp(1.8rem,3.55vw,2.625rem)] font-normal uppercase leading-[0.95] text-ink md:mb-5 2xl:text-[2.625rem]"
-                data-shutter-key="introduction.headline"
+                data-content-key="introduction.headline"
               >
                 {content.introduction.headline}
               </h2>
               <div
                 className="relative z-20 h-[58vw] min-h-[320px] w-full overflow-hidden outline-none md:h-[590px]"
                 data-tenuta-visual
-                data-shutter-key="introduction.videoPlaceholder"
+                data-content-key="introduction.videoPlaceholder"
               >
                 <div
                   className="absolute inset-0 z-0 overflow-hidden"
@@ -2380,13 +2380,13 @@ export default function LandingPage({ content }: LandingPageProps) {
                 data-tenuta-copy
                 className="relative z-30 mx-auto mt-8 max-w-[720px] text-center font-menu text-sm leading-7 text-ink/68 md:text-base"
               >
-                <p data-shutter-key="introduction.body">
+                <p data-content-key="introduction.body">
                   {content.introduction.body}
                 </p>
                 <a
                   href="#spumanti"
                   className="mt-8 inline-flex items-center font-menu text-[0.72rem] uppercase tracking-[0.18em] text-ink transition hover:text-wine"
-                  data-shutter-key="introduction.cta"
+                  data-content-key="introduction.cta"
                 >
                   <CtaLabel>{content.introduction.cta}</CtaLabel>
                 </a>
@@ -2402,7 +2402,7 @@ export default function LandingPage({ content }: LandingPageProps) {
         >
             <SectionReference
               marker={content.menu.sections.corallo}
-              shutterKey="menu.sections.corallo.referenceId"
+              contentKey="menu.sections.corallo.referenceId"
               tone="dark"
             />
           <div className="mx-auto max-w-[1560px]">
