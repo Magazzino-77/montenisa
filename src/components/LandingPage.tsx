@@ -1190,11 +1190,11 @@ function VineyardScrollSection({
         data-vineyard-desktop
         className="relative hidden h-[100svh] min-h-[640px] overflow-hidden md:block lg:min-h-[700px] 2xl:min-h-[760px]"
       >
-        <div className="mx-auto grid h-full max-w-[1560px] grid-cols-2 gap-20">
+        <div className="mx-auto grid h-full max-w-[1560px] grid-cols-2 gap-0">
           {(["left", "right"] as const).map((side) => (
             <div
               key={`vineyard-column-${side}`}
-              className="relative h-full overflow-hidden"
+              className="relative h-full w-full overflow-hidden"
               data-vineyard-desktop-column={side}
             >
               {states.map((state, index) => {
