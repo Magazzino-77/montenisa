@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { type MouseEvent, useEffect, useRef, useState } from "react";
+import { type MouseEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
@@ -152,17 +152,102 @@ function splitIntoBalancedLines(text: string, lineCount = 3) {
   return lines.slice(0, lineCount);
 }
 
-function ThreeLineProductCopy({
-  children,
-}: {
-  children: string;
-}) {
-  const lines = splitIntoBalancedLines(children);
+function TwoLineProductCopy({ children }: { children: string }) {
+  const containerRef = useRef<HTMLSpanElement>(null);
+  const [lines, setLines] = useState<[string, string]>(() => {
+    const [first = "", second = ""] = splitIntoBalancedLines(children, 2);
+    return [first, second];
+  });
+  const [fontSize, setFontSize] = useState<number | null>(null);
+  const [linesFit, setLinesFit] = useState(false);
+
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    if (!container) {
+      return;
+    }
+
+    const fitLines = () => {
+      const width = container.clientWidth;
+      if (width <= 0) {
+        return;
+      }
+
+      const words = children.trim().split(/\s+/);
+      if (words.length < 2) {
+        setLines([children, ""]);
+        setFontSize(null);
+        setLinesFit(false);
+        return;
+      }
+
+      const style = getComputedStyle(container);
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+      if (!context) {
+        return;
+      }
+
+      const baseSize = Number.parseFloat(style.fontSize);
+      const fontFamily = style.fontFamily;
+      const fontWeight = style.fontWeight;
+
+      for (let size = baseSize; size >= 12; size -= 0.5) {
+        context.font = `${fontWeight} ${size}px ${fontFamily}`;
+
+        let bestSplit: [string, string] | null = null;
+        let bestBalance = Number.POSITIVE_INFINITY;
+
+        for (let split = 1; split < words.length; split += 1) {
+          const firstLine = words.slice(0, split).join(" ");
+          const secondLine = words.slice(split).join(" ");
+          const firstWidth = context.measureText(firstLine).width;
+          const secondWidth = context.measureText(secondLine).width;
+
+          if (firstWidth <= width && secondWidth <= width) {
+            const balance = Math.abs(firstWidth - secondWidth);
+            if (balance < bestBalance) {
+              bestBalance = balance;
+              bestSplit = [firstLine, secondLine];
+            }
+          }
+        }
+
+        if (bestSplit) {
+          setLines(bestSplit);
+          setFontSize(size === baseSize ? null : size);
+          setLinesFit(true);
+          return;
+        }
+      }
+
+      const [first = "", second = ""] = splitIntoBalancedLines(children, 2);
+      setLines([first, second]);
+      setFontSize(null);
+      setLinesFit(false);
+    };
+
+    fitLines();
+
+    const observer = new ResizeObserver(fitLines);
+    observer.observe(container);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [children]);
 
   return (
-    <span className="block">
+    <span
+      ref={containerRef}
+      className="block w-full"
+      style={fontSize ? { fontSize: `${fontSize}px` } : undefined}
+    >
       {lines.map((line, index) => (
-        <span key={`${line}-${index}`} className="block">
+        <span
+          key={`${line}-${index}`}
+          className={linesFit ? "block whitespace-nowrap" : "block"}
+        >
           {line}
         </span>
       ))}
@@ -358,7 +443,7 @@ function ProductGallerySlider({
                 goToPrevious();
               }
             }}
-            className="absolute left-[-0.8rem] top-1/2 z-30 grid h-[58px] w-[58px] -translate-y-1/2 place-items-center opacity-82 transition hover:opacity-100 md:left-[-3.2rem] md:h-[64px] md:w-[64px] 2xl:left-[-4.5rem] 2xl:h-[91px] 2xl:w-[91px]"
+            className="absolute left-[-2rem] top-1/2 z-30 grid h-[58px] w-[58px] -translate-y-1/2 place-items-center opacity-82 transition hover:opacity-100 md:left-[-5rem] md:h-[64px] md:w-[64px] lg:left-[-6rem] 2xl:left-[-8rem] 2xl:h-[91px] 2xl:w-[91px]"
             aria-label="Previous image"
           >
             <Image
@@ -381,7 +466,7 @@ function ProductGallerySlider({
                 goToNext();
               }
             }}
-            className="absolute right-[-0.8rem] top-1/2 z-30 grid h-[58px] w-[58px] -translate-y-1/2 place-items-center opacity-82 transition hover:opacity-100 md:right-[-3.2rem] md:h-[64px] md:w-[64px] 2xl:right-[-4.5rem] 2xl:h-[91px] 2xl:w-[91px]"
+            className="absolute right-[-2rem] top-1/2 z-30 grid h-[58px] w-[58px] -translate-y-1/2 place-items-center opacity-82 transition hover:opacity-100 md:right-[-5rem] md:h-[64px] md:w-[64px] lg:right-[-6rem] 2xl:right-[-8rem] 2xl:h-[91px] 2xl:w-[91px]"
             aria-label="Next image"
           >
             <Image
@@ -397,10 +482,10 @@ function ProductGallerySlider({
         {activeSlide.body ? (
           <p
             data-reveal
-            className="mx-auto mt-5 flex min-h-[66px] w-full max-w-[920px] items-center justify-center text-center font-menu text-[16px] leading-[22px] text-paper/82 md:mt-6"
+            className="mx-auto mt-5 flex min-h-[44px] w-full max-w-[920px] items-center justify-center text-center font-menu text-[16px] leading-[22px] text-paper/82 md:mt-6"
             data-content-key={`product.slides.${activeIndex}.body`}
           >
-            <ThreeLineProductCopy>{activeSlide.body}</ThreeLineProductCopy>
+            <TwoLineProductCopy>{activeSlide.body}</TwoLineProductCopy>
           </p>
         ) : null}
 
@@ -453,9 +538,9 @@ function ProductGallerySlider({
                   src={slide.thumbnail.src}
                   alt={slide.thumbnail.alt}
                   fill
-                  sizes="(min-width: 1536px) 640px, (min-width: 768px) 42vw, 70vw"
+                  sizes="(min-width: 1536px) 420px, (min-width: 768px) 26vw, 45vw"
                   className={`object-cover transition duration-700 ${
-                    isActive ? "scale-105" : "scale-100 group-hover:scale-105"
+                    isActive ? "scale-100" : "scale-100 group-hover:scale-105"
                   }`}
                 />
                 {!isActive ? (
