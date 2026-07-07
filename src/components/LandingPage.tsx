@@ -306,17 +306,20 @@ function ProductGallerySlider({
         }));
 
   return (
-    <div ref={sliderRootRef} className="contents">
+    <div
+      ref={sliderRootRef}
+      className="mx-auto flex w-full flex-col items-center text-center"
+    >
       <h2
         ref={headlineRef}
-        className="font-menu text-[clamp(2rem,3.25vw,2.5rem)] font-normal uppercase leading-none text-paper 2xl:text-[2.5rem]"
+        className="w-full text-center font-menu text-[clamp(2rem,3.25vw,2.5rem)] font-normal uppercase leading-none text-paper 2xl:text-[2.5rem]"
         data-shutter-key={`product.slides.${activeIndex}.headline`}
       >
         {activeSlide.headline}
       </h2>
 
       <div
-        className="mx-auto w-full max-w-[1280px]"
+        className="mx-auto flex w-full max-w-[1280px] flex-col items-center text-center"
         data-active-slide={activeIndex}
         data-product-slider
       >
@@ -394,14 +397,20 @@ function ProductGallerySlider({
         {activeSlide.body ? (
           <p
             data-reveal
-            className="mx-auto mt-5 flex min-h-[66px] max-w-[920px] items-center justify-center font-menu text-[16px] leading-[22px] text-paper/82 md:mt-6"
+            className="mx-auto mt-5 flex min-h-[66px] w-full max-w-[920px] items-center justify-center text-center font-menu text-[16px] leading-[22px] text-paper/82 md:mt-6"
             data-shutter-key={`product.slides.${activeIndex}.body`}
           >
             <ThreeLineProductCopy>{activeSlide.body}</ThreeLineProductCopy>
           </p>
         ) : null}
 
-        <div className="relative left-1/2 mt-7 flex w-screen -translate-x-1/2 items-center justify-center gap-8 overflow-hidden md:mt-8 md:gap-14 2xl:mt-10">
+        <div
+          className="product-thumb-stage relative mt-7 w-screen overflow-hidden md:mt-8 2xl:mt-10"
+          style={{
+            marginLeft: "calc(50% - 50vw)",
+            marginRight: "calc(50% - 50vw)",
+          }}
+        >
           {visibleThumbs.map(({ slide, index, offset }) => {
             const isActive = activeIndex === index;
             const sideOverlay =
@@ -426,10 +435,12 @@ function ProductGallerySlider({
                     setActiveIndex(index);
                   }
                 }}
-                className={`group relative shrink-0 overflow-hidden transition duration-500 ${
-                  isActive
-                    ? "aspect-[2157/1458] w-[min(70vw,520px)] md:w-[min(46vw,640px)] lg:w-[min(44vw,640px)]"
-                    : "aspect-[2157/1458] w-[min(46vw,320px)] md:w-[min(26vw,390px)] lg:w-[min(24vw,430px)]"
+                className={`group product-thumb ${
+                  offset < 0
+                    ? "product-thumb--side product-thumb--prev"
+                    : offset > 0
+                      ? "product-thumb--side product-thumb--next"
+                      : "product-thumb--active"
                 } ${
                   isActive
                     ? "opacity-100"
@@ -1306,7 +1317,7 @@ function MemoryHorizontalSection({
 
     return Math.max(maxRight, panelLayout.left + 760);
   }, 0);
-  const trackWidth = Math.max(5000, layoutRightEdge + 900);
+  const trackWidth = layoutRightEdge + 800;
 
   useEffect(() => {
     const stage = stageRef.current;
@@ -1324,28 +1335,33 @@ function MemoryHorizontalSection({
         return;
       }
 
-      const getTrackWidth = () => {
-        const panels = gsap.utils.toArray<HTMLElement>(
+      const getPanels = () =>
+        gsap.utils.toArray<HTMLElement>(
           stage.querySelectorAll("[data-memory-slot]"),
         );
-        const contentRight = panels.reduce(
-          (maxRight, panel) =>
-            Math.max(maxRight, panel.offsetLeft + panel.offsetWidth),
-          0,
-        );
+      const getTravelDistance = () => {
+        const panels = getPanels();
+        const lastPanel = panels.at(-1);
 
-        return Math.max(
-          track.scrollWidth,
-          contentRight + Math.min(window.innerWidth * 0.55, 720),
-          window.innerWidth,
-        );
+        if (!lastPanel) {
+          return 0;
+        }
+
+        const lastPanelCenter = lastPanel.offsetLeft + lastPanel.offsetWidth / 2;
+        const finalCenter = window.innerWidth * 0.55;
+
+        return Math.max(0, lastPanelCenter - finalCenter);
       };
-      const getDistance = () => Math.max(0, getTrackWidth() - window.innerWidth);
+      const getScrollLength = () => {
+        const travelDistance = getTravelDistance();
+
+        return Math.max(travelDistance * 1.5, window.innerHeight * 3.15);
+      };
       const timeline = gsap.timeline({
         scrollTrigger: {
           trigger: stage,
           start: "top top",
-          end: () => `+=${Math.max(getDistance(), 4600)}`,
+          end: () => `+=${getScrollLength()}`,
           pin: true,
           scrub: 0.9,
           anticipatePin: 1,
@@ -1357,7 +1373,7 @@ function MemoryHorizontalSection({
       timeline.to(
         track,
         {
-          x: () => -getDistance(),
+          x: () => -getTravelDistance(),
           duration: items.length,
           ease: "none",
         },
@@ -1366,7 +1382,7 @@ function MemoryHorizontalSection({
       timeline.to(
         words,
         {
-          x: () => getDistance() * 0.18,
+          x: () => getTravelDistance() * 0.18,
           force3D: true,
           duration: items.length,
           ease: "none",
