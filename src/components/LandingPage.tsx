@@ -116,6 +116,39 @@ function CtaLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
+const TENUTA_ARCH_MASK = {
+  viewBox: { width: 1200, height: 700 },
+  initial: {
+    left: { x: 100, y: 320, radius: 150, right: 400, bottom: 650 },
+    center: { x: 450, y: 300, radius: 150, right: 750, bottom: 650 },
+    right: { x: 800, y: 320, radius: 150, right: 1100, bottom: 650 },
+  },
+} as const;
+
+function archMaskPath({
+  x,
+  y,
+  radius,
+  right,
+  bottom = 650,
+}: {
+  x: number;
+  y: number;
+  radius: number;
+  right: number;
+  bottom?: number;
+}) {
+  const { width, height } = TENUTA_ARCH_MASK.viewBox;
+  const nx = x / width;
+  const nright = right / width;
+  const ny = y / height;
+  const nbottom = bottom / height;
+  const nrx = radius / width;
+  const nry = radius / height;
+
+  return `M${nx} ${nbottom} L${nx} ${ny} A${nrx} ${nry} 0 0 1 ${nright} ${ny} L${nright} ${nbottom} Z`;
+}
+
 function splitIntoBalancedLines(text: string, lineCount = 3) {
   const words = text.trim().split(/\s+/);
   const totalLength = words.reduce((sum, word) => sum + word.length, 0);
@@ -2099,6 +2132,9 @@ export default function LandingPage({ content }: LandingPageProps) {
           const tenutaVisual = tenutaStage.querySelector<HTMLElement>(
             "[data-tenuta-visual]",
           );
+          const tenutaVisualMotion = tenutaStage.querySelector<HTMLElement>(
+            "[data-tenuta-visual-motion]",
+          );
           const tenutaText = gsap.utils.toArray<HTMLElement>(
             "[data-tenuta-heading]",
             tenutaStage,
@@ -2117,20 +2153,8 @@ export default function LandingPage({ content }: LandingPageProps) {
               '[data-tenuta-mask-opening="right"]',
             ),
           };
-          const archPath = ({
-            x,
-            y,
-            radius,
-            right,
-            bottom = 650,
-          }: {
-            x: number;
-            y: number;
-            radius: number;
-            right: number;
-            bottom?: number;
-          }) =>
-            `M${x} ${bottom} L${x} ${y} A${radius} ${radius} 0 0 1 ${right} ${y} L${right} ${bottom} Z`;
+          const archPath = archMaskPath;
+          const { initial: initialArchMask } = TENUTA_ARCH_MASK;
           const interpolate = (from: number, to: number, progress: number) =>
             from + (to - from) * progress;
           const tenutaMaskEase = gsap.parseEase("power2.inOut");
@@ -2141,31 +2165,31 @@ export default function LandingPage({ content }: LandingPageProps) {
             maskOpenings.left?.setAttribute(
               "d",
               archPath({
-                x: interpolate(82, -620, sideProgress),
-                y: interpolate(320, 180, sideProgress),
-                radius: interpolate(150, 300, sideProgress),
-                right: interpolate(382, -110, sideProgress),
-                bottom: interpolate(650, 820, sideProgress),
+                x: interpolate(initialArchMask.left.x, -620, sideProgress),
+                y: interpolate(initialArchMask.left.y, 180, sideProgress),
+                radius: interpolate(initialArchMask.left.radius, 300, sideProgress),
+                right: interpolate(initialArchMask.left.right, -110, sideProgress),
+                bottom: interpolate(initialArchMask.left.bottom, 820, sideProgress),
               }),
             );
             maskOpenings.center?.setAttribute(
               "d",
               archPath({
-                x: interpolate(450, -320, centerProgress),
-                y: interpolate(300, -560, centerProgress),
-                radius: interpolate(150, 920, centerProgress),
-                right: interpolate(750, 1520, centerProgress),
+                x: interpolate(initialArchMask.center.x, -320, centerProgress),
+                y: interpolate(initialArchMask.center.y, -560, centerProgress),
+                radius: interpolate(initialArchMask.center.radius, 920, centerProgress),
+                right: interpolate(initialArchMask.center.right, 1520, centerProgress),
                 bottom: centerBottom,
               }),
             );
             maskOpenings.right?.setAttribute(
               "d",
               archPath({
-                x: interpolate(818, 1310, sideProgress),
-                y: interpolate(320, 180, sideProgress),
-                radius: interpolate(150, 300, sideProgress),
-                right: interpolate(1118, 1820, sideProgress),
-                bottom: interpolate(650, 820, sideProgress),
+                x: interpolate(initialArchMask.right.x, 1310, sideProgress),
+                y: interpolate(initialArchMask.right.y, 180, sideProgress),
+                radius: interpolate(initialArchMask.right.radius, 300, sideProgress),
+                right: interpolate(initialArchMask.right.right, 1820, sideProgress),
+                bottom: interpolate(initialArchMask.right.bottom, 820, sideProgress),
               }),
             );
           };
@@ -2246,7 +2270,7 @@ export default function LandingPage({ content }: LandingPageProps) {
           };
           tenutaTimeline
             .fromTo(
-              tenutaVisual ?? tenutaStage,
+              tenutaVisualMotion ?? tenutaVisual ?? tenutaStage,
               { x: 0, y: 0, scale: 1 },
               {
                 x: () => getTenutaTargetFrame().x,
@@ -2301,14 +2325,6 @@ export default function LandingPage({ content }: LandingPageProps) {
                 overflow: "hidden",
                 duration: 0.16,
                 ease: "power1.out",
-              },
-              0,
-            )
-            .to(
-              "[data-tenuta-mask-surface]",
-              {
-                opacity: 0.92,
-                ease: "none",
               },
               0,
             );
@@ -2386,7 +2402,7 @@ export default function LandingPage({ content }: LandingPageProps) {
         <section
           id="tenuta"
           data-section="tenuta"
-          className="relative overflow-hidden bg-paper px-5 pb-0 pt-12 md:px-8 md:pt-16"
+          className="relative bg-paper px-5 pb-0 pt-12 md:px-8 md:pt-16"
         >
           <SectionReference
             marker={content.menu.sections.tenuta}
@@ -2405,77 +2421,60 @@ export default function LandingPage({ content }: LandingPageProps) {
                 {content.introduction.headline}
               </h2>
               <div
-                className="relative z-20 mb-[-1px] h-[58vw] min-h-[320px] w-full overflow-hidden outline-none md:h-[590px]"
+                className="relative z-20 mb-[-1px] aspect-[1200/700] w-full min-h-[320px] outline-none"
                 data-tenuta-visual
                 data-content-key="introduction.videoPlaceholder"
               >
-                <div
-                  className="absolute inset-0 z-0 overflow-hidden"
-                  data-tenuta-video
-                  aria-hidden="true"
-                >
-                  <Image
-                    src="/images/tenuta-arches-static.png"
-                    alt={content.introduction.image!.alt}
-                    fill
-                    priority
-                    sizes="100vw"
-                    className="scale-105 object-cover object-[50%_52%]"
-                  />
+                <div className="absolute inset-0" data-tenuta-visual-motion>
+                  <svg
+                    className="pointer-events-none absolute h-0 w-0 overflow-hidden"
+                    viewBox={`0 0 ${TENUTA_ARCH_MASK.viewBox.width} ${TENUTA_ARCH_MASK.viewBox.height}`}
+                    aria-hidden="true"
+                  >
+                    <defs>
+                      <mask
+                        id="tenuta-arch-openings"
+                        maskUnits="objectBoundingBox"
+                        maskContentUnits="objectBoundingBox"
+                      >
+                        <rect width="1" height="1" fill="black" />
+                        <path
+                          data-tenuta-mask-opening="left"
+                          d={archMaskPath(TENUTA_ARCH_MASK.initial.left)}
+                          fill="white"
+                        />
+                        <path
+                          data-tenuta-mask-opening="center"
+                          d={archMaskPath(TENUTA_ARCH_MASK.initial.center)}
+                          fill="white"
+                        />
+                        <path
+                          data-tenuta-mask-opening="right"
+                          d={archMaskPath(TENUTA_ARCH_MASK.initial.right)}
+                          fill="white"
+                        />
+                      </mask>
+                    </defs>
+                  </svg>
                   <div
-                    className="absolute inset-0 bg-ink"
-                    data-tenuta-video-shade
-                  />
+                    className="absolute inset-0 z-0 overflow-visible mask-[url(#tenuta-arch-openings)] mask-position-center mask-no-repeat [-webkit-mask-image:url(#tenuta-arch-openings)] [-webkit-mask-position:center] [-webkit-mask-repeat:no-repeat]"
+                    data-tenuta-video
+                    aria-hidden="true"
+                  >
+                    <Image
+                      src="/images/tenuta-arches-static.png"
+                      alt={content.introduction.image!.alt}
+                      fill
+                      priority
+                      sizes="(min-width: 768px) 1120px, 100vw"
+                      className="object-cover object-center"
+                    />
+                    <div
+                      className="absolute inset-0 bg-ink"
+                      data-tenuta-video-shade
+                    />
+                  </div>
                 </div>
-                <svg
-                  className="pointer-events-none absolute -inset-[1px] z-10 h-[calc(100%+2px)] w-[calc(100%+2px)]"
-                  viewBox="0 0 1200 700"
-                  preserveAspectRatio="none"
-                  aria-hidden="true"
-                >
-                  <defs>
-                    <mask
-                      id="tenuta-arch-openings"
-                      maskUnits="userSpaceOnUse"
-                      x="-1800"
-                      y="-1800"
-                      width="4800"
-                      height="3600"
-                    >
-                      <rect
-                        x="-1800"
-                        y="-1800"
-                        width="4800"
-                        height="3600"
-                        fill="white"
-                      />
-                      <path
-                        data-tenuta-mask-opening="left"
-                        d="M82 650 L82 320 A150 150 0 0 1 382 320 L382 650 Z"
-                        fill="black"
-                      />
-                      <path
-                        data-tenuta-mask-opening="center"
-                        d="M450 650 L450 300 A150 150 0 0 1 750 300 L750 650 Z"
-                        fill="black"
-                      />
-                      <path
-                        data-tenuta-mask-opening="right"
-                        d="M818 650 L818 320 A150 150 0 0 1 1118 320 L1118 650 Z"
-                        fill="black"
-                      />
-                    </mask>
-                  </defs>
-                  <rect
-                    data-tenuta-mask-surface
-                    x="-1800"
-                    y="-1800"
-                    width="4800"
-                    height="3600"
-                    fill="var(--paper)"
-                    mask="url(#tenuta-arch-openings)"
-                  />
-                </svg>
               </div>
 
               <div
