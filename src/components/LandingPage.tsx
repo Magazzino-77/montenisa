@@ -1170,21 +1170,6 @@ function VineyardScrollSection({
       return;
     }
 
-    const desktopInner = stage.querySelector<HTMLElement>(
-      "[data-vineyard-desktop-inner]",
-    );
-    const syncVineyardHeaderInset = () => {
-      const headerHeight =
-        document.querySelector<HTMLElement>("header")?.offsetHeight ?? 72;
-
-      if (desktopInner) {
-        desktopInner.style.paddingTop = `${headerHeight}px`;
-      }
-    };
-
-    syncVineyardHeaderInset();
-    window.addEventListener("resize", syncVineyardHeaderInset);
-
     const ctx = gsap.context(() => {
       const copyLayers = states
         .map((_, index) =>
@@ -1291,7 +1276,6 @@ function VineyardScrollSection({
     }, stage);
 
     return () => {
-      window.removeEventListener("resize", syncVineyardHeaderInset);
       ctx.revert();
     };
   }, [states]);
