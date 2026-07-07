@@ -1215,21 +1215,21 @@ const mergeByIndex = <T extends Record<string, unknown>>(
     return fallback;
   }
 
-  return items.map((item, index) => ({
+  const merged = items.map((item, index) => ({
     ...fallback[index],
     ...(isRecord(item) ? withoutUndefined(item) : {}),
   })) as T[];
+
+  return merged.length < fallback.length
+    ? [...merged, ...fallback.slice(merged.length)]
+    : merged;
 };
 
 const mergeProductSlides = (
   fallback: ProductSlide[],
   content: unknown,
 ): ProductSlide[] => {
-  const merged = mergeByIndex(fallback, content) as ProductSlide[];
-
-  return merged.length < fallback.length
-    ? [...merged, ...fallback.slice(merged.length)]
-    : merged;
+  return mergeByIndex(fallback, content) as ProductSlide[];
 };
 
 const mergeSectionMarkers = (
