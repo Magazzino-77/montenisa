@@ -116,6 +116,60 @@ function CtaLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
+function splitIntoBalancedLines(text: string, lineCount = 3) {
+  const words = text.trim().split(/\s+/);
+  const totalLength = words.reduce((sum, word) => sum + word.length, 0);
+  const targetLength = Math.max(1, totalLength / lineCount);
+  const lines: string[] = [];
+  let currentLine = "";
+
+  words.forEach((word) => {
+    const nextLine = currentLine ? `${currentLine} ${word}` : word;
+    const remainingLines = lineCount - lines.length - 1;
+
+    if (
+      currentLine &&
+      lines.length < lineCount - 1 &&
+      nextLine.length >= targetLength &&
+      remainingLines > 0
+    ) {
+      lines.push(currentLine);
+      currentLine = word;
+      return;
+    }
+
+    currentLine = nextLine;
+  });
+
+  if (currentLine) {
+    lines.push(currentLine);
+  }
+
+  while (lines.length < lineCount) {
+    lines.push("");
+  }
+
+  return lines.slice(0, lineCount);
+}
+
+function ThreeLineProductCopy({
+  children,
+}: {
+  children: string;
+}) {
+  const lines = splitIntoBalancedLines(children);
+
+  return (
+    <span className="block">
+      {lines.map((line, index) => (
+        <span key={`${line}-${index}`} className="block">
+          {line}
+        </span>
+      ))}
+    </span>
+  );
+}
+
 function ProductGallerySlider({
   slides,
 }: {
@@ -340,14 +394,14 @@ function ProductGallerySlider({
         {activeSlide.body ? (
           <p
             data-reveal
-            className="mx-auto mt-5 max-w-[720px] font-menu text-[0.76rem] leading-6 text-paper/82 md:mt-6 md:text-sm md:leading-7"
+            className="mx-auto mt-5 flex min-h-[66px] max-w-[920px] items-center justify-center font-menu text-[16px] leading-[22px] text-paper/82 md:mt-6"
             data-shutter-key={`product.slides.${activeIndex}.body`}
           >
-            {activeSlide.body}
+            <ThreeLineProductCopy>{activeSlide.body}</ThreeLineProductCopy>
           </p>
         ) : null}
 
-        <div className="mx-auto mt-7 flex w-screen max-w-none items-center justify-center gap-8 overflow-hidden md:mt-8 md:gap-14 2xl:mt-10">
+        <div className="relative left-1/2 mt-7 flex w-screen -translate-x-1/2 items-center justify-center gap-8 overflow-hidden md:mt-8 md:gap-14 2xl:mt-10">
           {visibleThumbs.map(({ slide, index, offset }) => {
             const isActive = activeIndex === index;
             const sideOverlay =
@@ -374,8 +428,8 @@ function ProductGallerySlider({
                 }}
                 className={`group relative shrink-0 overflow-hidden transition duration-500 ${
                   isActive
-                    ? "aspect-[2157/1458] w-[min(70vw,520px)] md:w-[min(42vw,640px)]"
-                    : "aspect-[2157/1458] w-[min(46vw,320px)] md:w-[min(28vw,430px)]"
+                    ? "aspect-[2157/1458] w-[min(70vw,520px)] md:w-[min(46vw,640px)] lg:w-[min(44vw,640px)]"
+                    : "aspect-[2157/1458] w-[min(46vw,320px)] md:w-[min(26vw,390px)] lg:w-[min(24vw,430px)]"
                 } ${
                   isActive
                     ? "opacity-100"
@@ -941,7 +995,7 @@ function VineyardCopy({
         {state.headline}
       </h2>
       <figure
-        className="relative mt-7 h-[180px] w-[150px] overflow-hidden shadow-[0_24px_70px_rgba(0,0,0,0.32)] md:mt-8 md:h-[260px] md:w-[217px]"
+        className="relative mt-10 h-[180px] w-[150px] overflow-hidden shadow-[0_24px_70px_rgba(0,0,0,0.32)] md:mt-12 md:h-[260px] md:w-[217px]"
         data-shutter-key={`vineyard.states.${index}.secondaryImage`}
       >
         <Image
@@ -953,14 +1007,14 @@ function VineyardCopy({
         />
       </figure>
       <p
-        className="mt-6 max-w-[620px] font-menu text-[0.92rem] leading-[1.58] text-paper/82 md:mt-7 md:text-[1rem] md:leading-[1.75] 2xl:mt-8 2xl:max-w-[651px] 2xl:text-[1.08rem] 2xl:leading-[1.85]"
+        className="mt-9 max-w-[620px] font-menu text-[0.92rem] leading-[1.58] text-paper/82 md:mt-10 md:text-[1rem] md:leading-[1.75] 2xl:mt-11 2xl:max-w-[651px] 2xl:text-[1.08rem] 2xl:leading-[1.85]"
         data-shutter-key={`vineyard.states.${index}.body`}
       >
         {state.body}
       </p>
       <a
         href="#tenuta"
-        className="mt-7 inline-flex items-center font-menu text-[0.72rem] uppercase tracking-[0.18em] text-paper/72 transition hover:text-paper 2xl:mt-8"
+        className="mt-9 inline-flex items-center font-menu text-[0.72rem] uppercase tracking-[0.18em] text-paper/72 transition hover:text-paper md:mt-10 2xl:mt-11"
       >
         <CtaLabel>Esplora la tenuta</CtaLabel>
       </a>
@@ -1244,7 +1298,15 @@ function MemoryHorizontalSection({
 }) {
   const stageRef = useRef<HTMLElement>(null);
   const items = memory.items;
-  const trackWidth = Math.max(5000, items.length * 620 + 1200);
+  const layoutRightEdge = items.reduce((maxRight, _item, index) => {
+    const panelLayout =
+      memoryPanelLayouts[index % memoryPanelLayouts.length] ?? {
+        left: 410 + index * 720,
+      };
+
+    return Math.max(maxRight, panelLayout.left + 760);
+  }, 0);
+  const trackWidth = Math.max(5000, layoutRightEdge + 900);
 
   useEffect(() => {
     const stage = stageRef.current;
@@ -1263,7 +1325,9 @@ function MemoryHorizontalSection({
       }
 
       const getTrackWidth = () => {
-        const panels = gsap.utils.toArray<HTMLElement>("[data-memory-slot]");
+        const panels = gsap.utils.toArray<HTMLElement>(
+          stage.querySelectorAll("[data-memory-slot]"),
+        );
         const contentRight = panels.reduce(
           (maxRight, panel) =>
             Math.max(maxRight, panel.offsetLeft + panel.offsetWidth),
