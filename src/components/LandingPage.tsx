@@ -117,7 +117,7 @@ function CtaLabel({ children }: { children: React.ReactNode }) {
 }
 
 const TENUTA_ARCH_MASK = {
-  viewBox: { width: 1200, height: 700 },
+  viewBox: { x: 0, y: 130, width: 1200, height: 540 },
   maskExtent: { x: -1800, y: -1800, width: 4800, height: 3600 },
   initial: {
     left: { x: 82, y: 320, radius: 150, right: 382, bottom: 650 },
@@ -1419,34 +1419,34 @@ function VineyardScrollSection({
 }
 
 const memoryImageLayouts = [
-  "h-[min(23vh,184px)] w-[min(18vh,146px)]",
-  "h-[min(28vh,224px)] w-[min(17vh,136px)]",
-  "h-[min(25vh,200px)] w-[min(17vh,136px)]",
-  "h-[min(23vh,184px)] w-[min(18vh,144px)]",
-  "h-[min(27vh,216px)] w-[min(18vh,144px)]",
-  "h-[min(22vh,176px)] w-[min(17vh,136px)]",
+  "h-[min(29vh,230px)] w-[min(22vh,182px)]",
+  "h-[min(34vh,280px)] w-[min(21vh,170px)]",
+  "h-[min(31vh,250px)] w-[min(21vh,170px)]",
+  "h-[min(29vh,230px)] w-[min(22vh,180px)]",
+  "h-[min(33vh,270px)] w-[min(22vh,180px)]",
+  "h-[min(27vh,220px)] w-[min(21vh,170px)]",
 ];
 
 const memoryWordLayouts = [
   {
     text: "Memoria",
     className:
-      "left-[120px] top-[38vh] text-[12rem] opacity-[0.9] md:text-[14rem] lg:text-[16rem] 2xl:top-[37vh] 2xl:text-[19.5rem]",
+      "left-[120px] top-[30vh] text-[12rem] opacity-[0.9] md:text-[14rem] lg:text-[16rem] 2xl:top-[30vh] 2xl:text-[18rem]",
   },
   {
     text: "viva",
     className:
-      "left-[900px] top-[56vh] text-[11.5rem] opacity-[0.9] md:text-[13.5rem] lg:text-[15rem] 2xl:top-[57vh] 2xl:text-[18.5rem]",
+      "left-[900px] top-[62vh] text-[11.5rem] opacity-[0.9] md:text-[13.5rem] lg:text-[15rem] 2xl:top-[62vh] 2xl:text-[17.5rem]",
   },
   {
     text: "il sogno",
     className:
-      "left-[1510px] top-[38vh] text-[11.5rem] opacity-[0.9] md:text-[13.5rem] lg:text-[15rem] 2xl:top-[37vh] 2xl:text-[18.5rem]",
+      "left-[1510px] top-[30vh] text-[11.5rem] opacity-[0.9] md:text-[13.5rem] lg:text-[15rem] 2xl:top-[30vh] 2xl:text-[17.5rem]",
   },
   {
     text: "delle bollicine",
     className:
-      "left-[2120px] top-[56vh] text-[11rem] opacity-[0.9] md:text-[13rem] lg:text-[14.5rem] 2xl:top-[57vh] 2xl:text-[17.5rem]",
+      "left-[2120px] top-[62vh] text-[11rem] opacity-[0.9] md:text-[13rem] lg:text-[14.5rem] 2xl:top-[62vh] 2xl:text-[17rem]",
   },
 ];
 
@@ -1630,7 +1630,7 @@ function MemoryHorizontalSection({
         <div
           data-memory-words
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 font-menu font-normal uppercase leading-[0.75] text-white will-change-transform"
+          className="pointer-events-none absolute inset-0 font-menu font-normal uppercase leading-[0.9] text-white will-change-transform"
         >
           {memoryWordLayouts.map((word) => (
             <span
@@ -1670,7 +1670,7 @@ function MemoryHorizontalSection({
                 src={item.image.src}
                 alt={item.image.alt}
                 fill
-                sizes="(min-width: 768px) 240px, 54vw"
+                sizes="(min-width: 768px) 300px, 60vw"
                 className="object-cover"
               />
             </figure>
@@ -1678,22 +1678,22 @@ function MemoryHorizontalSection({
           const memoryText = (
             <article
               data-memory-panel
-              className="max-w-[260px] text-paper"
+              className="max-w-[320px] text-paper"
             >
               <p
-                className="font-menu text-[1.1rem] leading-none text-paper md:text-[1.35rem]"
+                className="font-menu text-[1.35rem] leading-none text-paper md:text-[1.7rem]"
                 data-content-key={`memory.items.${index}.number`}
               >
                 ({item.number})
               </p>
               <h3
-                className="mt-2 font-menu text-[0.72rem] uppercase leading-[1.08] text-paper md:text-[0.82rem]"
+                className="mt-2.5 font-menu text-[0.9rem] uppercase leading-[1.12] text-paper md:text-[1.05rem]"
                 data-content-key={`memory.items.${index}.headline`}
               >
                 {item.headline}
               </h3>
               <p
-                className="mt-2 max-w-[245px] font-menu text-[0.68rem] leading-[1.25] text-paper/84 md:text-[0.76rem]"
+                className="mt-2.5 max-w-[300px] font-menu text-[0.84rem] leading-[1.32] text-paper/84 md:text-[0.95rem]"
                 data-content-key={`memory.items.${index}.body`}
               >
                 {item.body}
@@ -1776,7 +1776,7 @@ function SiteMenu({
       className={`fixed inset-x-0 top-0 z-40 ${tone.background} ${tone.text} transition-colors duration-500`}
       data-menu-theme={menuState.isDark ? "dark" : "light"}
     >
-      <div className="mx-auto max-w-[1568px] px-5 pt-3 md:px-8 md:pt-4 2xl:pt-7">
+      <div className="mx-auto max-w-[1568px] px-5 pt-0 md:px-8">
         <div className="relative flex h-[64px] items-center justify-between md:h-[68px] 2xl:h-[80px]">
           <a
             href="#top"
@@ -2456,7 +2456,7 @@ export default function LandingPage({ content }: LandingPageProps) {
         <section
           id="tenuta"
           data-section="tenuta"
-          className="relative bg-paper px-5 pb-0 pt-12 md:px-8 md:pt-16"
+          className="relative bg-paper px-5 pb-0 pt-0 md:px-8"
         >
           <SectionReference
             marker={content.menu.sections.tenuta}
@@ -2464,18 +2464,18 @@ export default function LandingPage({ content }: LandingPageProps) {
           />
           <div className="mx-auto max-w-[1560px]">
             <div
-              className="relative mx-auto w-full max-w-[1120px]"
+              className="relative mx-auto flex min-h-[100svh] w-full max-w-[1120px] flex-col items-center justify-center"
               data-tenuta-reveal
             >
               <h2
                 data-tenuta-heading
-                className="relative z-30 mx-auto mb-4 max-w-full text-center font-snell text-[clamp(1.8rem,3.55vw,2.625rem)] font-normal uppercase leading-[0.95] text-ink md:mb-5 2xl:text-[2.625rem]"
+                className="relative z-30 mx-auto mb-2 max-w-full text-center font-snell text-[clamp(1.8rem,3.55vw,2.625rem)] font-normal uppercase leading-[0.95] text-ink md:mb-3 2xl:text-[2.625rem]"
                 data-content-key="introduction.headline"
               >
                 {content.introduction.headline}
               </h2>
               <div
-                className="relative z-20 aspect-[1200/700] w-full min-h-[320px] overflow-hidden outline-none"
+                className="relative z-20 mx-auto aspect-[1200/540] w-full min-h-[260px] max-w-[760px] overflow-hidden outline-none"
                 data-tenuta-visual
                 data-content-key="introduction.videoPlaceholder"
               >
@@ -2499,7 +2499,7 @@ export default function LandingPage({ content }: LandingPageProps) {
                 </div>
                 <svg
                   className="pointer-events-none absolute -inset-px z-10 h-[calc(100%+2px)] w-[calc(100%+2px)]"
-                  viewBox={`0 0 ${TENUTA_ARCH_MASK.viewBox.width} ${TENUTA_ARCH_MASK.viewBox.height}`}
+                  viewBox={`${TENUTA_ARCH_MASK.viewBox.x} ${TENUTA_ARCH_MASK.viewBox.y} ${TENUTA_ARCH_MASK.viewBox.width} ${TENUTA_ARCH_MASK.viewBox.height}`}
                   preserveAspectRatio="none"
                   aria-hidden="true"
                 >
@@ -2550,14 +2550,14 @@ export default function LandingPage({ content }: LandingPageProps) {
 
               <div
                 data-tenuta-copy
-                className="relative z-30 mx-auto mt-8 max-w-[720px] text-center font-menu text-sm leading-7 text-ink/68 md:text-base"
+                className="relative z-30 mx-auto mt-6 max-w-[720px] text-center font-menu text-sm leading-7 text-ink/68 md:text-base"
               >
                 <p data-content-key="introduction.body">
                   {content.introduction.body}
                 </p>
                 <a
                   href="#spumanti"
-                  className="mt-8 inline-flex items-center font-menu text-[0.72rem] uppercase tracking-[0.18em] text-ink transition hover:text-wine"
+                  className="mt-6 inline-flex items-center font-menu text-[0.72rem] uppercase tracking-[0.18em] text-ink transition hover:text-wine"
                   data-content-key="introduction.cta"
                 >
                   <CtaLabel>{content.introduction.cta}</CtaLabel>
