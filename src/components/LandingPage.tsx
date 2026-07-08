@@ -398,23 +398,24 @@ function ProductGallerySlider({
     setActiveIndex((current) =>
       current === safeSlides.length - 1 ? 0 : current + 1,
     );
-  const visibleThumbs =
-    safeSlides.length > 2
-      ? [-1, 0, 1].map((offset) => {
-          const index =
-            (activeIndex + offset + safeSlides.length) % safeSlides.length;
+  const total = safeSlides.length;
+  const centerSlot = Math.floor((total - 1) / 2);
+  const visibleThumbs = Array.from({ length: total }, (_, slot) => {
+    const offset = slot - centerSlot;
+    const index = (activeIndex + offset + total) % total;
 
-          return {
-            index,
-            offset,
-            slide: safeSlides[index],
-          };
-        })
-      : safeSlides.map((slide, index) => ({
-          index,
-          offset: index === activeIndex ? 0 : index < activeIndex ? -1 : 1,
-          slide,
-        }));
+    return {
+      index,
+      offset,
+      slide: safeSlides[index],
+    };
+  });
+  const leftCount = visibleThumbs.filter((thumb) => thumb.offset < 0).length;
+  const rightCount = visibleThumbs.filter((thumb) => thumb.offset > 0).length;
+  // Balance the row with empty spacers on the shorter side so the active
+  // thumbnail always sits dead-center in the section, even with an even count.
+  const spacersLeft = Math.max(0, rightCount - leftCount);
+  const spacersRight = Math.max(0, leftCount - rightCount);
 
   return (
     <div
@@ -477,7 +478,7 @@ function ProductGallerySlider({
               alt=""
               width={91}
               height={91}
-              className="h-[64px] w-[64px] max-w-none object-contain 2xl:h-[91px] 2xl:w-[91px]"
+              className="h-[52px] w-[52px] max-w-none object-contain 2xl:h-[74px] 2xl:w-[74px]"
             />
           </button>
           <button
@@ -500,7 +501,7 @@ function ProductGallerySlider({
               alt=""
               width={91}
               height={91}
-              className="h-[64px] w-[64px] max-w-none rotate-180 object-contain 2xl:h-[91px] 2xl:w-[91px]"
+              className="h-[52px] w-[52px] max-w-none rotate-180 object-contain 2xl:h-[74px] 2xl:w-[74px]"
             />
           </button>
         </div>
@@ -522,6 +523,13 @@ function ProductGallerySlider({
             marginRight: "calc(50% - 50vw)",
           }}
         >
+          {Array.from({ length: spacersLeft }).map((_, spacerIndex) => (
+            <span
+              key={`thumb-spacer-left-${spacerIndex}`}
+              className="product-thumb-spacer"
+              aria-hidden="true"
+            />
+          ))}
           {visibleThumbs.map(({ slide, index, offset }) => {
             const isActive = activeIndex === index;
             const sideOverlay =
@@ -564,7 +572,7 @@ function ProductGallerySlider({
                   src={slide.thumbnail.src}
                   alt={slide.thumbnail.alt}
                   fill
-                  sizes="(min-width: 1536px) 420px, (min-width: 768px) 26vw, 45vw"
+                  sizes="(min-width: 768px) 17vw, 30vw"
                   className={`object-cover transition duration-700 ${
                     isActive ? "scale-100" : "scale-100 group-hover:scale-105"
                   }`}
@@ -585,6 +593,13 @@ function ProductGallerySlider({
               </button>
             );
           })}
+          {Array.from({ length: spacersRight }).map((_, spacerIndex) => (
+            <span
+              key={`thumb-spacer-right-${spacerIndex}`}
+              className="product-thumb-spacer"
+              aria-hidden="true"
+            />
+          ))}
         </div>
 
         <a
@@ -634,11 +649,23 @@ function ArchiveChapterSection({
         "[data-archive-float]",
         stage,
       );
+      const copyFrame = stage.querySelector<HTMLElement>(
+        "[data-archive-copy-frame]",
+      );
+      // Natural height of a given copy layer, independent of the frame's
+      // current (possibly animated) height, so the gap between text and CTA
+      // stays constant while the CTA follows the active state.
+      const getLayerHeight = (index: number) =>
+        copyLayers[index]?.offsetHeight ?? 0;
 
       gsap.set(stateLayers, { autoAlpha: 0 });
       gsap.set(copyLayers, { autoAlpha: 0, y: 28 });
       gsap.set(stateLayers[0], { autoAlpha: 1 });
       gsap.set(copyLayers[0], { autoAlpha: 1, y: 0 });
+
+      if (copyFrame) {
+        gsap.set(copyFrame, { height: () => getLayerHeight(0) });
+      }
 
       // Idle drift lives on an inner wrapper so it never competes with the
       // scroll-driven entrance transform on [data-archive-object].
@@ -715,6 +742,19 @@ function ArchiveChapterSection({
           },
           transitionStart + 0.08,
         );
+        if (copyFrame) {
+          // Resize the copy frame to the incoming state so the CTA below keeps
+          // a constant gap and simply shifts with the changing text height.
+          timeline.to(
+            copyFrame,
+            {
+              height: () => getLayerHeight(index),
+              duration: 0.45,
+              ease: "power2.out",
+            },
+            transitionStart + 0.08,
+          );
+        }
         timeline.fromTo(
           `[data-archive-state="${index}"] [data-archive-object]`,
           { y: 120, autoAlpha: 0 },
@@ -800,7 +840,7 @@ function ArchiveChapterSection({
         </div>
 
         <div className="relative z-10 mx-auto w-full max-w-[1180px] text-center">
-          <div className="relative min-h-[clamp(16rem,35vw,24rem)] 2xl:min-h-[clamp(18rem,42vw,28rem)]">
+          <div data-archive-copy-frame className="relative">
             {states.map((state, stateIndex) => (
               <div
                 key={`archive-copy-${stateIndex}`}
@@ -875,6 +915,14 @@ function CellarChapterSection({
         "[data-cellar-object]",
         stage,
       );
+      const copyFrame = stage.querySelector<HTMLElement>(
+        "[data-cellar-copy-frame]",
+      );
+      // Natural height of a given copy layer, independent of the frame's
+      // current (possibly animated) height, so the gap between text and CTA
+      // stays constant while the CTA follows the active state.
+      const getLayerHeight = (index: number) =>
+        copyLayers[index]?.offsetHeight ?? 0;
 
       gsap.set(stateLayers, { autoAlpha: 1 });
       gsap.set(copyLayers, { autoAlpha: 0, y: 28 });
@@ -887,6 +935,10 @@ function CellarChapterSection({
       });
       gsap.set(stateLayers[0], { autoAlpha: 1 });
       gsap.set(copyLayers[0], { autoAlpha: 1, y: 0 });
+
+      if (copyFrame) {
+        gsap.set(copyFrame, { height: () => getLayerHeight(0) });
+      }
 
       if (reduceMotion) {
         gsap.set(cellarObjects.slice(0, 3), {
@@ -972,6 +1024,20 @@ function CellarChapterSection({
             { autoAlpha: 1, y: 0, duration: 0.45, ease: "power2.out" },
             at + 0.08,
           );
+
+        if (copyFrame) {
+          // Resize the copy frame to the incoming state so the CTA below keeps
+          // a constant gap and simply shifts with the changing text height.
+          timeline.to(
+            copyFrame,
+            {
+              height: () => getLayerHeight(next),
+              duration: 0.45,
+              ease: "power2.out",
+            },
+            at + 0.08,
+          );
+        }
       };
 
       fadeCopy(0, 1, objectInterval * 3);
@@ -1031,7 +1097,7 @@ function CellarChapterSection({
         </div>
 
         <div className="relative z-10 mx-auto w-full max-w-[1180px] text-center">
-          <div className="relative min-h-[clamp(10rem,24vw,16rem)] 2xl:min-h-[clamp(11rem,24vw,22rem)]">
+          <div data-cellar-copy-frame className="relative">
             {states.map((state, stateIndex) => (
               <div
                 key={`cellar-copy-${stateIndex}`}
@@ -1365,22 +1431,22 @@ const memoryWordLayouts = [
   {
     text: "Memoria",
     className:
-      "left-[120px] top-[38vh] text-[7.8rem] opacity-[0.9] md:text-[9.2rem] lg:text-[10.4rem] 2xl:top-[37vh] 2xl:text-[12.8rem]",
+      "left-[120px] top-[38vh] text-[12rem] opacity-[0.9] md:text-[14rem] lg:text-[16rem] 2xl:top-[37vh] 2xl:text-[19.5rem]",
   },
   {
     text: "viva",
     className:
-      "left-[900px] top-[56vh] text-[7.4rem] opacity-[0.9] md:text-[8.8rem] lg:text-[10rem] 2xl:top-[57vh] 2xl:text-[12rem]",
+      "left-[900px] top-[56vh] text-[11.5rem] opacity-[0.9] md:text-[13.5rem] lg:text-[15rem] 2xl:top-[57vh] 2xl:text-[18.5rem]",
   },
   {
     text: "il sogno",
     className:
-      "left-[1510px] top-[38vh] text-[7.4rem] opacity-[0.9] md:text-[8.8rem] lg:text-[10rem] 2xl:top-[37vh] 2xl:text-[12rem]",
+      "left-[1510px] top-[38vh] text-[11.5rem] opacity-[0.9] md:text-[13.5rem] lg:text-[15rem] 2xl:top-[37vh] 2xl:text-[18.5rem]",
   },
   {
     text: "delle bollicine",
     className:
-      "left-[2120px] top-[56vh] text-[7.2rem] opacity-[0.9] md:text-[8.5rem] lg:text-[9.6rem] 2xl:top-[57vh] 2xl:text-[11.5rem]",
+      "left-[2120px] top-[56vh] text-[11rem] opacity-[0.9] md:text-[13rem] lg:text-[14.5rem] 2xl:top-[57vh] 2xl:text-[17.5rem]",
   },
 ];
 
@@ -1711,7 +1777,7 @@ function SiteMenu({
       data-menu-theme={menuState.isDark ? "dark" : "light"}
     >
       <div className="mx-auto max-w-[1568px] px-5 pt-3 md:px-8 md:pt-4 2xl:pt-7">
-        <div className="relative flex h-[64px] items-center justify-between md:h-[68px] md:items-end md:pb-4 2xl:h-[80px] 2xl:pb-5">
+        <div className="relative flex h-[64px] items-center justify-between md:h-[68px] 2xl:h-[80px]">
           <a
             href="#top"
             className="relative block h-[32px] w-[158px] shrink-0 md:h-[37px] md:w-[180px] 2xl:h-[41px] 2xl:w-[200px]"
