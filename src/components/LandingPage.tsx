@@ -2336,7 +2336,7 @@ export default function LandingPage({ content }: LandingPageProps) {
             );
 
             tenutaVideo.style.clipPath = clipPath;
-            tenutaVideo.style.webkitClipPath = clipPath;
+            tenutaVideo.style.setProperty("-webkit-clip-path", clipPath);
           };
 
           const setTenutaPinActive = (active: boolean) => {
