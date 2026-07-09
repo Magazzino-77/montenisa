@@ -118,8 +118,8 @@ a {
 
 .archive-grid {
   background-image:
-    linear-gradient(45deg, rgba(16, 16, 17, 0.055) 1px, transparent 1px),
-    linear-gradient(-45deg, rgba(16, 16, 17, 0.045) 1px, transparent 1px);
+    linear-gradient(45deg, rgba(16, 16, 17, 0.14) 1px, transparent 1px),
+    linear-gradient(-45deg, rgba(16, 16, 17, 0.12) 1px, transparent 1px);
   background-size: 116px 116px;
 }
 

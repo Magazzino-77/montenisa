@@ -424,7 +424,7 @@ function ProductGallerySlider({
     >
       <h2
         ref={headlineRef}
-        className="w-full text-center font-menu text-[clamp(2rem,3.25vw,2.5rem)] font-normal uppercase leading-none text-paper 2xl:text-[2.5rem]"
+        className="mb-6 w-full text-center font-menu text-[clamp(2rem,3.25vw,2.5rem)] font-normal uppercase leading-none text-paper md:mb-8 2xl:text-[2.5rem]"
         data-content-key={`product.slides.${activeIndex}.headline`}
       >
         {activeSlide.headline}
@@ -799,7 +799,7 @@ function ArchiveChapterSection({
         contentKey="menu.sections.archive.referenceId"
       />
       <div
-        className="pointer-events-none absolute inset-0 z-0 overflow-hidden opacity-[0.18] mix-blend-multiply"
+        className="pointer-events-none absolute inset-0 z-0 overflow-hidden opacity-[0.48] mix-blend-multiply"
         aria-hidden="true"
       >
         <Image
