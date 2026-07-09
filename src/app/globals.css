@@ -123,6 +123,13 @@ a {
   background-size: 116px 116px;
 }
 
+html.tenuta-pin-active,
+html.tenuta-pin-active body,
+html.tenuta-pin-active .grain,
+.grain.tenuta-pin-active {
+  overflow: visible !important;
+}
+
 .menu-row-scroll {
   scrollbar-width: none;
 }
